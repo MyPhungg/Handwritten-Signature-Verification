@@ -7,6 +7,7 @@ class NhanVien:
         self.MaNV = MaNV
         self.Ho = Ho
         self.Ten = Ten
+    
 
 class AccountNV:
     def __init__(self, MaTK: str, MatKhau: str, TenDangNhap: str, IDLogin: str):
@@ -34,8 +35,10 @@ class KhachHang:
         self.NgayHetHanCCCD = NgayHetHanCCCD
         try:
             self.NgayHetHanCCCD = datetime.strptime(NgayHetHanCCCD,"%Y-%m-%d").date()
+            if NgayHetHanCCCD<NgayCapCCCD:
+                raise ValueError("Lỗi! Ngày hết hạn CCCD không phù hợp.")
         except ValueError:
-            raise ValueError("Lỗi nhạp ngày không đúng đinh định dạng YYYY-MM-DD.")
+            raise ValueError("Lỗi nhập ngày không đúng đinh định dạng YYYY-MM-DD.")
         try:
             ngay_sinh = datetime.strptime(NgaySinh,"%Y-%m-%d").date()
             today = date.today()
@@ -52,7 +55,6 @@ class AccountKH:
         self.IDLogin = IDLogin
 
 class TaiKhoan:
-
     def __init__(self, MaTK: str, LoaiTK: str, SoDu: str):
         self.MaTK = MaTK
         self.LoaiTK = LoaiTK
@@ -73,7 +75,7 @@ class LichSuGiaoDich:
         self.HinhThuc = HinhThuc
         try:
             ngaygd = datetime.strptime(NgayGD,"%Y-%m-%d").date()
-            today = date.todat()
+            today = date.today()
             if ngaygd > today:
                 raise ValueError("Ngày giao dịch không được vuọt quá hôm nay.")
             self.NgayGD = ngaygd
@@ -82,11 +84,6 @@ class LichSuGiaoDich:
     
 
 class CapBacKhachHang:
-    MaCapBac
-    NgayTao
-    MucDatDuoc
-    TenCapBac
-    MaNVQL
     def __init__(self, MaCapBac: str, NgayTao: str, MucDatDuoc: str, TenCapBac: str, MaNVQL: str):
         self.MaCapBac = MaCapBac
         self.MacDatDuoc = Decimal(MucDatDuoc)
@@ -117,12 +114,10 @@ class KhuyenMai:
             raise ValueError("Lỗi nhập không đúng định dạng YYYY-MM-DD.")
 
 class ChiTietKhuyenMai:
-    def __int__(self, MaCapBac: str, MaKM: str):
+    def __init__ (self, MaCapBac: str, MaKM: str):
         self.MaCapBac = MaCapBac
         self.MaKM = MaKM
 
-class QuanLyUuDai:
-    
 class QuanLyNhanVien:
 
 class QuanLyKhachHang:
@@ -131,4 +126,3 @@ class QuanLyCapBacThe:
 
 class QuanLyTaiKhoan:
     
-
