@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ưu đãi - Ngân hàng</title>
+    <link rel="stylesheet" href="offers.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body class="offers-page">
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#">Trang chủ</a></li>
+                    <li><a href="#">Về chúng tôi</a></li>
+                    <li><a href="{{ url_for('logout') }}" class="logout-link"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+                </ul>
+            </nav>
+        </header>
+        <!--sidebar-->
+        <div class="offers-content">
+            <h3></h3>
+            <div class="placeholder">
+                slide bar
+            </div>
+        </div>
+        <footer class="footer">
+            <p class="footer-title"><strong><h2>Các ưu đãy gần đây</h2></strong></p>
+        </footer>
+        <!-- Main Content -->
+        <main>    
+            <ul class="offers-list">
+                <!-- cập nhật thông tin tu database : cần chỉnh sửa-->
+                <li>Miễn phí chuyển khoản trong vòng 30 ngày đầu tiên <span class="status">[Tình trạng: Hàng ngày]</span></li>
+                <li>Miễn phí chuyển khoản trong vòng 60 ngày đầu tiên <span class="status">[Tình trạng: Hàng ngày]</span></li>
+                <li>Miễn phí chuyển khoản trong vòng 90 ngày đầu tiên <span class="status">[Tình trạng: Hàng ngày]</span></li>
+                <li>Miễn phí chuyển khoản trong vòng 120 ngày đầu tiên <span class="status">[Tình trạng: Hàng ngày]</span></li>
+                <li>Miễn phí chuyển khoản trong vòng 150 ngày đầu tiên <span class="status">[Tình trạng: Hàng ngày]</span></li>
+                <li>Miễn phí chuyển khoản trong vòng 180 ngày đầu tiên <span class="status">[Tình trạng: Hàng ngày]</span></li>
+            </ul>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="footer-title"><strong>VỀ CHÚNG TÔI</strong></p>
+            <p>ABC là công ty xử lý chuyển tiền đầu tiên tại Việt Nam. Được thành lập năm 2013 với sứ mệnh xử lý chuyển tiền nhanh, chính xác, an toàn, minh bạch và hỗ trợ khách hàng 24/7. Được cấp phép bởi Ngân hàng Nhà nước Việt Nam.</p>
+            <p class="footer-copyright">© 2023 ABC Company. All Rights Reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
