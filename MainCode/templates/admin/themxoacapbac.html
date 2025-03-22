@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm/Xóa Cấp bậc</title>
+    <link rel="stylesheet" href="../css/themxoauudai.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="offers-page">
+    <div class="container">
+        <!-- Header Buttons -->
+        <div class="header-buttons">
+            <input type="text" id="search-input" class="search-input" name="search-input"
+                placeholder="Nhập từ khóa tìm kiếm... ">
+            <button class="btn search-btn">Tìm kiếm</button>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-container">
+            <div class="action-row">
+                <div class="action-buttons">
+                    <button class="btn add-btn">Thêm</button>
+                    <button class="btn delete-btn">Xóa</button>
+                </div>
+            </div>
+            <div class="table-header">
+                <span>Mã cấp bậc</span>
+                <span>Tên cấp bậc</span>
+                <span>Mô tả sơ lược</span>
+            </div>
+            <ul class="offers-list">
+                <li>
+                    <input type="checkbox" name="offer-select" value="{{ offer.ma_cap_bac }}">
+                    <span>ma cap bac</span>
+                    <span>ten cap bac</span>
+                    <span>danh cho nhung ...</span>
+                </li>
+            </ul>
+            <ul class="offers-list">
+                <li>
+                    <input type="checkbox" name="offer-select" value="{{ offer.ma_cap_bac }}">
+                    <span>ma cap bac</span>
+                    <span>ten cap bac</span>
+                    <span>danh cho nhung...</span>
+                </li>
+            </ul>
+            <!-- du tru khi co database
+            <ul class="offers-list">
+                {% for offer in offers %}
+                    <li>
+                        <input type="checkbox" name="offer-select" value="{{ offer.ma_cap_bac }}">
+                        <span>{{ offer.ma_cap_bac }}</span>
+                        <span>{{ offer.ten_cap_bac }}</span>
+                        <span>{{ offer.noi_dung }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        -->
+        </div>
+    </div>
+</body>
+
+</html>
