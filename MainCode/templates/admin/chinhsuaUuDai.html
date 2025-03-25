@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giao diện Nhân Viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chinhSuaUuDai.css') }}">
+</head>
+
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <a href="{{ url_for('auth.login') }}"><i class="fa-solid fa-right-from-bracket fa-lg"></i></a>
+            <div class="text-center mb-3">
+                <div class="rounded-circle bg-primary text-white"
+                    style="width: 80px; height: 80px; line-height: 80px; margin: auto;">A</div>
+                <p class="mt-2">Nhân viên A</p>
+            </div>
+            <a href="{{ url_for('home.chinhsua_kh') }}">
+                <div class="menu-item">Khách hàng</div>
+            </a>
+            <a href="{{ url_for('home.chinhsua_uudai') }}">
+                <div class="menu-item">Ưu đãi</div>
+            </a>
+            <a href="{{ url_for('home.chinhsua_capbac') }}">
+                <div class="menu-item">Bậc thành viên</div>
+            </a>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+            <h4 class="text-muted">Ưu đãi</h4>
+
+            <!-- Thông báo từ Flask -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="card p-3">
+                <!-- Form chứa nút xóa -->
+                <form method="POST" action="{{ url_for('home.xoa_uudai') }}">
+                    <div class="d-flex">
+                        <input type="text" class="form-control me-2" placeholder="Tìm kiếm tên ưu đãi...">
+                        <button class="btn btn-primary">Tìm kiếm</button>
+                        <a href="{{ url_for('home.them_uudai') }}" class="btn btn-success ms-2">Thêm</a>
+                        <button type="submit" class="btn btn-danger ms-2">Xóa</button>
+                    </div>
+
+                    <table class="table table-striped mt-3">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Mã ưu đãi</th>
+                                <th>Tên ưu đãi</th>
+                                <th>Bậc thành viên</th>
+                                <th>Hành động</th>
+                                <th>Chọn để xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for uu_dai in uu_dai_list %}
+                            <tr>
+                                <td>{{ uu_dai.MaKM }}</td>
+                                <td>{{ uu_dai.NoiDung }}</td>
+                                <td>{{ uu_dai.capbackh.TenCapBac}}</td>
+                                <td>
+                                    <a href="{{ url_for('home.chi_tiet_uudai', maKM=uu_dai.MaKM) }}" class="btn btn-info">
+                                        Xem chi tiết
+                                    </a>
+                                </td>
+                                <td>
+                                    <input type="checkbox" name="xoa_uu_dai" value="{{ uu_dai.MaKM }}">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

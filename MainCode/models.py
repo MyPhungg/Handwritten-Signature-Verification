@@ -92,10 +92,12 @@ class KhuyenMai(db.Model):
     ThoiGian = db.Column(db.Date, nullable=False)
     LoaiTKApDung = db.Column(db.String(10), db.ForeignKey(
         'loaitk.MaLoai'), nullable=False)
+    CapBacThanhVien = db.Column(db.String(10), db.ForeignKey('capbackh.MaCapBac'), nullable=True)
     LoaiKM = db.Column(db.String(50), nullable=False)
     GiaTriKM = db.Column(db.Integer, nullable=False)
-
+    
     loaitk = db.relationship('LoaiTK', backref='khuyenmai')
+    capbackh = db.relationship('CapBacKH', backref='khuyenmai')
 
 # Model lichsugiaodich
 

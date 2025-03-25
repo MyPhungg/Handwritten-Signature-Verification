@@ -4,21 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sửa cấp bậc</title>
-    <link rel="stylesheet" href="../css/suauudai.css">
+    <title>Sửa Cấp Bậc</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/suauudai.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body class="offers-page">
     <div class="container">
-        <form method="POST" action="{{ url_for('sua_capbac') }}">
+        <!-- Thông báo từ Flask -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('home.sua_cap_bac', maCB=capbac.MaCapBac) }}">
             <div class="input-group">
-                <input type="text" id="ma_cap_bac" name="ma_cap_bac" placeholder="Mã cấp bậc" class="input-field">
-                <input type="text" id="ten_cap_bac" name="ten_cap_bac" placeholder="Tên cấp bậc" class="input-field">
+                <input type="text" id="ma_cap_bac" name="ma_cap_bac" value="{{ capbac.MaCapBac }}" class="input-field" readonly>
+                <input type="text" id="ten_cap_bac" name="ten_cap_bac" value="{{ capbac.TenCapBac }}" placeholder="Tên cấp bậc" class="input-field" required>
+            </div>
+            <div class="input-group">
+                <input type="number" id="muc_dat_duoc" name="muc_dat_duoc" value="{{ capbac.MucDatDuoc }}" placeholder="Mức đạt được" class="input-field" required>
+                <input type="text" id="ngay_tao" name="ngay_tao" value="{{ capbac.NgayTao.strftime('%Y-%m-%d') }}" class="input-field" readonly>
             </div>
             <textarea id="mo_ta" name="mo_ta" placeholder="Mô tả" class="textarea-field"></textarea>
             <div class="select-group">
                 <button type="submit" class="btn sua-btn">Sửa</button>
+                <a href="{{ url_for('home.danh_sach_cap_bac') }}" class="btn back-btn">Quay lại</a>
             </div>
         </form>
     </div>

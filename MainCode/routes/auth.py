@@ -1,22 +1,30 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask import session, flash
-from models import AccountKH, KhachHang
+from models import AccountKH, KhachHang, AccountNV
 auth_bp = Blueprint('auth', __name__)
 
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        account = AccountKH.query.filter_by(
-            TenDangNhap=username, MatKhau=password).first()
-        if account:
-            session['MaKH'] = account.MaKH
-            return redirect(url_for('account.chooseAcc'))
-        else:
-            flash('Tên đăng nhập hoặc mật khẩu không đúng', 'error')
+        username = request.form['username']
+        password = request.form['password']
+        
+        # Kiểm tra tài khoản khách hàng
+        user_kh = AccountKH.query.filter_by(TenDangNhap=username, MatKhau=password).first()
+        if user_kh:
+            session['MaKH'] = user_kh.MaKH
+            flash('Đăng nhập thành công!', 'success')
+            return redirect(url_for('home.home'))
+        
+        # Kiểm tra tài khoản nhân viên (admin)
+        user_nv = AccountNV.query.filter_by(TenDangNhap=username, MatKhau=password).first()
+        if user_nv:
+            session['MaNV'] = user_nv.MaNV
+            flash('Đăng nhập admin thành công!', 'success')
+            return redirect(url_for('home.admin_uudai'))
+        
+        flash('Tên đăng nhập hoặc mật khẩu không đúng!', 'error')
     return render_template('login.html')
 
 

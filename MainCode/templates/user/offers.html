@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ưu đãi - Ngân hàng</title>
-    <link rel="stylesheet" href="../css/offers.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/offers.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -17,10 +17,11 @@
 </head>
 
 <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand " href="#">
-                <img src="/MainCode/img/logoBank.jpg" style="width: 50px; height: 50px; " class="rounded">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='img/logoBank.jpg') }}" style="width: 50px; height: 50px;" class="rounded">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
                 aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,7 +30,7 @@
             <div class="collapse navbar-collapse" id="navbarScroll">
                 <ul class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
                     <li class="nav-item">
-                        <a class="nav-link active text-white" aria-current="page" href="./home.html">Trang chủ</a>
+                        <a class="nav-link active text-white" aria-current="page" href="{{ url_for('home.home') }}">Trang chủ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-white" onclick="location.href='#aboutUs'">Về chúng tôi</a>
@@ -40,103 +41,111 @@
                             Dịch vụ
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="./offers.html">Ưu đãi</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
+                            <li><a class="dropdown-item" href="{{ url_for('home.xem_uudai') }}">Ưu đãi</a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#">Lịch sử giao dịch</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="#">Gửi tiết kiệm</a></li>
                         </ul>
                     </li>
-
                 </ul>
                 <li class="nav-item dropdown d-flex align-items-center">
                     <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
                         <i class="fa-solid fa-user"></i>
                     </a>
-                    <ul class="dropdown-menu  dropdown-menu-end">
-                        <li><a class="dropdown-item" href="../user/infoUser.html">Thông tin tài khoản</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="../login.html">Đăng xuất</a></li>
-                        <li>
-
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{{ url_for('home.inforUser') }}">Thông tin tài khoản</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Đăng xuất</a></li>
                     </ul>
                 </li>
-
-
             </div>
         </div>
-
     </nav>
-    <div class="offers-page">
-        <!--sidebar-->
-        <div class="offers-content">
-            <h3></h3>
-            <div class="placeholder">
-                slide bar
+
+    <!-- Main Content -->
+    <div class="offers-page container mt-5">
+        <!-- Sidebar Placeholder -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="offers-content">
+                    <h3></h3>
+                    <div class="placeholder">
+                        Slide bar
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <!-- Hiển thị thông báo flash (nếu có) -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Tiêu đề và tìm kiếm -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Các ưu đãi gần đây</h2>
+                </div>
+
+                <!-- Danh sách ưu đãi -->
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="offers-list list-group list-group-flush">
+                            {% if uu_dai_list %}
+                                {% for uu_dai in uu_dai_list %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ uu_dai.NoiDung }}</strong><br>
+                                            <small>
+                                                Loại tài khoản áp dụng: {{ uu_dai.LoaiTKApDung }}<br>
+                                                Loại khuyến mãi: {{ uu_dai.LoaiKM }} - Giá trị: {{ uu_dai.GiaTriKM }}<br>
+                                                Hết hạn: {{ uu_dai.ThoiGian.strftime('%Y-%m-%d') }}<br>
+                                                Tình trạng: 
+                                                {% if uu_dai.ThoiGian >= current_date %}
+                                                    <span class="text-success">Hàng ngày</span>
+                                                {% else %}
+                                                    <span class="text-danger">Hết hạn</span>
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="list-group-item text-center">
+                                    Không có ưu đãi nào phù hợp với bạn!
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
-        <footer class="footer">
-            <p class="footer-title"><strong>
-                    <h2>Các ưu đãy gần đây</h2>
-                </strong></p>
-        </footer>
-        <!-- Main Content -->
-        <main>
-            <ul class="offers-list">
-                <!-- cập nhật thông tin tu database : cần chỉnh sửa-->
-                <li>Miễn phí chuyển khoản trong vòng 30 ngày đầu tiên <span class="status">[Tình trạng: Hàng
-                        ngày]</span></li>
-                <li>Miễn phí chuyển khoản trong vòng 60 ngày đầu tiên <span class="status">[Tình trạng: Hàng
-                        ngày]</span></li>
-                <li>Miễn phí chuyển khoản trong vòng 90 ngày đầu tiên <span class="status">[Tình trạng: Hàng
-                        ngày]</span></li>
-                <li>Miễn phí chuyển khoản trong vòng 120 ngày đầu tiên <span class="status">[Tình trạng: Hàng
-                        ngày]</span></li>
-                <li>Miễn phí chuyển khoản trong vòng 150 ngày đầu tiên <span class="status">[Tình trạng: Hàng
-                        ngày]</span></li>
-                <li>Miễn phí chuyển khoản trong vòng 180 ngày đầu tiên <span class="status">[Tình trạng: Hàng
-                        ngày]</span></li>
-            </ul>
-        </main>
     </div>
-    <footer class="bg-dark text-white  py-5">
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5 mt-5">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col">
-                    <p>PyBank là nền tảng ngân
-                        hàng số hiện đại, giúp bạn gửi tiết kiệm, quản lý tài chính và giao dịch mọi lúc, mọi nơi chỉ
-                        với vài thao
-                        tác đơn giản.</p>
-                    <p>💰 Gửi tiết kiệm linh hoạt – Lãi suất hấp dẫn, kỳ hạn đa dạng, giúp bạn tối ưu hóa số tiền nhàn
-                        rỗi.</p>
-                    <p>🔒 An toàn & bảo mật – Công nghệ mã hóa tiên tiến, đảm bảo an toàn tuyệt đối cho tài khoản của
-                        bạn.</p>
-                    <p>🎯 Trải nghiệm thông minh – Giao diện thân thiện, thao tác đơn giản, phù hợp với mọi đối tượng.
-                    </p>
+                    <p>PyBank là nền tảng ngân hàng số hiện đại, giúp bạn gửi tiết kiệm, quản lý tài chính và giao dịch mọi lúc, mọi nơi chỉ với vài thao tác đơn giản.</p>
+                    <p>💰 Gửi tiết kiệm linh hoạt – Lãi suất hấp dẫn, kỳ hạn đa dạng, giúp bạn tối ưu hóa số tiền nhàn rỗi.</p>
+                    <p>🔒 An toàn & bảo mật – Công nghệ mã hóa tiên tiến, đảm bảo an toàn tuyệt đối cho tài khoản của bạn.</p>
+                    <p>🎯 Trải nghiệm thông minh – Giao diện thân thiện, thao tác đơn giản, phù hợp với mọi đối tượng.</p>
                     <p>PyBank – Tiết kiệm thông minh, tài chính vững vàng! 🚀</p>
                 </div>
                 <div class="col">
-                    <p>PyBank - Ngân hàng số thông minh cho tương lai </p>
-                    <p>Địa chỉ: 123 Đường ABC, Quận 1, TP. HCM </p>
+                    <p>PyBank - Ngân hàng số thông minh cho tương lai</p>
+                    <p>Địa chỉ: 123 Đường ABC, Quận 1, TP. HCM</p>
                     <p>Email: support@xyz.com</p>
                     <p>Hotline: 0987 654 321</p>
                 </div>
             </div>
         </div>
-
-        <p style="margin: 2%; text-align: center;">&copy; 2025 Trang Chủ. Mọi quyền được bảo lưu.</p>
-
+        <p style="margin: 2%; text-align: center;">© 2025 Trang Chủ. Mọi quyền được bảo lưu.</p>
     </footer>
 </body>
-
-
-</body>
-
 </html>
