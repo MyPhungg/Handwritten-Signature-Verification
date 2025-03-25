@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th3 22, 2025 lúc 04:25 PM
+-- Thời gian đã tạo: Th3 25, 2025 lúc 09:00 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -104,6 +104,7 @@ CREATE TABLE `capbackh` (
 --
 
 INSERT INTO `capbackh` (`MaCapBac`, `NgayTao`, `MucDatDuoc`, `TenCapBac`) VALUES
+('BC1021', '2025-03-25', 2147483647, 'Ruby'),
 ('CB1', '2025-03-20', 0, 'Thường'),
 ('CB2', '2025-03-20', 20000000, 'Bạc'),
 ('CB3', '2025-03-20', 100000000, 'Vàng'),
@@ -125,7 +126,6 @@ CREATE TABLE `chitietkhuyenmai` (
 --
 
 INSERT INTO `chitietkhuyenmai` (`MaKM`, `MaCapBac`) VALUES
-('KM1', 'CB1'),
 ('KM10', 'CB3'),
 ('KM2', 'CB2'),
 ('KM3', 'CB3'),
@@ -161,31 +161,32 @@ CREATE TABLE `khachhang` (
   `Email` varchar(100) NOT NULL,
   `MaNVQL` varchar(10) NOT NULL,
   `MaCapBac` varchar(10) NOT NULL,
-  `ChuKy` varchar(1000) NOT NULL
+  `ChuKy` varchar(1000) NOT NULL,
+  `ADB` float DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `khachhang`
 --
 
-INSERT INTO `khachhang` (`MaKH`, `HoTen`, `NgaySinh`, `SoCCCD`, `NgayCapCCCD`, `NoiCapCCCD`, `CoGiaTriDen`, `QuocTich`, `DanToc`, `NoiCuTru`, `DiaChiHienTai`, `DiaChiThuongTru`, `GioiTinh`, `SoDienThoai`, `NgheNghiep`, `Email`, `MaNVQL`, `MaCapBac`, `ChuKy`) VALUES
-('KH1', 'Nguyễn Văn A', '1995-06-15', '123456789012', '2020-01-01', 'Hà Nội', '2030-01-01', 'Việt Nam', 'Kinh', 'Hà Nội', 'Hà Nội', 'Hà Nội', 'Nam', '0123456789', 'Kinh doanh', 'a@gmail.com', 'NV1', 'CB1', '00100001.png'),
-('KH10', 'Tạ Thị J', '1983-03-19', '999000111222', '2012-12-05', 'Quảng Nam', '2022-12-05', 'Việt Nam', 'Kinh', 'Quảng Nam', 'Quảng Nam', 'Quảng Nam', 'Nữ', '0988889999', 'Giảng viên', 'j@gmail.com', 'NV8', 'CB4', '00100001.png'),
-('KH11', 'Nguyễn Văn K', '1992-07-14', '112233445566', '2011-07-10', 'Hà Giang', '2021-07-10', 'Việt Nam', 'Kinh', 'Hà Giang', 'Hà Giang', 'Hà Giang', 'Nam', '0999990000', 'Công an', 'k@gmail.com', 'NV1', 'CB1', '00100001.png'),
-('KH12', 'Trần Thị L', '1999-06-21', '667788990011', '2021-01-10', 'Phú Yên', '2031-01-10', 'Việt Nam', 'Kinh', 'Phú Yên', 'Phú Yên', 'Phú Yên', 'Nữ', '0101010101', 'Dược sĩ', 'l@gmail.com', 'NV2', 'CB1', '00100001.png'),
-('KH13', 'Hoàng Văn M', '1993-09-30', '223344556677', '2018-11-20', 'Hậu Giang', '2028-11-20', 'Việt Nam', 'Kinh', 'Hậu Giang', 'Hậu Giang', 'Hậu Giang', 'Nam', '0111112222', 'Kinh doanh', 'm@gmail.com', 'NV9', 'CB1', '00100001.png'),
-('KH14', 'Đinh Thị N', '2001-01-15', '334455667788', '2020-03-25', 'Lào Cai', '2030-03-25', 'Việt Nam', 'Kinh', 'Lào Cai', 'Lào Cai', 'Lào Cai', 'Nữ', '0122223333', 'Sinh viên', 'n@gmail.com', 'NV10', 'CB2', '00100001.png'),
-('KH15', 'Lê Văn O', '1996-05-12', '445566778899', '2016-06-15', 'Đồng Nai', '2026-06-15', 'Việt Nam', 'Kinh', 'Đồng Nai', 'Đồng Nai', 'Đồng Nai', 'Nam', '0133334444', 'Cơ khí', 'o@gmail.com', 'NV3', 'CB2', '00100001.png'),
-('KH16', 'Bùi Thị P', '1990-04-09', '556677889900', '2015-08-05', 'Bình Thuận', '2025-08-05', 'Việt Nam', 'Kinh', 'Bình Thuận', 'Bình Thuận', 'Bình Thuận', 'Nữ', '0144445555', 'Y tá', 'p@gmail.com', 'NV4', 'CB2', '00100001.png'),
-('KH17', 'Phạm Văn Q', '1986-07-17', '667788990011', '2014-09-20', 'Sóc Trăng', '2024-09-20', 'Việt Nam', 'Kinh', 'Sóc Trăng', 'Sóc Trăng', 'Sóc Trăng', 'Nam', '0155556666', 'Công nhân', 'q@gmail.com', 'NV5', 'CB3', '00100001.png'),
-('KH2', 'Trần Thị B', '1998-07-22', '987654321098', '2019-02-20', 'TP.HCM', '2029-02-20', 'Việt Nam', 'Kinh', 'TP.HCM', 'TP.HCM', 'TP.HCM', 'Nữ', '0987654321', 'Nhân viên văn phòng', 'b@gmail.com', 'NV2', 'CB1', '00100001.png'),
-('KH3', 'Lê Văn C', '1990-09-10', '123123123123', '2018-03-10', 'Đà Nẵng', '2028-03-10', 'Việt Nam', 'Kinh', 'Đà Nẵng', 'Đà Nẵng', 'Đà Nẵng', 'Nam', '0909090909', 'Kỹ sư', 'c@gmail.com', 'NV9', 'CB1', '00100001.png'),
-('KH4', '', '1985-05-05', '321321321321', '2017-04-15', 'Cần Thơ', '2027-04-15', 'Việt Nam', 'Kinh', 'Cần Thơ', 'Cần Thơ', 'Cần Thơ', 'Nữ', '0912121212', 'Giáo viên', 'd@gmail.com', 'NV10', 'CB2', '00100001.png'),
-('KH5', 'Hoàng Văn E', '2000-12-30', '111222333444', '2021-06-25', 'Hải Phòng', '2031-06-25', 'Việt Nam', 'Kinh', 'Hải Phòng', 'Hải Phòng', 'Hải Phòng', 'Nam', '0933334444', 'Sinh viên', 'e@gmail.com', 'NV3', 'CB2', '00100001.png'),
-('KH6', 'Ngô Thị F', '1997-04-18', '444333222111', '2016-07-10', 'Nghệ An', '2026-07-10', 'Việt Nam', 'Kinh', 'Nghệ An', 'Nghệ An', 'Nghệ An', 'Nữ', '0944445555', 'Bác sĩ', 'f@gmail.com', 'NV4', 'CB2', '00100001.png'),
-('KH7', 'Đặng Văn G', '1994-11-09', '555666777888', '2015-05-20', 'Huế', '2025-05-20', 'Việt Nam', 'Kinh', 'Huế', 'Huế', 'Huế', 'Nam', '0955556666', 'Nhân viên IT', 'g@gmail.com', 'NV5', 'CB3', '00100001.png'),
-('KH8', 'Lý Thị H', '1991-08-07', '777888999000', '2014-08-30', 'Bắc Ninh', '2024-08-30', 'Việt Nam', 'Kinh', 'Bắc Ninh', 'Bắc Ninh', 'Bắc Ninh', 'Nữ', '0966667777', 'Luật sư', 'h@gmail.com', 'NV6', 'CB3', '00100001.png'),
-('KH9', 'Vũ Văn I', '1988-10-25', '888999000111', '2013-09-25', 'Thanh Hóa', '2023-09-25', 'Việt Nam', 'Kinh', 'Thanh Hóa', 'Thanh Hóa', 'Thanh Hóa', 'Nam', '0977778888', 'Kiến trúc sư', 'i@gmail.com', 'NV7', 'CB4', '00100001.png');
+INSERT INTO `khachhang` (`MaKH`, `HoTen`, `NgaySinh`, `SoCCCD`, `NgayCapCCCD`, `NoiCapCCCD`, `CoGiaTriDen`, `QuocTich`, `DanToc`, `NoiCuTru`, `DiaChiHienTai`, `DiaChiThuongTru`, `GioiTinh`, `SoDienThoai`, `NgheNghiep`, `Email`, `MaNVQL`, `MaCapBac`, `ChuKy`, `ADB`) VALUES
+('KH1', 'Nguyễn Văn A', '1995-06-15', '123456789012', '2020-01-01', 'Hà Nội', '2030-01-01', 'Việt Nam', 'Kinh', 'Hà Nội', 'Hà Nội', 'Hà Nội', 'Nam', '0123456789', 'Kinh doanh', 'a@gmail.com', 'NV1', 'CB1', '00100001.png', 0),
+('KH10', 'Tạ Thị J', '1983-03-19', '999000111222', '2012-12-05', 'Quảng Nam', '2022-12-05', 'Việt Nam', 'Kinh', 'Quảng Nam', 'Quảng Nam', 'Quảng Nam', 'Nữ', '0988889999', 'Giảng viên', 'j@gmail.com', 'NV8', 'CB4', '00100001.png', 0),
+('KH11', 'Nguyễn Văn K', '1992-07-14', '112233445566', '2011-07-10', 'Hà Giang', '2021-07-10', 'Việt Nam', 'Kinh', 'Hà Giang', 'Hà Giang', 'Hà Giang', 'Nam', '0999990000', 'Công an', 'k@gmail.com', 'NV1', 'CB1', '00100001.png', 0),
+('KH12', 'Trần Thị L', '1999-06-21', '667788990011', '2021-01-10', 'Phú Yên', '2031-01-10', 'Việt Nam', 'Kinh', 'Phú Yên', 'Phú Yên', 'Phú Yên', 'Nữ', '0101010101', 'Dược sĩ', 'l@gmail.com', 'NV2', 'CB1', '00100001.png', 0),
+('KH13', 'Hoàng Văn M', '1993-09-30', '223344556677', '2018-11-20', 'Hậu Giang', '2028-11-20', 'Việt Nam', 'Kinh', 'Hậu Giang', 'Hậu Giang', 'Hậu Giang', 'Nam', '0111112222', 'Kinh doanh', 'm@gmail.com', 'NV9', 'CB1', '00100001.png', 0),
+('KH14', 'Đinh Thị N', '2001-01-15', '334455667788', '2020-03-25', 'Lào Cai', '2030-03-25', 'Việt Nam', 'Kinh', 'Lào Cai', 'Lào Cai', 'Lào Cai', 'Nữ', '0122223333', 'Sinh viên', 'n@gmail.com', 'NV10', 'CB2', '00100001.png', 0),
+('KH15', 'Lê Văn O', '1996-05-12', '445566778899', '2016-06-15', 'Đồng Nai', '2026-06-15', 'Việt Nam', 'Kinh', 'Đồng Nai', 'Đồng Nai', 'Đồng Nai', 'Nam', '0133334444', 'Cơ khí', 'o@gmail.com', 'NV3', 'CB2', '00100001.png', 0),
+('KH16', 'Bùi Thị P', '1990-04-09', '556677889900', '2015-08-05', 'Bình Thuận', '2025-08-05', 'Việt Nam', 'Kinh', 'Bình Thuận', 'Bình Thuận', 'Bình Thuận', 'Nữ', '0144445555', 'Y tá', 'p@gmail.com', 'NV4', 'CB2', '00100001.png', 0),
+('KH17', 'Phạm Văn Q', '1986-07-17', '667788990011', '2014-09-20', 'Sóc Trăng', '2024-09-20', 'Việt Nam', 'Kinh', 'Sóc Trăng', 'Sóc Trăng', 'Sóc Trăng', 'Nam', '0155556666', 'Công nhân', 'q@gmail.com', 'NV5', 'CB3', '00100001.png', 0),
+('KH2', 'Trần Thị B', '1998-07-22', '987654321098', '2019-02-20', 'TP.HCM', '2029-02-20', 'Việt Nam', 'Kinh', 'TP.HCM', 'TP.HCM', 'TP.HCM', 'Nữ', '0987654321', 'Nhân viên văn phòng', 'b@gmail.com', 'NV2', 'CB1', '00100001.png', 0),
+('KH3', 'Lê Văn C', '1990-09-10', '123123123123', '2018-03-10', 'Đà Nẵng', '2028-03-10', 'Việt Nam', 'Kinh', 'Đà Nẵng', 'Đà Nẵng', 'Đà Nẵng', 'Nam', '0909090909', 'Kỹ sư', 'c@gmail.com', 'NV9', 'CB1', '00100001.png', 0),
+('KH4', '', '1985-05-05', '321321321321', '2017-04-15', 'Cần Thơ', '2027-04-15', 'Việt Nam', 'Kinh', 'Cần Thơ', 'Cần Thơ', 'Cần Thơ', 'Nữ', '0912121212', 'Giáo viên', 'd@gmail.com', 'NV10', 'CB2', '00100001.png', 0),
+('KH5', 'Hoàng Văn E', '2000-12-30', '111222333444', '2021-06-25', 'Hải Phòng', '2031-06-25', 'Việt Nam', 'Kinh', 'Hải Phòng', 'Hải Phòng', 'Hải Phòng', 'Nam', '0933334444', 'Sinh viên', 'e@gmail.com', 'NV3', 'CB2', '00100001.png', 0),
+('KH6', 'Ngô Thị F', '1997-04-18', '444333222111', '2016-07-10', 'Nghệ An', '2026-07-10', 'Việt Nam', 'Kinh', 'Nghệ An', 'Nghệ An', 'Nghệ An', 'Nữ', '0944445555', 'Bác sĩ', 'f@gmail.com', 'NV4', 'CB2', '00100001.png', 0),
+('KH7', 'Đặng Văn G', '1994-11-09', '555666777888', '2015-05-20', 'Huế', '2025-05-20', 'Việt Nam', 'Kinh', 'Huế', 'Huế', 'Huế', 'Nam', '0955556666', 'Nhân viên IT', 'g@gmail.com', 'NV5', 'CB3', '00100001.png', 0),
+('KH8', 'Lý Thị H', '1991-08-07', '777888999000', '2014-08-30', 'Bắc Ninh', '2024-08-30', 'Việt Nam', 'Kinh', 'Bắc Ninh', 'Bắc Ninh', 'Bắc Ninh', 'Nữ', '0966667777', 'Luật sư', 'h@gmail.com', 'NV6', 'CB3', '00100001.png', 0),
+('KH9', 'Vũ Văn I', '1988-10-25', '888999000111', '2013-09-25', 'Thanh Hóa', '2023-09-25', 'Việt Nam', 'Kinh', 'Thanh Hóa', 'Thanh Hóa', 'Thanh Hóa', 'Nam', '0977778888', 'Kiến trúc sư', 'i@gmail.com', 'NV7', 'CB4', '00100001.png', 0);
 
 -- --------------------------------------------------------
 
@@ -199,24 +200,25 @@ CREATE TABLE `khuyenmai` (
   `ThoiGian` date NOT NULL,
   `LoaiTKApDung` varchar(10) NOT NULL,
   `LoaiKM` varchar(50) NOT NULL,
-  `GiaTriKM` int(11) NOT NULL
+  `GiaTriKM` int(11) NOT NULL,
+  `CapBacThanhVien` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `khuyenmai`
 --
 
-INSERT INTO `khuyenmai` (`MaKM`, `NoiDung`, `ThoiGian`, `LoaiTKApDung`, `LoaiKM`, `GiaTriKM`) VALUES
-('KM1', 'Tăng lãi suất cho tài khoản Tiết kiệm', '2025-04-01', 'ML2', 'Tăng', 1),
-('KM10', 'Giảm lãi suất vay cho khách hàng lâu năm (Tín dụng)', '2025-05-15', 'ML1', 'Giảm', 3),
-('KM2', 'Giảm lãi suất vay cho tài khoản Tín dụng', '2025-04-05', 'ML1', 'Giảm', 2),
-('KM3', 'Tăng lãi suất khi gửi trên 500 triệu với tài khoản Tiết kiệm', '2025-04-10', 'ML2', 'Tăng', 1),
-('KM4', 'Giảm phí rút tiền trước hạn cho tài khoản Tiết kiệm', '2025-04-15', 'ML2', 'Giảm', 2),
-('KM5', 'Tăng lãi suất cho tài khoản Tiết kiệm từ 1 tỷ', '2025-04-20', 'ML2', 'Tăng', 2),
-('KM6', 'Giảm lãi suất vay cho tài khoản Ghi nợ', '2025-04-25', 'ML3', 'Giảm', 1),
-('KM7', 'Tăng lãi suất khi gửi từ 2 tỷ với tài khoản Tiết kiệm', '2025-04-30', 'ML2', 'Tăng', 3),
-('KM8', 'Giảm phí duy trì tài khoản Tín dụng', '2025-05-05', 'ML1', 'Giảm', 1),
-('KM9', 'Tăng lãi suất khi tái gửi với tài khoản Tiết kiệm', '2025-05-10', 'ML2', 'Tăng', 2);
+INSERT INTO `khuyenmai` (`MaKM`, `NoiDung`, `ThoiGian`, `LoaiTKApDung`, `LoaiKM`, `GiaTriKM`, `CapBacThanhVien`) VALUES
+('KM10', 'Giảm lãi suất vay cho khách hàng lâu năm (Tín dụng)', '2025-05-15', 'ML1', 'Giảm', 3, 'CB2'),
+('KM2', 'Giảm lãi suất vay cho tài khoản Tín dụng', '2025-04-05', 'ML1', 'Giảm', 2, NULL),
+('KM3', 'Tăng lãi suất khi gửi trên 500 triệu với tài khoản Tiết kiệm', '2025-04-10', 'ML2', 'Tăng', 1, 'CB4'),
+('KM4', 'Giảm phí rút tiền trước hạn cho tài khoản Tiết kiệm', '2025-04-15', 'ML2', 'Giảm', 2, NULL),
+('KM5', 'Tăng lãi suất cho tài khoản Tiết kiệm từ 1 tỷ', '2025-04-20', 'ML2', 'Tăng', 2, NULL),
+('KM6', 'Giảm lãi suất vay cho tài khoản Ghi nợ', '2025-04-25', 'ML3', 'Giảm', 1, NULL),
+('KM7', 'Tăng lãi suất khi gửi từ 2 tỷ với tài khoản Tiết kiệm', '2025-04-30', 'ML2', 'Tăng', 3, NULL),
+('KM8', 'Giảm phí duy trì tài khoản Tín dụng', '2025-05-05', 'ML1', 'Giảm', 1, NULL),
+('KM9', 'Tăng lãi suất khi tái gửi với tài khoản Tiết kiệm', '2025-05-10', 'ML2', 'Tăng', 2, NULL),
+('UD111', 'NewUD', '2025-03-28', 'ML2', 'Tăng', 1, 'BC1021');
 
 -- --------------------------------------------------------
 
@@ -394,7 +396,8 @@ ALTER TABLE `khachhang`
 --
 ALTER TABLE `khuyenmai`
   ADD PRIMARY KEY (`MaKM`),
-  ADD KEY `LoaiTKApDung` (`LoaiTKApDung`);
+  ADD KEY `LoaiTKApDung` (`LoaiTKApDung`),
+  ADD KEY `fk_capbackh` (`CapBacThanhVien`);
 
 --
 -- Chỉ mục cho bảng `lichsugiaodich`
@@ -465,6 +468,7 @@ ALTER TABLE `khachhang`
 -- Các ràng buộc cho bảng `khuyenmai`
 --
 ALTER TABLE `khuyenmai`
+  ADD CONSTRAINT `fk_capbackh` FOREIGN KEY (`CapBacThanhVien`) REFERENCES `capbackh` (`MaCapBac`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `khuyenmai_ibfk_1` FOREIGN KEY (`LoaiTKApDung`) REFERENCES `loaitk` (`MaLoai`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
