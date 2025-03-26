@@ -14,7 +14,7 @@
     <div class="d-flex">
         <!-- Sidebar -->
         <div class="sidebar">
-            <a href="{{ url_for('static', filename='html/login.html') }}"><i class="fa-solid fa-right-from-bracket fa-lg"></i></a>
+            <a href="{{ url_for('auth.login') }}"><i class="fa-solid fa-right-from-bracket fa-lg"></i></a>
             <div class="text-center mb-3">
                 <div class="rounded-circle bg-primary text-white"
                     style="width: 80px; height: 80px; line-height: 80px; margin: auto;">A</div>
@@ -45,6 +45,7 @@
             {% endwith %}
 
             <div class="card p-3">
+                <form method="POST" action="{{ url_for('home.xoa_capbac') }}">
                 <div class="d-flex">
                     <input type="text" class="form-control me-2" placeholder="Tìm kiếm tên bậc...">
                     <button class="btn btn-primary">Tìm kiếm</button>
@@ -78,6 +79,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                </form>
             </div>
         </div>
     </div>

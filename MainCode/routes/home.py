@@ -39,46 +39,46 @@ def inforUser():
         return redirect(url_for('home.home'))
     return render_template('user/infoUser.html', info=info, infoCard=infoCard)
 # uu dai
-@home_bp.route('/uudai')
-def xem_uudai():
-    # Kiểm tra xem người dùng đã đăng nhập chưa
-    if 'MaKH' not in session:
-        flash('Vui lòng đăng nhập để xem ưu đãi!', 'error')
-        return redirect(url_for('auth.login'))
+# @home_bp.route('/uudai')
+# def xem_uudai():
+#     # Kiểm tra xem người dùng đã đăng nhập chưa
+#     if 'MaKH' not in session:
+#         flash('Vui lòng đăng nhập để xem ưu đãi!', 'error')
+#         return redirect(url_for('auth.login'))
 
-    # Lấy thông tin khách hàng từ session
-    ma_kh = session['MaKH']
-    user = KhachHang.query.get(ma_kh)
-    if not user:
-        flash('Không tìm thấy thông tin khách hàng!', 'error')
-        session.pop('MaKH', None)
-        return redirect(url_for('auth.login'))
+#     # Lấy thông tin khách hàng từ session
+#     ma_kh = session['MaKH']
+#     user = KhachHang.query.get(ma_kh)
+#     if not user:
+#         flash('Không tìm thấy thông tin khách hàng!', 'error')
+#         session.pop('MaKH', None)
+#         return redirect(url_for('auth.login'))
 
-    # Lấy tài khoản đăng nhập của khách hàng
-    account_kh = AccountKH.query.get(ma_kh)
-    if not account_kh:
-        flash('Không tìm thấy tài khoản đăng nhập của bạn!', 'error')
-        return redirect(url_for('home.home'))
+#     # Lấy tài khoản đăng nhập của khách hàng
+#     account_kh = AccountKH.query.get(ma_kh)
+#     if not account_kh:
+#         flash('Không tìm thấy tài khoản đăng nhập của bạn!', 'error')
+#         return redirect(url_for('home.home'))
 
-    # Lấy danh sách tất cả tài khoản ngân hàng của khách hàng
-    tai_khoan_list = TaiKhoan.query.filter_by(MaKH=account_kh.MaKH).all()
-    if not tai_khoan_list:
-        flash('Không tìm thấy tài khoản ngân hàng nào của bạn!', 'error')
-        return redirect(url_for('home.home'))
+#     # Lấy danh sách tất cả tài khoản ngân hàng của khách hàng
+#     tai_khoan_list = TaiKhoan.query.filter_by(MaKH=account_kh.MaKH).all()
+#     if not tai_khoan_list:
+#         flash('Không tìm thấy tài khoản ngân hàng nào của bạn!', 'error')
+#         return redirect(url_for('home.home'))
 
-    # Lấy danh sách các loại tài khoản của khách hàng
-    loai_tk_list = [tai_khoan.LoaiTK for tai_khoan in tai_khoan_list]
+#     # Lấy danh sách các loại tài khoản của khách hàng
+#     loai_tk_list = [tai_khoan.LoaiTK for tai_khoan in tai_khoan_list]
 
-    # Lọc ưu đãi dựa trên LoaiTKApDung và CapBacThanhVien
-    uu_dai_list = KhuyenMai.query.filter(
-        (KhuyenMai.LoaiTKApDung.in_(loai_tk_list)) &
-        ((KhuyenMai.CapBacThanhVien == user.MaCapBac) | (KhuyenMai.CapBacThanhVien == None))
-    ).all()
+#     # Lọc ưu đãi dựa trên LoaiTKApDung và CapBacThanhVien
+#     uu_dai_list = KhuyenMai.query.filter(
+#         (KhuyenMai.LoaiTKApDung.in_(loai_tk_list)) &
+#         ((KhuyenMai.CapBacThanhVien == user.MaCapBac) | (KhuyenMai.CapBacThanhVien == None))
+#     ).all()
 
-    # Lấy ngày hiện tại
-    current_date = date.today()
-    return render_template('user/offers.html', uu_dai_list=uu_dai_list, current_date=current_date)
-
+#     # Lấy ngày hiện tại
+#     current_date = date.today()
+#     return render_template('user/offers.html', uu_dai_list=uu_dai_list, current_date=current_date)
+# ###
 @home_bp.route('/uudai/<maKM>')
 def chi_tiet_uudai(maKM):
     uu_dai = KhuyenMai.query.get(maKM)
@@ -219,7 +219,11 @@ def xem_uudai():
     return render_template('user/offers.html')
 
 # cap bac
-@home_bp.route('/admin/capbac')
+@home_bp.route('/admin/xoacap_bac')
+def xoa_capbac():
+    pass
+
+@home_bp.route('/admin/cap_bac')
 def danh_sach_cap_bac():
     cap_bac_list = CapBacKH.query.all()  # Lấy toàn bộ danh sách cấp bậc từ DB
     return render_template('admin/chinhsuaCapBac.html', cap_bac_list=cap_bac_list)
@@ -264,79 +268,27 @@ def them_capbac():
 
     return render_template("admin/themCapBac.html")
 
-@home_bp.route('/capbac/sua/<maCB>', methods=['GET', 'POST'])
-def sua_cap_bac(maCB):
-    capbac = CapBacKH.query.get(maCB)
-    if not capbac:
-        flash('Không tìm thấy cấp bậc!', 'error')
-        return redirect(url_for('home.danh_sach_cap_bac'))
+# @home_bp.route('/capbac/sua/<maCB>', methods=['GET', 'POST'])
+# def sua_cap_bac(maCB):
+#     capbac = CapBacKH.query.get(maCB)
+#     if not capbac:
+#         flash('Không tìm thấy cấp bậc!', 'error')
+#         return redirect(url_for('home.danh_sach_cap_bac'))
 
-    if request.method == 'POST':
-        # Lấy dữ liệu từ form
-        ten_cap_bac = request.form.get('ten_cap_bac')
-        muc_dat_duoc = request.form.get('muc_dat_duoc')
-        mo_ta = request.form.get('mo_ta')
+#     if request.method == 'POST':
+#         # Lấy dữ liệu từ form
+#         ten_cap_bac = request.form.get('ten_cap_bac')
+#         muc_dat_duoc = request.form.get('muc_dat_duoc')
+#         mo_ta = request.form.get('mo_ta')
 
-        # Cập nhật thông tin
-        capbac.TenCapBac = ten_cap_bac
-        capbac.MucDatDuoc = muc_dat_duoc
-        db.session.commit()
-        flash('Cập nhật cấp bậc thành công!', 'success')
-        return redirect(url_for('home.danh_sach_cap_bac'))
+#         # Cập nhật thông tin
+#         capbac.TenCapBac = ten_cap_bac
+#         capbac.MucDatDuoc = muc_dat_duoc
+#         db.session.commit()
+#         flash('Cập nhật cấp bậc thành công!', 'success')
+#         return redirect(url_for('home.danh_sach_cap_bac'))
 
-    return render_template('admin/suaCapBac.html', capbac=capbac)
+#     return render_template('admin/suaCapBac.html', capbac=capbac)
 
-## Tinh cap bac tu dong
+# ## Tinh cap bac tu dong
 
-###def nang_cap_cap_bac():
-    print(f"Bắt đầu nâng cấp cấp bậc khách hàng: {datetime.now()}")
-    
-    # Lấy danh sách tất cả khách hàng
-    khach_hangs = KhachHang.query.all()
-    
-    # Lấy danh sách cấp bậc, sắp xếp theo MucDatDuoc tăng dần
-    cap_bacs = CapBacKH.query.order_by(CapBacKH.MucDatDuoc.asc()).all()
-    
-    for khach_hang in khach_hangs:
-        # Lấy danh sách tài khoản của khách hàng
-        tai_khoans = TaiKhoan.query.filter_by(MaKH=khach_hang.MaKH).all()
-        if not tai_khoans:
-            print(f"Khách hàng {khach_hang.MaKH} không có tài khoản.")
-            continue
-        
-        # Tính tổng chi tiêu từ bảng LichSuGiaoDich
-        # Chỉ tính các giao dịch có ChieuGD = 1 (chi tiêu)
-        tong_chi_tieu = 0
-        for tai_khoan in tai_khoans:
-            # Tính tổng GiaTriGD cho từng tài khoản
-            tong = db.session.query(func.sum(LichSuGiaoDich.GiaTriGD)).filter(
-                LichSuGiaoDich.TKGD == tai_khoan.MaTK,
-                LichSuGiaoDich.ChieuGD == 1
-            ).scalar() or 0
-            tong_chi_tieu += tong
-        
-        # Tìm cấp bậc phù hợp
-        cap_bac_phu_hop = None
-        for cap_bac in cap_bacs:
-            if tong_chi_tieu >= cap_bac.MucDatDuoc:
-                cap_bac_phu_hop = cap_bac
-            else:
-                break  # Vì danh sách đã sắp xếp tăng dần, nên thoát khi không thỏa mãn
-        
-        # Cập nhật cấp bậc cho khách hàng
-        if cap_bac_phu_hop:
-            if khach_hang.MaCapBac != cap_bac_phu_hop.MaCapBac:
-                khach_hang.MaCapBac = cap_bac_phu_hop.MaCapBac
-                print(f"Khách hàng {khach_hang.MaKH} được nâng cấp lên {cap_bac_phu_hop.TenCapBac} (Tổng chi tiêu: {tong_chi_tieu})")
-        else:
-            khach_hang.MaCapBac = None  # Không đạt cấp bậc nào
-            print(f"Khách hàng {khach_hang.MaKH} không đạt cấp bậc nào (Tổng chi tiêu: {tong_chi_tieu})")
-    
-    # Lưu thay đổi vào CSDL
-    try:
-        db.session.commit()
-        print(f"Kết thúc nâng cấp cấp bậc khách hàng: {datetime.now()}")
-    except Exception as e:
-        db.session.rollback()
-        print(f"Lỗi khi nâng cấp cấp bậc: {e}")
-    ###
