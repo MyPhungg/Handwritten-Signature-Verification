@@ -7,24 +7,25 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        # Kiểm tra tài khoản khách hàng
-        user_kh = AccountKH.query.filter_by(TenDangNhap=username, MatKhau=password).first()
-        if user_kh:
-            session['MaKH'] = user_kh.MaKH
-            flash('Đăng nhập thành công!', 'success')
-            return redirect(url_for('home.home'))
-        
-        # Kiểm tra tài khoản nhân viên (admin)
-        user_nv = AccountNV.query.filter_by(TenDangNhap=username, MatKhau=password).first()
-        if user_nv:
-            session['MaNV'] = user_nv.MaNV
-            flash('Đăng nhập admin thành công!', 'success')
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        account = AccountKH.query.filter_by(
+            TenDangNhap=username, MatKhau=password).first()
+        if account:
+            session['MaKH'] = account.MaKH
+            session['user_type'] = 'KH'  # Lưu loại người dùng vào session
+            return redirect(url_for('account.chooseAcc'))
+
+        # Kiểm tra xem có phải là nhân viên không
+        account_nv = AccountNV.query.filter_by(
+            TenDangNhap=username, MatKhau=password).first()
+        if account_nv:
+            session['MaNV'] = account_nv.MaNV
+            session['user_type'] = 'NV'  # Lưu loại người dùng vào session
             return redirect(url_for('home.admin_uudai'))
-        
-        flash('Tên đăng nhập hoặc mật khẩu không đúng!', 'error')
+
+        flash('Tên đăng nhập hoặc mật khẩu không đúng', 'error')
     return render_template('login.html')
 
 
@@ -74,3 +75,45 @@ def forgetAccSubmit():
         else:
             flash('Vui lòng chọn hình thức xác thực!', 'error')
             return redirect(url_for('auth.forgetAcc'))
+
+
+@auth_bp.route('/login/forgetPass', methods=['GET'])
+def forgetPass():
+    return render_template('forgetPass.html')
+
+
+@auth_bp.route('/login/forgetPass/submit', methods=['GET', 'POST'])
+def forgetPassSubmit():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        authMethod = request.form.get('authMethod')
+        cccd = request.form.get('cccd')
+        account = AccountKH.query.filter_by(TenDangNhap=username).first()
+        if not account:
+            flash('Không có tài khoản!', 'error')
+            return redirect(url_for('auth.forgetPass'))
+        khachHang = KhachHang.query.filter_by(MaKH=account.MaKH).first()
+        if authMethod == 'cccd':
+            if khachHang.SoCCCD == cccd:
+                password = account.MatKhau
+                if not password:
+                    flash('Lỗi trong việc tìm kiếm mã KH hoặc mật khẩu',
+                          'error')
+                    return redirect(url_for('auth.forgetPass'))
+                else:
+                    return render_template('forgetPass.html',
+                                           username=username,
+                                           password=password,
+                                           show_result=True)
+            else:
+                flash('Số CCCD không khớp!', 'error')
+                return redirect(url_for('auth.forgetPass'))
+        if authMethod == 'signature':
+            flash("Chưa hỗ trợ tính năng này!", 'error')
+            return redirect(url_for('auth.forgetPass'))
+        # Nếu không chọn hình thức xác thực
+        else:
+            flash('Vui lòng chọn hình thức xác thực!', 'error')
+            return redirect(url_for('auth.forgetPass'))
+
+# Đang suy nghĩ nên chỉnh CSDL để xét trường hợp Nhân viên
