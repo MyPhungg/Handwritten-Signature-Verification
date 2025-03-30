@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th3 22, 2025 lúc 04:25 PM
+-- Thời gian đã tạo: Th3 30, 2025 lúc 05:55 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -170,7 +170,7 @@ CREATE TABLE `khachhang` (
 --
 
 INSERT INTO `khachhang` (`MaKH`, `HoTen`, `NgaySinh`, `SoCCCD`, `NgayCapCCCD`, `NoiCapCCCD`, `CoGiaTriDen`, `QuocTich`, `DanToc`, `NoiCuTru`, `DiaChiHienTai`, `DiaChiThuongTru`, `GioiTinh`, `SoDienThoai`, `NgheNghiep`, `Email`, `MaNVQL`, `MaCapBac`, `ChuKy`, `ADB`) VALUES
-('KH1', 'Nguyễn Văn A', '1995-06-15', '123456789012', '2020-01-01', 'Hà Nội', '2030-01-01', 'Việt Nam', 'Kinh', 'Hà Nội', 'Hà Nội', 'Hà Nội', 'Nam', '0123456789', 'Kinh doanh', 'a@gmail.com', 'NV1', 'CB1', '00100001.png', 0),
+('KH1', 'Nguyễn Văn An', '1995-06-15', '023456789012', '2020-01-01', 'Hà Nội', '2030-01-01', 'Việt Nam', 'Kinh', 'Hà Nội', 'Hà Nội', 'Hà Nội', 'Nam', '0123456789', 'Kinh doanh', 'a@gmail.com', 'NV1', 'CB1', '00100001.png', 0),
 ('KH10', 'Tạ Thị J', '1983-03-19', '999000111222', '2012-12-05', 'Quảng Nam', '2022-12-05', 'Việt Nam', 'Kinh', 'Quảng Nam', 'Quảng Nam', 'Quảng Nam', 'Nữ', '0988889999', 'Giảng viên', 'j@gmail.com', 'NV8', 'CB4', '00100001.png', 0),
 ('KH11', 'Nguyễn Văn K', '1992-07-14', '112233445566', '2011-07-10', 'Hà Giang', '2021-07-10', 'Việt Nam', 'Kinh', 'Hà Giang', 'Hà Giang', 'Hà Giang', 'Nam', '0999990000', 'Công an', 'k@gmail.com', 'NV1', 'CB1', '00100001.png', 0),
 ('KH12', 'Trần Thị L', '1999-06-21', '667788990011', '2021-01-10', 'Phú Yên', '2031-01-10', 'Việt Nam', 'Kinh', 'Phú Yên', 'Phú Yên', 'Phú Yên', 'Nữ', '0101010101', 'Dược sĩ', 'l@gmail.com', 'NV2', 'CB1', '00100001.png', 0),
@@ -279,25 +279,25 @@ CREATE TABLE `nhanvien` (
   `MaNV` varchar(10) NOT NULL,
   `HoTen` varchar(50) NOT NULL,
   `MaNVQL` varchar(10) NOT NULL,
-  `CCCD` varchar(20) NOT NULL,
-  `SDT` varchar(10) NOT NULL
+  `SoCCCD` varchar(12) NOT NULL,
+  `SoDienThoai` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `nhanvien`
 --
 
-INSERT INTO `nhanvien` (`MaNV`, `HoTen`, `MaNVQL`, `CCCD`, `SDT`) VALUES
-('NV1', 'Nguyễn Văn A', 'NV1', '', ''),
-('NV10', 'Tô Thị J', 'NV6', '', ''),
-('NV2', 'Trần Thị B', 'NV1', '', ''),
-('NV3', 'Lê Văn C', 'NV1', '', ''),
-('NV4', 'Phạm Thị D', 'NV2', '', ''),
-('NV5', 'Hoàng Văn E', 'NV2', '', ''),
-('NV6', 'Đặng Thị F', 'NV3', '', ''),
-('NV7', 'Bùi Văn G', 'NV3', '', ''),
-('NV8', 'Vũ Thị H', 'NV4', '', ''),
-('NV9', 'Lý Văn I', 'NV5', '', '');
+INSERT INTO `nhanvien` (`MaNV`, `HoTen`, `MaNVQL`, `SoCCCD`, `SoDienThoai`) VALUES
+('NV1', 'Nguyễn Văn A', 'NV1', '123456789012', '0912345678'),
+('NV10', 'Tô Thị J', 'NV6', '929292929292', '0929292929'), -- Đã thay đổi cả CCCD và số điện thoại
+('NV2', 'Trần Thị B', 'NV1', '123456789013', '0912345679'),
+('NV3', 'Lê Văn C', 'NV1', '123456789014', '0912345680'),
+('NV4', 'Phạm Thị D', 'NV2', '123456789015', '0912345681'),
+('NV5', 'Hoàng Văn E', 'NV2', '123456789016', '0912345682'),
+('NV6', 'Đặng Thị F', 'NV3', '123456789017', '0912345683'),
+('NV7', 'Bùi Văn G', 'NV3', '123456789018', '0912345684'),
+('NV8', 'Vũ Thị H', 'NV4', '123456789019', '0912345685'),
+('NV9', 'Lý Văn I', 'NV5', '123456789020', '0912345686');
 
 -- --------------------------------------------------------
 
