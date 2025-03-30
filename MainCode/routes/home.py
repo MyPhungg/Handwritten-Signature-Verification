@@ -11,6 +11,7 @@ import re
 home_bp = Blueprint('home', __name__)
 
 
+# Kiểm tra xem đã chọn tại khoản chưa
 @home_bp.route('/home')
 def home():
     if 'MaTK' not in session:
@@ -22,8 +23,9 @@ def home():
     return render_template('user/home.html', tk=tk)
 
 
+# Hiển thị thông tin người dùng
 @home_bp.route('/infoUser')
-def inforUser():
+def infoUser():
     if 'MaKH' not in session:
         flash('Vui lòng đăng nhập để truy cập trang này!', 'error')
         return redirect(url_for('auth.login'))
@@ -46,6 +48,7 @@ def inforUser():
     return render_template('user/infoUser.html', info=info, infoCard=infoCard)
 
 
+# Tải thông tin vào trang đổi thông tin
 @home_bp.route('/infoUser/inputForm')
 def inputForm():
     if 'MaKH' not in session:
@@ -60,6 +63,8 @@ def inputForm():
         flash('Không tìm thấy thông tin khách hàng!', 'error')
         return redirect(url_for('home.home'))
     return render_template('user/changeInfoUser.html', info=info)
+
+# Đổi thông tin người dùng
 
 
 @home_bp.route('/infoUser/inputForm/changeInfoUser', methods=['GET', 'POST'])
@@ -96,29 +101,76 @@ def changeInfoUser():
         khachhang = KhachHang.query.filter_by(MaKH=maKH).first()
 
         if khachhang:
-            return True
+            # Cập nhật thông tin từ request form
+            khachhang.HoTen = request.form.get('hoten', khachhang.HoTen)
+            khachhang.SoCCCD = request.form.get('cccd', khachhang.SoCCCD)
+            khachhang.NoiCapCCCD = request.form.get(
+                'noicapcccd', khachhang.NoiCapCCCD)
+            khachhang.QuocTich = request.form.get(
+                'quoctich', khachhang.QuocTich)
+            khachhang.NoiCuTru = request.form.get(
+                'noicutru', khachhang.NoiCuTru)
+            khachhang.DiaChiThuongTru = request.form.get(
+                'diachithuongtru', khachhang.DiaChiThuongTru)
+            khachhang.SoDienThoai = request.form.get(
+                'sodienthoai', khachhang.SoDienThoai)
+            khachhang.Email = request.form.get('email', khachhang.Email)
+            khachhang.NgaySinh = request.form.get(
+                'ngaysinh', khachhang.NgaySinh)
+            khachhang.NgayCapCCCD = request.form.get(
+                'ngaycapcccd', khachhang.NgayCapCCCD)
+            khachhang.CoGiaTriDen = request.form.get(
+                'cogiatriden', khachhang.CoGiaTriDen)
+            khachhang.DanToc = request.form.get('dantoc', khachhang.DanToc)
+            khachhang.DiaChiHienTai = request.form.get(
+                'diachihientai', khachhang.DiaChiHienTai)
+            khachhang.GioiTinh = request.form.get(
+                'gioitinh', khachhang.GioiTinh)
+            khachhang.NgheNghiep = request.form.get(
+                'nghenghiep', khachhang.NgheNghiep)
 
-    return False  # đại đại đi
+            # Lưu thay đổi
+            db.session.commit()
+            flash('Thông tin của bạn đã được cập nhật!', 'success')
+            return redirect(url_for('home.infoUser'))
+        else:
+            flash('Cập nhật thông tin thất bại! Không tìm thấy người dùng!', 'error')
+
+    return redirect(url_for('home.inputForm'))
+
+# Regex
+
+
+# Định nghĩa regex
+patterns = {
+    "hoten": (re.compile(r"^[a-zA-ZÀ-ỹ\s]+$"), "Họ tên chỉ chứa chữ cái và dấu cách"),
+    "cccd": (re.compile(r"^\d{12}$"), "CCCD phải có đúng 12 chữ số"),
+    "noicapcccd": (re.compile(r"^[\w\sÀ-ỹ]+$", re.UNICODE), "Nơi cấp CCCD chỉ chứa chữ cái và dấu cách"),
+    "quoctich": (re.compile(r"^[\w\sÀ-ỹ]+$", re.UNICODE), "Quốc tịch chỉ chứa chữ cái và dấu cách"),
+    "noicutru": (re.compile(r"^[\w\d\s,.-À-ỹ]+$", re.UNICODE), "Nơi cư trú không hợp lệ"),
+    "diachithuongtru": (re.compile(r"^[\w\d\s,.-À-ỹ]+$", re.UNICODE), "Địa chỉ thường trú không hợp lệ"),
+    "sodienthoai": (re.compile(r"^0\d{9}$"), "Số điện thoại phải có 10 chữ số và bắt đầu bằng 0"),
+    "email": (re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"), "Email không hợp lệ"),
+    "ngaysinh": (re.compile(r"^\d{4}-\d{2}-\d{2}$"), "Ngày sinh phải có định dạng YYYY-MM-DD"),
+    "ngaycapcccd": (re.compile(r"^\d{4}-\d{2}-\d{2}$"), "Ngày cấp CCCD phải có định dạng YYYY-MM-DD"),
+    "cogiatriden": (re.compile(r"^\d{4}-\d{2}-\d{2}$"), "Có giá trị đến phải có định dạng YYYY-MM-DD"),
+    "dantoc": (re.compile(r"^[\w\sÀ-ỹ]+$", re.UNICODE), "Dân tộc chỉ chứa chữ cái và dấu cách"),
+    "diachihientai": (re.compile(r"^[\w\d\s,.-À-ỹ]+$", re.UNICODE), "Địa chỉ hiện tại không hợp lệ"),
+    "gioitinh": (re.compile(r"^(Nam|Nữ|Khác)$"), "Giới tính chỉ có thể là Nam, Nữ hoặc Khác"),
+    "nghenghiep": (re.compile(r"^[\w\sÀ-ỹ]+$", re.UNICODE), "Nghề nghiệp chỉ chứa chữ cái và dấu cách"),
+}
 
 
 def validate_input(data):
     errors = {}
 
-    if not re.match(r'^[a-zA-ZÀ-ỹ\s]+$', data.get('hoten', '')):
-        errors['hoten'] = 'Họ tên chỉ được chứa chữ cái và dấu cách'
+    for field, (pattern, error_msg) in patterns.items():
+        value = data.get(field, "").strip()
+        if not pattern.match(value):
+            errors[field] = error_msg  # Lưu thông báo lỗi nếu không khớp regex
 
-    if not re.match(r'^\d{12}$', data.get('cccd', '')):
-        errors['cccd'] = 'CCCD phải có đúng 12 chữ số'
+    return errors  # Trả về dict lỗi, rỗng nếu không có lỗi
 
-    if not re.match(r'^0\d{9}$', data.get('sodienthoai', '')):
-        errors['sodienthoai'] = 'Số điện thoại phải bắt đầu bằng 0'
-        +' và có 10 chữ số'
-
-    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-                    data.get('email', '')):
-        errors['email'] = 'Email không hợp lệ'
-
-    return errors
 # uu dai
 # @home_bp.route('/uudai')
 # def xem_uudai():
@@ -286,13 +338,16 @@ def sua_uu_dai(maKM):
             return redirect(url_for('home.admin_uudai'))
         except ValueError as e:
             flash(
-                'Định dạng thời gian không hợp lệ! Vui lòng nhập theo định dạng YYYY-MM-DD.', 'error')
+                'Định dạng thời gian không hợp lệ! Vui lòng nhập '
+                + 'theo định dạng YYYY-MM-DD.', 'error')
             return redirect(url_for('home.sua_uu_dai', maKM=maKM))
 
     # Lấy danh sách loại tài khoản và cấp bậc để hiển thị trong dropdown
     loai_tk_list = LoaiTK.query.all()
     cap_bac_list = CapBacKH.query.all()
-    return render_template('admin/suaUuDai.html', uudai=uudai, loai_tk_list=loai_tk_list, cap_bac_list=cap_bac_list)
+    return render_template('admin/suaUuDai.html', uudai=uudai,
+                           loai_tk_list=loai_tk_list,
+                           cap_bac_list=cap_bac_list)
 
 # dia chi tra ve cho cac sidebar
 
@@ -327,7 +382,8 @@ def xoa_capbac():
 @home_bp.route('/admin/cap_bac')
 def danh_sach_cap_bac():
     cap_bac_list = CapBacKH.query.all()  # Lấy toàn bộ danh sách cấp bậc từ DB
-    return render_template('admin/chinhsuaCapBac.html', cap_bac_list=cap_bac_list)
+    return render_template('admin/chinhsuaCapBac.html',
+                           cap_bac_list=cap_bac_list)
 
 
 @home_bp.route('/capbac/<maCB>')

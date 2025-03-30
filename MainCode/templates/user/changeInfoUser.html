@@ -117,7 +117,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
-                <a class="dropdown-item" href="{{url_for('home.inforUser')}}"
+                <a class="dropdown-item" href="{{url_for('home.infoUser')}}"
                   >Thông tin tài khoản</a
                 >
               </li>
@@ -141,203 +141,328 @@
         <h4 class="info-title">THÔNG TIN KHÁCH HÀNG</h4>
         <form
           action="{{url_for('home.changeInfoUser')}}"
-          onsubmit="return validateForm()"
+          onsubmit="return validateForm(event)"
           method="POST"
         >
           <div class="row">
             <div class="col-md-6">
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px">Họ Tên:</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="name"
-                  name="hoten"
-                  value="{{info.HoTen}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Họ Tên:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="hoten"
+                    name="hoten"
+                    value="{{info.HoTen}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="hoten-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Số CCCD:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="cccd"
-                  name="cccd"
-                  value="{{info.SoCCCD}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Số CCCD:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cccd"
+                    name="cccd"
+                    value="{{info.SoCCCD}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="cccd-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Nơi cấp CCCD:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="noicapcccd"
-                  name="noicapcccd"
-                  value="{{info.NoiCapCCCD}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Nơi cấp CCCD:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="noicapcccd"
+                    name="noicapcccd"
+                    value="{{info.NoiCapCCCD}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="noicapcccd-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Quốc tịch:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="quoctich"
-                  name="quoctich"
-                  value="{{info.QuocTich}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Quốc tịch:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="quoctich"
+                    name="quoctich"
+                    value="{{info.QuocTich}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="quoctich-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Nơi cư trú:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="noicutru"
-                  name="noicutru"
-                  value="{{info.NoiCuTru}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Nơi cư trú:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="noicutru"
+                    name="noicutru"
+                    value="{{info.NoiCuTru}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="noicutru-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Địa chỉ thường trú:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="diachithuongtru"
-                  name="diachithuongtru"
-                  value="{{info.DiaChiThuongTru}}"
-                  placeholder=""
-                />
+
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Địa chỉ thường trú:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="diachithuongtru"
+                    name="diachithuongtru"
+                    value="{{info.DiaChiThuongTru}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="diachithuongtru'-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Số điện thoại:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="sodienthoai"
-                  name="sodienthoai"
-                  value="{{info.SoDienThoai}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Số điện thoại:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="sodienthoai"
+                    name="sodienthoai"
+                    value="{{info.SoDienThoai}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="sodienthoai-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px">Email:</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="email"
-                  name="email"
-                  value="{{info.Email}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Email:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    value="{{info.Email}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="email-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
             </div>
             <div class="col-md-6">
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Ngày sinh:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="ngaysinh"
-                  name="ngaysinh"
-                  value="{{info.NgaySinh}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Ngày sinh:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="ngaysinh"
+                    name="ngaysinh"
+                    value="{{info.NgaySinh}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="ngaysinh-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Ngày cấp CCCD:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="ngaycapcccd"
-                  name="ngaycapcccd"
-                  value="{{info.NgayCapCCCD}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Ngày cấp CCCD:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="ngaycapcccd"
+                    name="ngaycapcccd"
+                    value="{{info.NgayCapCCCD}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="ngaycapcccd-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Có giá trị đến:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="cogiatriden"
-                  name="cogiatriden"
-                  value="{{info.CoGiaTriDen}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Có giá trị đến:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cogiatriden"
+                    name="cogiatriden"
+                    value="{{info.CoGiaTriDen}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="cogiatriden-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Dân tộc:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="dantoc"
-                  name="dantoc"
-                  value="{{info.DanToc}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Dân tộc:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="dantoc"
+                    name="dantoc"
+                    value="{{info.DanToc}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="dantoc-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Địa chỉ hiện tại:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="diachihientai"
-                  name="diachihientai"
-                  value="{{info.DiaChiHienTai}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Địa chỉ hiện tại:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="diachihientai"
+                    name="diachihientai"
+                    value="{{info.DiaChiHienTai}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="diachihientai-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Giới tính:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="gioitinh"
-                  name="gioitinh"
-                  value="{{info.GioiTinh}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Giới tính:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="gioitinh"
+                    name="gioitinh"
+                    value="{{info.GioiTinh}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="gioitinh-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
-              <div class="d-flex align-items-center mb-3">
-                <label class="fw-bold me-2" style="width: 100px"
-                  >Nghề nghiệp:</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="nghenghiep"
-                  name="nghenghiep"
-                  value="{{info.NgheNghiep}}"
-                  placeholder=""
-                />
+              <div class="d-flex flex-column mb-3">
+                <div class="d-flex align-items-center">
+                  <label class="fw-bold me-2" style="width: 100px"
+                    >Nghề nghiệp:</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nghenghiep"
+                    name="nghenghiep"
+                    value="{{info.NgheNghiep}}"
+                    placeholder=""
+                    required
+                  />
+                </div>
+                <span
+                  id="nghenghiep-error"
+                  class="text-danger mt-1"
+                  style="font-size: 14px"
+                ></span>
               </div>
             </div>
           </div>

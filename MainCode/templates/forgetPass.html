@@ -36,7 +36,11 @@
         </div>
         <div class="col-md-6 d-flex flex-column justify-content-center">
           <div style="max-width: 400px; margin-left: 12%">
-            <form action="{{url_for('auth.forgetPassSubmit')}}" method="POST">
+            <form
+              action="{{url_for('auth.forgetPassSubmit')}}"
+              method="POST"
+              onsubmit="return validateFormForgetPass(event)"
+            >
               <div
                 id="inputForm"
                 style="display: {% if not show_result%}block{%else%}none{%endif%}"
@@ -52,8 +56,14 @@
                     id="username"
                     name="username"
                     placeholder="Nhập tên đăng nhập"
+                    value="{{username}}"
                     required
                   />
+                  <span
+                    id="username-error"
+                    class="text-danger mt-1"
+                    style="font-size: 14px"
+                  ></span>
                 </div>
 
                 <label class="form-label">Chọn hình thức xác thực:</label>
@@ -96,6 +106,11 @@
                     name="cccd"
                     placeholder="Nhập số CCCD"
                   />
+                  <span
+                    id="cccd-error"
+                    class="text-danger mt-1"
+                    style="font-size: 14px"
+                  ></span>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">
                   Xác nhận
