@@ -1,6 +1,6 @@
 
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
-from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, AccountKH
+from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, AccountKH,NhanVien
 from datetime import datetime, date
 from decimal import Decimal
 import re
@@ -171,6 +171,160 @@ def validate_input(data):
 
     return errors  # Trả về dict lỗi, rỗng nếu không có lỗi
 
+
+#------------Quản lý khách Hàng-----------------
+
+
+@home_bp.route('/admin/khachhang')
+def admin_khachhang():
+    khach_hang_list = KhachHang.query.all()  # Lấy tất cả khách hàng từ database
+    return render_template('admin/chinhsuaKH.html', khach_hang_list=khach_hang_list)
+
+@home_bp.route('/khachhang/timkiem', methods=['GET'])
+def tim_kiem_khachhang():
+    search_query = request.args.get('search', '').strip()  # Lấy từ khóa tìm kiếm
+
+    if search_query:
+        khach_hang_list = KhachHang.query.filter(KhachHang.HoTen.ilike(f"%{search_query}%")).all()
+    else:
+        khach_hang_list = KhachHang.query.all()
+
+    return render_template('admin/chinhsuaKH.html', khach_hang_list=khach_hang_list, search_query=search_query)
+
+
+
+
+@home_bp.route('/khachhang/<maKH>')
+def chi_tiet_khachhang(maKH):
+    khach_hang = KhachHang.query.get(maKH)
+    if not khach_hang:
+        flash('Không tìm thấy khách hàng!', 'error')
+        return redirect(url_for('home.admin_khachhang'))
+    return render_template('admin/chitietKH.html', khach_hang=khach_hang)
+
+
+def generate_ma_kh():
+    # Lấy khách hàng có mã lớn nhất
+    last_kh = KhachHang.query.order_by(KhachHang.MaKH.desc()).first()
+
+    if last_kh:
+        last_id = int(last_kh.MaKH[2:])  # Lấy số từ KH001 -> 001 -> 1
+        new_id = f"KH{last_id + 1:03d}"  # Tăng lên 1, format thành KH002, KH003, ...
+    else:
+        new_id = "KH001"  # Nếu chưa có khách hàng nào
+
+    return new_id
+
+@home_bp.route("/them_khachhang", methods=["GET", "POST"])
+def them_khachhang():
+    if request.method == "POST":
+        try:
+            ma_kh = generate_ma_kh()  # 🔥 Tự động sinh MaKH
+            ho_ten = request.form.get("HoTen")
+            ngay_sinh = datetime.strptime(request.form.get("NgaySinh"), "%Y-%m-%d")
+            so_cccd = request.form.get("SoCCCD")
+            ngay_cap_cccd = datetime.strptime(request.form.get("NgayCapCCCD"), "%Y-%m-%d")
+            noi_cap_cccd = request.form.get("NoiCapCCCD")
+            co_gia_tri_den = datetime.strptime(request.form.get("CoGiaTriDen"), "%Y-%m-%d")
+            quoc_tich = request.form.get("QuocTich")
+            dan_toc = request.form.get("DanToc")
+            noi_cu_tru = request.form.get("NoiCuTru")
+            dia_chi_hien_tai = request.form.get("DiaChiHienTai")
+            dia_chi_thuong_tru = request.form.get("DiaChiThuongTru")
+            gioi_tinh = request.form.get("GioiTinh")
+            so_dien_thoai = request.form.get("SoDienThoai")
+            nghe_nghiep = request.form.get("NgheNghiep")
+            email = request.form.get("Email")
+            
+            ma_nvql = "NV1"  # 🔥 Mặc định là NV1
+            ma_cap_bac = "CB1"  # 🔥 Mặc định là CB1
+            chu_ky = request.form.get("ChuKy") or "DEFAULT_CHUKY"
+
+            khach_hang = KhachHang(
+                MaKH=ma_kh,
+                HoTen=ho_ten,
+                NgaySinh=ngay_sinh,
+                SoCCCD=so_cccd,
+                NgayCapCCCD=ngay_cap_cccd,
+                NoiCapCCCD=noi_cap_cccd,
+                CoGiaTriDen=co_gia_tri_den,
+                QuocTich=quoc_tich,
+                DanToc=dan_toc,
+                NoiCuTru=noi_cu_tru,
+                DiaChiHienTai=dia_chi_hien_tai,
+                DiaChiThuongTru=dia_chi_thuong_tru,
+                GioiTinh=gioi_tinh,
+                SoDienThoai=so_dien_thoai,
+                NgheNghiep=nghe_nghiep,
+                Email=email,
+                MaNVQL=ma_nvql,
+                MaCapBac=ma_cap_bac,
+                ChuKy=chu_ky
+            )
+
+            db.session.add(khach_hang)
+            db.session.commit()
+
+            flash("Thêm khách hàng thành công!", "success")
+            return redirect(url_for("home.chinhsua_khachhang", maKH=ma_kh))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Lỗi khi thêm khách hàng: {str(e)}", "danger")
+
+    return render_template("admin/themKH.html")
+
+
+
+
+@home_bp.route('/khachhang/sua/<maKH>', methods=['GET', 'POST'])
+def sua_khachhang(maKH):
+    khach_hang = KhachHang.query.get(maKH)
+    if not khach_hang:
+        flash('Không tìm thấy khách hàng!', 'error')
+        return redirect(url_for('home.admin_khachhang'))
+
+    danh_sach_nhan_vien = NhanVien.query.all()
+    danh_sach_cap_bac = CapBacKH.query.all()
+
+    if request.method == 'POST':
+        try:
+            khach_hang.HoTen = request.form.get("HoTen")
+            khach_hang.NgaySinh = datetime.strptime(request.form.get("NgaySinh"), "%Y-%m-%d")
+            khach_hang.SoCCCD = request.form.get("SoCCCD")
+            khach_hang.NgayCapCCCD = datetime.strptime(request.form.get("NgayCapCCCD"), "%Y-%m-%d")
+            khach_hang.NoiCapCCCD = request.form.get("NoiCapCCCD")
+            khach_hang.CoGiaTriDen = datetime.strptime(request.form.get("CoGiaTriDen"), "%Y-%m-%d")
+            khach_hang.QuocTich = request.form.get("QuocTich")
+            khach_hang.DanToc = request.form.get("DanToc")
+            khach_hang.NoiCuTru = request.form.get("NoiCuTru")
+            khach_hang.DiaChiHienTai = request.form.get("DiaChiHienTai")
+            khach_hang.DiaChiThuongTru = request.form.get("DiaChiThuongTru")
+            khach_hang.GioiTinh = request.form.get("GioiTinh")
+            khach_hang.SoDienThoai = request.form.get("SoDienThoai")
+            khach_hang.NgheNghiep = request.form.get("NgheNghiep")
+            khach_hang.Email = request.form.get("Email")
+            khach_hang.ChuKy = request.form.get("ChuKy")
+
+
+            db.session.commit()
+            flash("Cập nhật khách hàng thành công!", "success")
+            return redirect(url_for('home.sua_khachhang', maKH=maKH))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Lỗi khi cập nhật: {str(e)}", "danger")
+
+    return render_template('admin/chitietKH.html', khach_hang=khach_hang)
+
+
+
+
+
+#----------------------------------------
+
+
+
 # uu dai
 # @home_bp.route('/uudai')
 # def xem_uudai():
@@ -225,10 +379,14 @@ def chi_tiet_uudai(maKM):
 
 @home_bp.route('/uudai/timkiem', methods=['GET'])
 def tim_kiem_uudai():
-    keyword = request.args.get('keyword', '')
-    uu_dai_list = KhuyenMai.query.filter(
-        KhuyenMai.NoiDung.contains(keyword)).all()
-    return render_template('user/offers.html', uu_dai_list=uu_dai_list, keyword=keyword)
+    search_query = request.args.get('search', '').strip()  # Lấy từ khóa tìm kiếm
+
+    if search_query:
+        uu_dai_list = KhuyenMai.query.filter(KhuyenMai.NoiDung.ilike(f"%{search_query}%")).all()
+    else:
+        uu_dai_list = KhuyenMai.query.all()
+
+    return render_template('admin/chinhsuaUuDai.html', uu_dai_list=uu_dai_list, search_query=search_query)
 
 
 @home_bp.route('/admin/uudai')
@@ -384,6 +542,17 @@ def danh_sach_cap_bac():
     cap_bac_list = CapBacKH.query.all()  # Lấy toàn bộ danh sách cấp bậc từ DB
     return render_template('admin/chinhsuaCapBac.html',
                            cap_bac_list=cap_bac_list)
+
+@home_bp.route('/capbac/timkiem', methods=['GET'])
+def tim_kiem_capbac():
+    search_query = request.args.get('search', '').strip()  # Lấy từ khóa tìm kiếm
+
+    if search_query:
+        cap_bac_list = CapBacKH.query.filter(CapBacKH.TenCapBac.ilike(f"%{search_query}%")).all()
+    else:
+        cap_bac_list = CapBacKH.query.all()
+
+    return render_template('admin/chinhsuaCapBac.html', cap_bac_list=cap_bac_list, search_query=search_query)
 
 
 @home_bp.route('/capbac/<maCB>')

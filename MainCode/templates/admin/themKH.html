@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Khách Hàng</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/themKH.css') }}">
+   
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center text-primary">Thêm Khách Hàng Mới</h2>
+        
+        <!-- Thông báo -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert alert-dismissible fade show" role="alert">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        
+        <form action="{{ url_for('home.them_khachhang') }}" method="POST">
+            <div class="mb-3"><label class="form-label">Họ và Tên:</label><input type="text" name="HoTen" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Ngày Sinh:</label><input type="date" name="NgaySinh" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Số CCCD:</label><input type="text" name="SoCCCD" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Ngày Cấp CCCD:</label><input type="date" name="NgayCapCCCD" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Nơi Cấp CCCD:</label><input type="text" name="NoiCapCCCD" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Có Giá Trị Đến:</label><input type="date" name="CoGiaTriDen" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Quốc Tịch:</label><input type="text" name="QuocTich" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Dân Tộc:</label><input type="text" name="DanToc" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Nơi Cư Trú:</label><input type="text" name="NoiCuTru" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Địa Chỉ Hiện Tại:</label><input type="text" name="DiaChiHienTai" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Địa Chỉ Thường Trú:</label><input type="text" name="DiaChiThuongTru" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Giới Tính:</label>
+                <select name="GioiTinh" class="form-control" required>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                </select>
+            </div>
+            <div class="mb-3"><label class="form-label">Số Điện Thoại:</label><input type="text" name="SoDienThoai" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Nghề Nghiệp:</label><input type="text" name="NgheNghiep" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Email:</label><input type="email" name="Email" class="form-control" required></div>
+            <div class="mb-3"><label class="form-label">Chữ Ký:</label><input type="text" name="ChuKy" class="form-control"></div>
+            
+            <button type="submit" class="btn btn-success w-100">Thêm Khách Hàng</button>
+            <a href="{{ url_for('home.admin_khachhang') }}" class="btn btn-secondary w-100 mt-2">Quay Lại</a>
+        </form>
+    </div>
+    
+</body>
+</html>
