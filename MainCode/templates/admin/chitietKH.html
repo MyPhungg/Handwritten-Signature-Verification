@@ -1,118 +1,113 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi Tiết Khách Hàng</title>
+    <title>Sửa Thông Tin Khách Hàng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css/chiTietKhachHang.css">
-
-</head>
-
-<body>
-    <div class="container">
-        <a href="chinhsuaKH.html"><i class="fa-solid fa-arrow-left fa-lg"></i></a>
-        <h2 class="text-center" ;">Chi Tiết Khách Hàng</h2>
-        <form>
-            <div class="form-group">
-                <label>Họ Tên:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Ngày sinh:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Số CCCD:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Ngày cấp CCCD:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Nơi cấp CCCD:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Có giá trị đến:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Quốc tịch:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Dân tộc:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Nơi cư trú:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Địa chỉ thường trú:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Địa chỉ hiện tại:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Số điện thoại:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Giới tính:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Email:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="form-group">
-                <label>Nghề nghiệp:</label>
-                <input type="text" class="form-control">
-                <button type="button" class="btn btn-primary">Sửa</button>
-            </div>
-            <div class="text-center mt-4">
-                <button type="button" class="btn btn-danger" onclick="openModal()">Đóng Tài Khoản</button>
-            </div>
-        </form>
-    </div>
-
-    <div id="confirmModal" class="modal">
-        <div class="modal-content">
-            <p>Nhập số CCCD của khách hàng:</p>
-            <input type="text" class="form-control mb-2">
-            <button class="btn btn-success" onclick="closeModal()">Xác Nhận</button>
-        </div>
-    </div>
-
     <script>
-        function openModal() {
-            document.getElementById("confirmModal").style.display = "block";
-        }
-        function closeModal() {
-            document.getElementById("confirmModal").style.display = "none";
+        function enableEditing() {
+            document.querySelectorAll("input, select").forEach(el => el.removeAttribute("readonly"));
+            document.querySelectorAll("select").forEach(el => el.removeAttribute("disabled"));
+            document.getElementById("saveButton").style.display = "inline-block";
+            document.getElementById("editButton").style.display = "none";
         }
     </script>
-</body>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center">Sửa Thông Tin Khách Hàng</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        
+        <form method="POST" action="{{ url_for('home.sua_khachhang', maKH=khach_hang.MaKH) }}" class="p-4 border rounded bg-light">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Cấp bậc</label>
+                <span class="form-control">{{ khach_hang.capbac.TenCapBac }}</span>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Họ Tên</label>
+                    <input type="text" name="HoTen" class="form-control" value="{{ khach_hang.HoTen }}" readonly required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Ngày Sinh</label>
+                    <input type="date" name="NgaySinh" class="form-control" value="{{ khach_hang.NgaySinh.strftime('%Y-%m-%d') }}" readonly required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Số CCCD</label>
+                    <input type="text" name="SoCCCD" class="form-control" value="{{ khach_hang.SoCCCD }}" readonly required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Ngày Cấp CCCD</label>
+                    <input type="date" name="NgayCapCCCD" class="form-control" value="{{ khach_hang.NgayCapCCCD.strftime('%Y-%m-%d') }}" readonly required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nơi Cấp CCCD</label>
+                    <input type="text" name="NoiCapCCCD" class="form-control" value="{{ khach_hang.NoiCapCCCD }}" readonly>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Có Giá Trị Đến</label>
+                    <input type="date" name="CoGiaTriDen" class="form-control" value="{{ khach_hang.CoGiaTriDen.strftime('%Y-%m-%d') }}" readonly>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Quốc Tịch</label>
+                    <input type="text" name="QuocTich" class="form-control" value="{{ khach_hang.QuocTich }}" readonly>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Dân Tộc</label>
+                    <input type="text" name="DanToc" class="form-control" value="{{ khach_hang.DanToc }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Địa Chỉ Hiện Tại</label>
+                <input type="text" name="DiaChiHienTai" class="form-control" value="{{ khach_hang.DiaChiHienTai }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Địa Chỉ Thường Trú</label>
+                <input type="text" name="DiaChiThuongTru" class="form-control" value="{{ khach_hang.DiaChiThuongTru }}" readonly>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Giới Tính</label>
+                    <input type="text" name="GioiTinh" class="form-control" value="{{ khach_hang.GioiTinh }}" readonly>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Số Điện Thoại</label>
+                    <input type="text" name="SoDienThoai" class="form-control" value="{{ khach_hang.SoDienThoai }}" readonly>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Nghề Nghiệp</label>
+                <input type="text" name="NgheNghiep" class="form-control" value="{{ khach_hang.NgheNghiep }}" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="Email" class="form-control" value="{{ khach_hang.Email }}" readonly>
+            </div>
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('home.admin_khachhang') }}" class="btn btn-secondary">Hủy</a>
+                <button type="button" id="editButton" class="btn btn-warning" onclick="enableEditing()">Sửa</button>
+                <button type="submit" id="saveButton" class="btn btn-primary" style="display: none;">Lưu Thay Đổi</button>
+            </div>
 
+                
+            
+            
+        </form>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

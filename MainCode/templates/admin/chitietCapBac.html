@@ -13,7 +13,7 @@
 <body>
     <div class="container">
         <a href="{{ url_for('home.danh_sach_cap_bac') }}"><i class="fa-solid fa-arrow-left fa-lg"></i></a>
-        <h2 class="text-center">Chi Tiết Ưu Đãi</h2>
+        <h2 class="text-center">Chi Tiết Cấp Bậc</h2>
         <form>
             <div class="row mb-3">
                 <div class="col-md-6">
@@ -25,13 +25,27 @@
                     <input type="text" class="form-control" value="{{ capbac.TenCapBac }}" readonly>
                 </div>
             </div>
-            <div class="form-group">
-                <label>Bậc thành viên áp dụng:</label>
-                <p id="selected-tier">Đã chọn: {{ uu_dai.LoaiTKApDung }}</p>
+            <div class="row mb-3">
+            <div class="col-md-6">
+                <label>Ngày tạo:</label>
+                <input type="text" class="form-control" value="{{ capbac.NgayTao }}" readonly>
+            </div>
+            
+                <div class="col-md-6">
+                    <label>Mức đạt được:</label>
+                    <input type="text" class="form-control" value="{{ capbac.MucDatDuoc }}" readonly>
+                </div>
             </div>
             <div class="text-center">
-                <a href="{{ url_for('home.admin_uudai') }}" class="btn btn-success">Hoàn thành</a>
+                <a href="{{ url_for('home.sua_cap_bac', maCB=capbac.MaCapBac) }}" class="btn btn-warning">
+                    <i class="fa-solid fa-edit"></i> Sửa
+                </a>
+                <a href="{{ url_for('home.danh_sach_cap_bac') }}" class="btn btn-success">
+                    <i class="fa-solid fa-check"></i> Hoàn thành
+                </a>
             </div>
+                
+            
         </form>
     </div>
 </body>

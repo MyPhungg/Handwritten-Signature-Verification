@@ -20,13 +20,13 @@
                     style="width: 80px; height: 80px; line-height: 80px; margin: auto;">A</div>
                 <p class="mt-2">Nhân viên A</p>
             </div>
-            <a href="{{ url_for('home.chinhsua_kh') }}">
+            <a href="{{ url_for('home.admin_khachhang') }}">
                 <div class="menu-item">Khách hàng</div>
             </a>
-            <a href="{{ url_for('home.chinhsua_uudai') }}">
+            <a href="{{ url_for('home.admin_uudai') }}">
                 <div class="menu-item">Ưu đãi</div>
             </a>
-            <a href="{{ url_for('home.chinhsua_capbac') }}">
+            <a href="{{ url_for('home.danh_sach_cap_bac') }}">
                 <div class="menu-item">Bậc thành viên</div>
             </a>
         </div>
@@ -45,12 +45,21 @@
             {% endwith %}
 
             <div class="card p-3">
-                <form method="POST" action="{{ url_for('home.xoa_capbac') }}">
-                <div class="d-flex">
-                    <input type="text" class="form-control me-2" placeholder="Tìm kiếm tên bậc...">
-                    <button class="btn btn-primary">Tìm kiếm</button>
-                    <a href="{{ url_for('home.them_capbac') }}" class="btn btn-success ms-2">Thêm</a>
-                    <button class="btn btn-danger ms-2">Xóa</button>
+                <div class="d-flex align-items-center gap-2">
+                    <!-- Form tìm kiếm -->
+                    <form action="{{ url_for('home.tim_kiem_capbac') }}" method="GET" class="d-flex">
+                        <input type="text" class="form-control me-2" name="search" placeholder="Tìm kiếm tên bậc..."
+                            value="{{ request.args.get('search', '') }}">
+                        <button type="submit" class="btn btn-primary btn-lg">Tìm kiếm</button>
+                    </form>
+            
+                    <!-- Nút thêm cấp bậc -->
+                    <a href="{{ url_for('home.them_capbac') }}" class="btn btn-success btn-lg d-flex align-items-center justify-content-center">Thêm</a>
+            
+                    <!-- Form xóa cấp bậc -->
+                    <form method="POST" action="{{ url_for('home.xoa_capbac') }}">
+                        <button type="submit" class="btn btn-danger btn-lg d-flex align-items-center justify-content-center">Xóa</button>
+                    </form>
                 </div>
                 <table class="table table-striped mt-3">
                     <thead class="table-primary">
@@ -59,7 +68,8 @@
                             <th>Tên bậc</th>
                             <th>Ngày tạo</th>
                             <th>Định mức</th>
-                            <th>Tích vào để xóa</th>
+                            <th>Hành động</th>
+                            <th>Chọn để xóa</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,12 +84,14 @@
                                     Xem chi tiết
                                 </a>
                             </td>
-                            <td><input type="checkbox"></td>
+                            <td>
+                                <input type="checkbox" name="xoa_capbac" value="{{ capbac.MaCapBac }}">
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                </form>
+
             </div>
         </div>
     </div>

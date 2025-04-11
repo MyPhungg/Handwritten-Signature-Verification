@@ -28,10 +28,9 @@
             <label for="bac_thanhvien">Bậc thành viên áp dụng:</label>
             <select id="bac_thanhvien" name="CapBacThanhVien" class="select-field" required>
                 <option value="" disabled selected>Chọn bậc thành viên</option>
-                <option value="CB1">Đồng</option>
-                <option value="CB2">Bạc</option>
-                <option value="CB3">Vàng</option>
-                <option value="CB4">Kim cương</option>
+                {% for cb in danh_sach_cap_bac %}
+                    <option value="{{ cb.MaCapBac }}">{{ cb.TenCapBac }}</option>
+                {% endfor %}
                 <option value="">Không hạn định</option>
             </select>
 
@@ -62,7 +61,7 @@
 
             <script>
                 document.getElementById("btnXong").addEventListener("click", function () {
-                window.location.href = "{{ url_for('home.chinhsua_uudai') }}";
+                window.location.href = "{{ url_for('home.admin_uudai') }}";
             });
 </script>
 

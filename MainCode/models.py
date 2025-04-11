@@ -73,9 +73,9 @@ class KhachHang(db.Model):
     NgheNghiep = db.Column(db.String(100), nullable=False)
     Email = db.Column(db.String(100), nullable=False)
     MaNVQL = db.Column(db.String(10), db.ForeignKey(
-        'nhanvien.MaNV'), nullable=False)
+        'nhanvien.MaNV'), nullable=False, default="NV1")
     MaCapBac = db.Column(db.String(10), db.ForeignKey(
-        'capbackh.MaCapBac'), nullable=False)
+        'capbackh.MaCapBac'), nullable=False, default="Thường")
     ChuKy = db.Column(db.String(1000), nullable=False)
 
     nhanvien = db.relationship('NhanVien', backref='khachhang')
@@ -115,6 +115,17 @@ class LichSuGiaoDich(db.Model):
         'taikhoan.MaTK'), nullable=False)
 
     taikhoan = db.relationship('TaiKhoan', backref='lichsugiaodich')
+ 
+# Model lstichdiem
+class LichSuTichDiem(db.Model):
+    __tablename__ = 'lichsutichdiem'
+
+    MaADB = db.Column(db.String(10), primary_key=True)
+    ThoiGian = db.Column(db.Date, nullable=False)
+    Diem = db.Column(db.Integer, nullable=False)
+    MaKH = db.Column(db.String(10), db.ForeignKey('khachhang.MaKH'), nullable=False)
+
+    khachhang = db.relationship('KhachHang', backref='lichsutichdiem')
 
 # Model loaitk
 
