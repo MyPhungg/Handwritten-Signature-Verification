@@ -1,9 +1,0 @@
-# file 1flask.py và file login.py tui giữ để có gì backup phần của tui (Phụng)
-# chạy chung bằng app.py
-# thiết lập blueprint trong __init__.py
-# các class chuyển đổi CSDL viết trong models.py
-# static chứa css, js, img
-# templates chứa file html
-# routes chứa file py xử lý BE 
-# config.py để kết nối CSDL
-import re
