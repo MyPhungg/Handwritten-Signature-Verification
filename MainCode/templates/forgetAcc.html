@@ -36,7 +36,11 @@
         </div>
         <div class="col-md-6 d-flex flex-column justify-content-center">
           <div style="max-width: 400px; margin-left: 12%">
-            <form action="{{ url_for('auth.forgetAccSubmit') }}" method="POST">
+            <form
+              action="{{ url_for('auth.forgetAccSubmit') }}"
+              method="POST"
+              onsubmit="return validateFormForgetAcc(event)"
+            >
               <div
                 id="inputForm"
                 style="display: {% if not show_result %}block{% else %}none{% endif %};"
@@ -50,8 +54,14 @@
                     id="phonenumber"
                     name="phonenumber"
                     placeholder="Nhập số điện thoại"
+                    value="{{soDienThoai}}"
                     required
                   />
+                  <span
+                    id="phonenumber-error"
+                    class="text-danger mt-1"
+                    style="font-size: 14px"
+                  ></span>
                 </div>
 
                 <label class="form-label">Chọn hình thức xác thực:</label>
@@ -95,6 +105,11 @@
                     placeholder="Nhập số CCCD"
                     required
                   />
+                  <span
+                    id="cccd-error"
+                    class="text-danger mt-1"
+                    style="font-size: 14px"
+                  ></span>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">
                   Xác nhận

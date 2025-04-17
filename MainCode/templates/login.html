@@ -70,9 +70,8 @@
               <p
                 class="text-end fst-italic"
                 style="cursor: pointer; color: blue"
-                onclick="goForgetPass()"
               >
-                Quên mật khẩu?
+                <a href="{{url_for('auth.forgetPass')}}"> Quên mật khẩu?</a>
               </p>
               <p class="text-end fst-italic" onclick="goForgetPass()"></p>
               <button type="submit" class="btn btn-primary w-100">

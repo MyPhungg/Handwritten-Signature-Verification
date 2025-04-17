@@ -5,6 +5,8 @@ from models import LoaiTK
 
 account_bp = Blueprint('account', __name__)
 
+# Chọn acc
+
 
 @account_bp.route('/chooseAcc', methods=['GET', 'POST'])
 def chooseAcc():
