@@ -92,10 +92,11 @@ class KhuyenMai(db.Model):
     ThoiGian = db.Column(db.Date, nullable=False)
     LoaiTKApDung = db.Column(db.String(10), db.ForeignKey(
         'loaitk.MaLoai'), nullable=False)
-    CapBacThanhVien = db.Column(db.String(10), db.ForeignKey('capbackh.MaCapBac'), nullable=True)
+    CapBacThanhVien = db.Column(db.String(10), db.ForeignKey(
+        'capbackh.MaCapBac'), nullable=True)
     LoaiKM = db.Column(db.String(50), nullable=False)
     GiaTriKM = db.Column(db.Integer, nullable=False)
-    
+
     loaitk = db.relationship('LoaiTK', backref='khuyenmai')
     capbackh = db.relationship('CapBacKH', backref='khuyenmai')
 
@@ -146,9 +147,10 @@ class NhanVien(db.Model):
     HoTen = db.Column(db.String(50), nullable=False)
     MaNVQL = db.Column(db.String(10), db.ForeignKey(
         'nhanvien.MaNV'), nullable=False)
-
+    SoCCCD = db.Column(db.String(12), nullable=False)
+    SoDienThoai = db.Column(db.String(10), nullable=False)
     quanly = db.relationship('NhanVien', remote_side=[
-                             MaNV], backref='nhanvien')
+        MaNV], backref='nhanvien')
 
 # Model quanlycapbac
 
