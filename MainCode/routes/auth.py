@@ -3,50 +3,78 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 import numpy as np
 import os
+import vc2
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask import session, flash
 from models import AccountKH, KhachHang, AccountNV, NhanVien
 auth_bp = Blueprint('auth', __name__)
+from tensorflow.keras.models import model_from_json
+from tensorflow.keras.models import Model
+from sklearn.metrics.pairwise import cosine_similarity
 
 
-# Load mô hình chữ ký
-current_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.abspath(
-    os.path.join(current_dir, '..', '..',
-                 'Handwritten_Signature_Verification', 'my_model.keras')
-)
-model = load_model(model_path)
+base_model_path = os.path.join(os.path.dirname(__file__), '..', '..', 'Handwritten_Signature_Verification')
+with open(os.path.join(base_model_path, "model.json"), "r") as json_file:
+    model = model_from_json(json_file.read())
 
-# Hàm xử lý tiền ảnh
+model.load_weights(os.path.join(base_model_path, "model.weights.h5"))
 
 
-def preprocess_image(image_path):
-    img = Image.open(image_path).convert("L")  # grayscale
-    img = img.resize((128, 128))               # resize
-    img_array = np.array(img) / 255.0          # normalize
-    img_array = img_array.reshape(1, 128, 128, 1)
-    return img_array
+# Tạo intermediate_layer_model giống phần huấn luyện:
+# Mô hình dùng để trích đặc trưng phải lấy đầu ra từ lớp áp chót (Dense(256)):
+intermediate_layer_model = Model(inputs=model.input, outputs=model.layers[-2].output)
 
-# Hàm xử lý chữ ký thật hoặc giả
+# Hàm tiền xử lý ảnh chuẩn với VGG16:
+def extract_features(image_path):
+    image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = cv2.resize(image, (224, 224))
+    image = image.astype('float32') / 255.0
+    image = np.expand_dims(image, axis=0)
+
+    features = intermediate_layer_model.predict(image)
+    return features
 
 
-def verify_signature(file):
-    # Lưu ảnh tạm thời
-    filename = secure_filename(file.filename)
-    upload_path = os.path.join(
-        current_dir, '..', '..', 'Handwritten_Signature_Verification', 'my_model.keras')
-    file.save(upload_path)
+# Duyệt toàn bộ data
+dataset_root = os.path.join(os.path.dirname(__file__), '..', '..', 'Handwritten_Signature_Verification', 'Dataset')
 
-    # Tiền xử lý và dự đoán
-    image_array = preprocess_image(upload_path)
-    prediction = model.predict(image_array)[0][0]
+real_paths = []
+forge_paths = []
 
-    # Gán nhãn và confidence
-    label = "Thật" if prediction >= 0.5 else "Giả"
-    confidence = round(float(prediction if prediction >=
-                       0.5 else 1 - prediction) * 100, 2)
+for folder_name in sorted(os.listdir(dataset_root)):
+    folder_path = os.path.join(dataset_root, folder_name)
+    if os.path.isdir(folder_path):
+        real_dir = os.path.join(folder_path, 'real')
+        forge_dir = os.path.join(folder_path, 'forge')
 
-    return label, confidence
+        # Lấy danh sách ảnh thật và giả
+        if os.path.exists(real_dir):
+            for img in os.listdir(real_dir):
+                real_paths.append(os.path.join(real_dir, img))
+
+        if os.path.exists(forge_dir):
+            for img in os.listdir(forge_dir):
+                forge_paths.append(os.path.join(forge_dir, img))
+
+print(f"Found {len(real_paths)} real images, {len(forge_paths)} forged images.")
+
+
+
+
+real_feature = extract_features(real_paths[0])
+test_feature = extract_features(forge_paths[0])  # hoặc ảnh upload
+
+cos_sim = cosine_similarity(real_feature, test_feature)[0][0]
+euclidean = np.linalg.norm(real_feature - test_feature)
+
+print(f"V Cosine Similarity: {cos_sim:.4f}")
+print(f"X Euclidean Distance: {euclidean:.4f}")
+
+if cos_sim > 0.85:
+    print("V Kết luận: Chữ ký giống nhau (THẬT)")
+else:
+    print("X Kết luận: Chữ ký KHÁC nhau (GIẢ)")
 
 # Đăng nhập
 
@@ -212,35 +240,49 @@ def forgetPassSubmit():
         return process_forgot_password(username, cccd, authMethod)
 
 
-@auth_bp.route('/predict', methods=['POST'])
-def predict_signature():
-    if 'signature' not in request.files:
-        flash('Không tìm thấy ảnh chữ ký!', 'error')
-        return redirect(request.referrer)
+@auth_bp.route('/verify-signature', methods=['GET', 'POST'])
+def verify_signature():
+    if request.method == 'POST':
+        file = request.files['signature']
+        if file:
+            filename = secure_filename(file.filename)
+            UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', '..', 'Handwritten_Signature_Verification', 'Dataset')
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-    file = request.files['signature']
-    if file.filename == '':
-        flash('Chưa chọn file!', 'error')
-        return redirect(request.referrer)
+            upload_path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(upload_path)
 
-    label, confidence = verify_signature(file)
-    flash(f'Chữ ký được xác định là: {label} ({confidence}%)', 'success')
-    return render_template('verify_result.html', label=label, confidence=confidence)
+            # Trích đặc trưng ảnh upload
+            feature_upload = extract_features(upload_path)
 
+            # So sánh với nhiều mẫu thật
+            cos_similarities = []
+            euclidean_distances = []
 
-@auth_bp.route('/test-signature', methods=['GET'])
-def test_signature_page():
-    return render_template('test_signature.html')
+            # Có thể chỉ lấy 5 mẫu thật đầu tiên (để giảm thời gian tính toán)
+            num_samples = 5
+            for real_path in real_paths[:num_samples]:
+                feature_real = extract_features(real_path)
+                cos_sim = cosine_similarity(feature_real, feature_upload)[0][0]
+                euclidean = np.linalg.norm(feature_real - feature_upload)
 
+                cos_similarities.append(cos_sim)
+                euclidean_distances.append(euclidean)
 
-@auth_bp.route('/api/predict', methods=['POST'])
-def api_predict_signature():
-    if 'signature' not in request.files:
-        return {'error': 'Không tìm thấy ảnh chữ ký!'}, 400
+            # Tính giá trị trung bình / tối đa
+            avg_cos_sim = np.mean(cos_similarities)
+            min_euclidean = np.min(euclidean_distances)
 
-    file = request.files['signature']
-    if file.filename == '':
-        return {'error': 'Chưa chọn file!'}, 400
+            # Ngưỡng phân biệt tốt hơn (đã giảm nhẹ)
+            threshold_cos = 0.70
 
-    label, confidence = verify_signature(file)
-    return {'label': label, 'confidence': confidence}
+            if avg_cos_sim > threshold_cos:
+                result = "V Chữ ký giống nhau (THẬT)"
+            else:
+                result = "X Chữ ký khác nhau (GIẢ)"
+
+            return render_template('verify_signature.html',
+                                   result=result,
+                                   cos_sim=f"{avg_cos_sim:.4f}",
+                                   euclidean=f"{min_euclidean:.4f}")
+    return render_template('verify_signature.html')
