@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-
+from datetime import datetime
 db = SQLAlchemy()
 # Model accountkh
 
@@ -114,7 +114,8 @@ class LichSuGiaoDich(db.Model):
     HinhThuc = db.Column(db.String(100), nullable=False)
     TKGD = db.Column(db.String(50), db.ForeignKey(
         'taikhoan.MaTK'), nullable=False)
-
+    MaKyHan = db.Column(db.String(10), nullable=False)
+    TenDM = db.Column(db.String(100), nullable=False)
     taikhoan = db.relationship('TaiKhoan', backref='lichsugiaodich')
  
 # Model lstichdiem
@@ -147,8 +148,8 @@ class NhanVien(db.Model):
     HoTen = db.Column(db.String(50), nullable=False)
     MaNVQL = db.Column(db.String(10), db.ForeignKey(
         'nhanvien.MaNV'), nullable=False)
-    SoCCCD = db.Column(db.String(12), nullable=False)
-    SoDienThoai = db.Column(db.String(10), nullable=False)
+    CCCD = db.Column(db.String(12), nullable=False)
+    SDT = db.Column(db.String(10), nullable=False)
     quanly = db.relationship('NhanVien', remote_side=[
         MaNV], backref='nhanvien')
 
@@ -177,6 +178,17 @@ class TaiKhoan(db.Model):
         'khachhang.MaKH'), nullable=False)
     STK = db.Column(db.String(50), nullable=False)
     NgayDangKy = db.Column(db.Date, nullable=False)
+    TrangThai = db.Column(db.Integer, nullable=False)
 
     loaitk = db.relationship('LoaiTK', backref='taikhoan')
     khachhang = db.relationship('KhachHang', backref='taikhoan')
+
+
+
+class SignatureVector(db.Model):
+    __tablename__ = 'signature_vectors'
+
+    MaVector = db.Column(db.Integer, primary_key=True)
+    MaKH = db.Column(db.String(50), nullable=False)
+    vector = db.Column(db.Text, nullable=False)  # lưu JSON string
+    NgayTao = db.Column(db.DateTime, default=datetime.utcnow)

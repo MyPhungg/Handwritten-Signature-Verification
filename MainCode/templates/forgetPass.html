@@ -34,151 +34,179 @@
             style="max-width: 100%; height: auto"
           />
         </div>
+
         <div class="col-md-6 d-flex flex-column justify-content-center">
           <div style="max-width: 400px; margin-left: 12%">
+
+            <!-- Form chọn hình thức xác thực -->
+            <div class="{% if not show_result %}d-block{% else %}d-none{% endif %}">
+              <h1 class="text-center">Lấy lại mật khẩu</h1>
+
+              <label class="form-label">Chọn hình thức xác thực:</label>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="authMethod"
+                  value="cccd"
+                  id="authCCCD"
+                  onclick="showCCCD()"
+                />
+                <label class="form-check-label" for="authCCCD">
+                  Xác thực bằng số CCCD
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="authMethod"
+                  value="signature"
+                  id="authSignature"
+                  onclick="showSignature()"
+                />
+                <label class="form-check-label" for="authSignature">
+                  Xác thực bằng chữ ký viết tay
+                </label>
+              </div>
+            </div>
+
+            <!-- Form xác thực CCCD -->
             <form
-              action="{{url_for('auth.forgetPassSubmit')}}"
-              method="POST"
-              onsubmit="return validateFormForgetPass(event)"
+            action="{{ url_for('auth.verify_cccd') }}"
+            method="POST"
+            class="mt-4"
+            id="cccdForm"
+            style="display: none"
+            onsubmit="return validateFormForgetPass(event)"
             >
-              <div
-                id="inputForm"
-                style="display: {% if not show_result%}block{%else%}none{%endif%}"
-              >
-                <h1 class="text-center">Lấy lại mật khẩu</h1>
-                <div class="mb-3">
-                  <label for="username" class="form-label"
-                    >Tên đăng nhập:
-                  </label>
-                  <input
-                    type="input"
-                    class="form-control"
-                    id="username"
-                    name="username"
-                    placeholder="Nhập tên đăng nhập"
-                    value="{{username}}"
-                    required
-                  />
-                  <span
-                    id="username-error"
-                    class="text-danger mt-1"
-                    style="font-size: 14px"
-                  ></span>
-                </div>
+            <h1 class="text-center">Xác thực CCCD</h1>
 
-                <label class="form-label">Chọn hình thức xác thực:</label>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    name="authMethod"
-                    value="cccd"
-                    id="authCCCD"
-                    onclick="showCCCD()"
-                  />
-                  <label class="form-check-label" for="authCCCD">
-                    Xác thực bằng số CCCD
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    name="authMethod"
-                    value="signature"
-                    id="authSignature"
-                    onclick="showSignature()"
-                  />
-                  <label class="form-check-label" for="authSignature">
-                    Xác thực bằng chữ ký viết tay
-                  </label>
-                </div>
-              </div>
+            <div class="mb-3">
+              <label for="cccd" class="form-label">Số CCCD:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="cccd"
+                name="cccd"
+                placeholder="Nhập số CCCD"
+                required
+              />
+              <span
+                id="cccd-error"
+                class="text-danger mt-1"
+                style="font-size: 14px"
+              ></span>
+            </div>
 
-              <!-- Form nhập CCCD -->
-              <div id="cccdForm" style="display: none">
-                <div class="mb-3">
-                  <label for="cccd" class="form-label">Số CCCD: </label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="cccd"
-                    name="cccd"
-                    placeholder="Nhập số CCCD"
-                  />
-                  <span
-                    id="cccd-error"
-                    class="text-danger mt-1"
-                    style="font-size: 14px"
-                  ></span>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">
-                  Xác nhận
-                </button>
-              </div>
+            <div class="mb-3">
+              <label for="usernameInput" class="form-label">Tên đăng nhập:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="usernameInput"
+                name="username"
+                placeholder="Nhập tên đăng nhập"
+                value="{{ username }}"
+                required
+              />
+              <span
+                id="username-error"
+                class="text-danger mt-1"
+                style="font-size: 14px"
+              ></span>
+            </div>
 
-              <!-- Form tải lên chữ ký -->
-              <div id="signatureForm" style="display: none">
-                <div class="mb-3">
-                  <label for="formFile" class="form-label"
-                    >Chọn ảnh chữ ký</label
-                  >
-                  <input class="form-control" type="file" id="formFile" />
-                </div>
-                <button type="submit" class="btn btn-primary w-100">
-                  Xác nhận
-                </button>
-              </div>
-
-              <!-- Form kết quả -->
-              <div
-                id="resultForm"
-                style="display: {% if show_result%}block{%else%}none{%endif%}"
-              >
-                <h1 class="text-center">Lấy lại mật khẩu</h1>
-                <div class="mb-3">
-                  <label for="username" class="form-label"
-                    >Tên đăng nhập:
-                  </label>
-                  <input
-                    class="form-control"
-                    type="text"
-                    value="{{username}}"
-                    aria-label="Disabled input example"
-                    disabled
-                    readonly
-                  />
-                </div>
-                <div class="mb-3">
-                  <label for="username" class="form-label">Mật khẩu: </label>
-                  <input
-                    class="form-control"
-                    type="text"
-                    value="{{password}}"
-                    aria-label="Disabled input example"
-                    disabled
-                    readonly
-                  />
-                </div>
-                <p class="text-danger">
-                  Vui lòng nhớ kỹ mật khẩu để đăng nhập!!!
-                </p>
-              </div>
-              <p
-                class="text-end fst-italic"
-                style="cursor: pointer; color: blue"
-                Quay
-                lại
-                đăng
-                nhập?
-              >
-                <a href="{{url_for('auth.login')}}"> Quay lại đăng nhập? </a>
-              </p>
+            <button type="submit" class="btn btn-primary w-100">
+              Xác nhận
+            </button>
             </form>
+
+
+            <!-- Form xác thực chữ ký -->
+            <form
+              action="{{ url_for('auth.verify_signature') }}"
+              method="POST"
+              enctype="multipart/form-data"
+              class="mt-4"
+              id="signatureForm"
+              style="display: none"
+            >
+              <h1 class="text-center">Xác thực chữ ký</h1>
+
+              <div class="mb-3">
+                <label for="formFile" class="form-label">Chọn ảnh chữ ký:</label>
+                <input
+                  class="form-control"
+                  type="file"
+                  id="formFile"
+                  name="signature"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="signature-username" class="form-label">Tên đăng nhập:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="username"
+                  id="signature-username"
+                  placeholder="Nhập tên đăng nhập"
+                  required
+                  value="{{ username }}"
+                />
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100">Xác nhận</button>
+            </form>
+
+            <!-- Form hiển thị kết quả -->
+            {% if show_result %}
+            <div class="mt-4">
+              <h2 class="text-center">Kết quả xác thực</h2>
+
+              <label for="username">Tên đăng nhập:</label>
+              <input type="text" name="username" class="form-control" value="{{ username }}" readonly>
+
+              <label for="password" class="mt-2">Mật khẩu:</label>
+              <input type="text" name="password" class="form-control" value="{{ password }}" readonly>
+
+              <p class="text-danger mt-2">{{ result }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Link quay lại -->
+            <p class="text-end fst-italic mt-3">
+              <a href="{{ url_for('auth.login') }}" style="color: blue">Quay lại đăng nhập?</a>
+            </p>
           </div>
         </div>
       </div>
     </div>
-    <script></script>
+
+    <script>
+      function showCCCD() {
+        document.getElementById("cccdForm").style.display = "block";
+        document.getElementById("signatureForm").style.display = "none";
+        // copy username từ input chính
+        const username = document.getElementById("usernameInput").value;
+        document.getElementById("cccd-username").value = username;
+      }
+
+      function showSignature() {
+        document.getElementById("cccdForm").style.display = "none";
+        document.getElementById("signatureForm").style.display = "block";
+        const username = document.getElementById("usernameInput").value;
+        document.getElementById("signature-username").value = username;
+      }
+    </script>
+    <script>
+      {% with messages = get_flashed_messages(with_categories=True) %}
+          {% for category, message in messages %}
+              alert("{{ message }}");
+          {% endfor %}
+      {% endwith %}
+    </script>
   </body>
 </html>

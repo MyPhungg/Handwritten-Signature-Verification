@@ -1,23 +1,27 @@
+# auto_update.py
+from app import app
 import schedule
+import threading
 import time
-from flask import Flask
-from models import db, KhachHang, cap_nhat_cap_bac
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/bank'
-db.init_app(app)
+from models import KhachHang, cap_nhat_cap_bac,initialize_signature_vectors
 
 def run_update():
     with app.app_context():
-        print("Chạy cập nhật tự động...")
+        print("Đang cập nhật dữ liệu...")
         all_kh = KhachHang.query.all()
+        initialize_signature_vectors()
         for kh in all_kh:
             cap_nhat_cap_bac(kh.MaKH)
-        print("Cập nhật hoàn tất!")
+        print("Xong!")
 
-# Chạy mỗi 1 giờ
 schedule.every(1).hours.do(run_update)
 
-while True:
-    schedule.run_pending()
-    time.sleep(60)
+def run_schedule():
+    while True:
+        schedule.run_pending()
+        time.sleep(60)
+
+def start_update_thread():
+    thread = threading.Thread(target=run_schedule)
+    thread.daemon = True
+    thread.start()
