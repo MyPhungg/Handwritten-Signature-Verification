@@ -362,26 +362,26 @@ CREATE TABLE `nhanvien` (
   `MaNV` varchar(10) NOT NULL,
   `HoTen` varchar(50) NOT NULL,
   `MaNVQL` varchar(10) NOT NULL,
-  `CCCD` varchar(20) NOT NULL,
-  `SDT` varchar(10) NOT NULL
+  `SoCCCD` varchar(20) NOT NULL,
+  `SoDienThoai` varchar(10) NOT NULL,
+  `isDelete` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `nhanvien`
 --
 
-INSERT INTO `nhanvien` (`MaNV`, `HoTen`, `MaNVQL`, `CCCD`, `SDT`) VALUES
-('NV1', 'Nguyễn Văn A', 'NV1', '092200004299', ''),
-('NV10', 'Tô Thị J', 'NV6', '', ''),
-('NV2', 'Trần Thị B', 'NV1', '', ''),
-('NV3', 'Lê Văn C', 'NV1', '', ''),
-('NV4', 'Phạm Thị D', 'NV2', '', ''),
-('NV5', 'Hoàng Văn E', 'NV2', '', ''),
-('NV6', 'Đặng Thị F', 'NV3', '', ''),
-('NV7', 'Bùi Văn G', 'NV3', '', ''),
-('NV8', 'Vũ Thị H', 'NV4', '', ''),
-('NV9', 'Lý Văn I', 'NV5', '', '');
-
+INSERT INTO `nhanvien` (`MaNV`, `HoTen`, `MaNVQL`, `SoCCCD`, `SoDienThoai`, `isDelete`) VALUES
+('NV1', 'Nguyễn Văn A', 'NV1', '092200004299', '', 0),
+('NV10', 'Tô Thị J', 'NV6', '', '', 0),
+('NV2', 'Trần Thị B', 'NV1', '', '', 0),
+('NV3', 'Lê Văn C', 'NV1', '', '', 0),
+('NV4', 'Phạm Thị D', 'NV2', '', '', 0),
+('NV5', 'Hoàng Văn E', 'NV2', '', '', 0),
+('NV6', 'Đặng Thị F', 'NV3', '', '', 0),
+('NV7', 'Bùi Văn G', 'NV3', '', '', 0),
+('NV8', 'Vũ Thị H', 'NV4', '', '', 0),
+('NV9', 'Lý Văn I', 'NV5', '', '', 0);
 -- --------------------------------------------------------
 
 --
