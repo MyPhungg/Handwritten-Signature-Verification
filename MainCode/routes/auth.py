@@ -50,8 +50,7 @@ def extract_augmented_features(image_path, angles=None):
     return mean_feature
 
 # Lưu vector chữ ký vào DB (ảnh đã xoay và lấy trung bình)
-def save_mean_signature_vector(ma_kh):
-    folder_path = os.path.join('static', 'signatures', ma_kh)
+def save_mean_signature_vector(folder_path,ma_kh):
     if not os.path.exists(folder_path):
         print(f"Thư mục {folder_path} không tồn tại.")
         return
