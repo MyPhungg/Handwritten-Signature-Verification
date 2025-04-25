@@ -148,8 +148,9 @@ class NhanVien(db.Model):
     HoTen = db.Column(db.String(50), nullable=False)
     MaNVQL = db.Column(db.String(10), db.ForeignKey(
         'nhanvien.MaNV'), nullable=False)
-    CCCD = db.Column(db.String(12), nullable=False)
-    SDT = db.Column(db.String(10), nullable=False)
+    SoCCCD = db.Column(db.String(12), nullable=False)
+    SoDienThoai = db.Column(db.String(10), nullable=False)
+    isDelete = db.Column(SmallInteger,nullable=False)
     quanly = db.relationship('NhanVien', remote_side=[
         MaNV], backref='nhanvien')
 
