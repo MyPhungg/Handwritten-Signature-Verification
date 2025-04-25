@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-
+from sqlalchemy import SmallInteger
 db = SQLAlchemy()
 # Model accountkh
 
@@ -116,15 +116,18 @@ class LichSuGiaoDich(db.Model):
         'taikhoan.MaTK'), nullable=False)
 
     taikhoan = db.relationship('TaiKhoan', backref='lichsugiaodich')
- 
+
 # Model lstichdiem
+
+
 class LichSuTichDiem(db.Model):
     __tablename__ = 'lichsutichdiem'
 
     MaADB = db.Column(db.String(10), primary_key=True)
     ThoiGian = db.Column(db.Date, nullable=False)
     Diem = db.Column(db.Integer, nullable=False)
-    MaKH = db.Column(db.String(10), db.ForeignKey('khachhang.MaKH'), nullable=False)
+    MaKH = db.Column(db.String(10), db.ForeignKey(
+        'khachhang.MaKH'), nullable=False)
 
     khachhang = db.relationship('KhachHang', backref='lichsutichdiem')
 
@@ -149,6 +152,7 @@ class NhanVien(db.Model):
         'nhanvien.MaNV'), nullable=False)
     SoCCCD = db.Column(db.String(12), nullable=False)
     SoDienThoai = db.Column(db.String(10), nullable=False)
+    isDelete = db.Column(SmallInteger, nullable=False, default=0)
     quanly = db.relationship('NhanVien', remote_side=[
         MaNV], backref='nhanvien')
 

@@ -13,7 +13,7 @@ auth_bp = Blueprint('auth', __name__)
 current_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.abspath(
     os.path.join(current_dir, '..', '..',
-                 'Handwritten_Signature_Verification', 'my_model.keras')
+                 'Handwritten_Signature_Verification', 'model.h5')  # my_model.keras
 )
 model = load_model(model_path)
 
@@ -71,7 +71,9 @@ def login():
             session['MaNV'] = account_nv.MaNV
             session['user_type'] = 'NV'  # Lưu loại người dùng vào session
             return redirect(url_for('home.admin_uudai'))
-
+        if username == 'admin' and password == 'admin':
+            session['user_type'] = 'admin'
+            return redirect(url_for('admin.loadDanhSachNhanVien'))
         flash('Tên đăng nhập hoặc mật khẩu không đúng', 'error')
     return render_template('login.html')
 

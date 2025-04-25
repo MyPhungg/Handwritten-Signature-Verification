@@ -180,8 +180,9 @@ def validate_input(data):
 
 @home_bp.route('/admin/khachhang')
 def admin_khachhang():
+    ten = loadTenNhanVien()
     khach_hang_list = KhachHang.query.all()  # Lấy tất cả khách hàng từ database
-    return render_template('admin/chinhsuaKH.html', khach_hang_list=khach_hang_list)
+    return render_template('admin/chinhsuaKH.html', khach_hang_list=khach_hang_list, ten=ten)
 
 
 @home_bp.route('/khachhang/timkiem', methods=['GET'])
@@ -391,10 +392,20 @@ def tim_kiem_uudai():
 # -------------------Quản lý ưu đãi -----------------
 
 
+def loadTenNhanVien():
+    maNV = session['MaNV']
+    info = NhanVien.query.filter_by(MaNV=maNV).first()
+    if not info:
+        flash('Không tìm thấy thông tin nhân viên! Vui lòng đăng nhập lại', 'error')
+        return redirect(url_for('auth.login'))
+    return info.HoTen
+
+
 @home_bp.route('/admin/uudai')
 def admin_uudai():
+    ten = loadTenNhanVien()
     uu_dai_list = KhuyenMai.query.all()  # Lấy tất cả ưu đãi từ CSDL
-    return render_template('admin/chinhsuaUuDai.html', uu_dai_list=uu_dai_list)
+    return render_template('admin/chinhsuaUuDai.html', uu_dai_list=uu_dai_list, ten=ten)
 
 
 @home_bp.route("/them_uudai", methods=["GET", "POST"])
@@ -562,9 +573,10 @@ def xoa_capbac():
 
 @home_bp.route('/admin/cap_bac')
 def danh_sach_cap_bac():
+    ten = loadTenNhanVien()
     cap_bac_list = CapBacKH.query.all()  # Lấy toàn bộ danh sách cấp bậc từ DB
     return render_template('admin/chinhsuaCapBac.html',
-                           cap_bac_list=cap_bac_list)
+                           cap_bac_list=cap_bac_list, ten=ten)
 
 
 @home_bp.route('/capbac/<maCB>')
