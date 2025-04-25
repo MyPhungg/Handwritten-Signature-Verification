@@ -204,7 +204,7 @@ def process_forgot_account(soDienThoai, authMethod, cccd=None, file=None):
     # Tìm người dùng theo số điện thoại (ưu tiên Khách Hàng trước)
     user = KhachHang.query.filter_by(SoDienThoai=soDienThoai).first()
     if not user:
-        user = NhanVien.query.filter_by(SDT=soDienThoai).first()
+        user = NhanVien.query.filter_by(SoDienThoai=soDienThoai).first()
     if not user:
         flash('Không tồn tại tài khoản liên kết với số điện thoại này!', 'error')
         return render_template('forgetAcc.html', soDienThoai=soDienThoai)
@@ -353,7 +353,7 @@ def verify_cccd():
         # -------- Kiểm tra trong tài khoản nhân viên --------
         account_nv = AccountNV.query.filter_by(TenDangNhap=username_input).first()
         if account_nv:
-            nhanvien = NhanVien.query.filter_by(MaNV=account_nv.MaNV, CCCD=cccd_input).first()
+            nhanvien = NhanVien.query.filter_by(MaNV=account_nv.MaNV, SoCCCD=cccd_input).first()
             if nhanvien:
                 return render_template('forgetPass.html',
                                        result="Xác thực thành công (Nhân viên)",
