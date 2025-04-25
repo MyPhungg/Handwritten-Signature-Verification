@@ -32,10 +32,9 @@ def rotate_image(image, angle):
 # Hàm trích đặc trưng có xoay ảnh
 def extract_augmented_features(image_path, angles=None):
     if angles is None:
-        angles = [-15, -12, -9, -6, -3, 0, 3, 6, 9, 12] #Chỉnh sửa các góc ảnh xoay nếu cần
+        angles = [-15, -12, -9, -6, -3, 0, 3, 6, 9, 12]
 
-    image = cv2.imread(image_path)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = cv2.cvtColor(image_path, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (224, 224))
     feature_list = []
 
@@ -62,7 +61,7 @@ def save_mean_signature_vector(folder_path,ma_kh):
     if len(image_paths) == 0:
         print(f"Không tìm thấy ảnh chữ ký trong {folder_path}")
         return
-
+    
     vectors = [extract_augmented_features(img_path) for img_path in image_paths]
     mean_vector = np.mean(vectors, axis=0)
 
@@ -102,7 +101,7 @@ def get_vector_from_db(ma_kh):
 def compare_vectors(feature1, feature2, threshold=0.85):
     cos_sim = cosine_similarity([feature1], [feature2])[0][0]
     euclidean = np.linalg.norm(feature1 - feature2)
-    result = "Trùng khớp" if cos_sim > threshold else "Không trùng khớp"
+    result = True if cos_sim > threshold else False
     return {
         "result": result,
         "cosine_similarity": round(float(cos_sim), 4),
@@ -125,9 +124,8 @@ def verify_signature_with_augmentation(file, ma_kh, threshold=0.85):
 
         if image is None:
             return {
-                "success": False,
-                "message": "Không thể đọc ảnh từ file upload.",
-                "result": "Không xác thực được"
+                "result": False,
+                "message": "Không thể đọc ảnh từ file upload."
             }
 
         # Bước 2: Trích đặc trưng từ ảnh đã xử lý augmentation
@@ -137,9 +135,8 @@ def verify_signature_with_augmentation(file, ma_kh, threshold=0.85):
         reference_vector = get_vector_from_db(ma_kh)
         if reference_vector is None:
             return {
-                "success": False,
-                "message": "Không tìm thấy vector mẫu trong cơ sở dữ liệu.",
-                "result": "Không xác thực được"
+                "result": False,
+                "message": "Không tìm thấy vector mẫu trong cơ sở dữ liệu."
             }
 
         # Bước 4: So sánh vector
@@ -147,9 +144,8 @@ def verify_signature_with_augmentation(file, ma_kh, threshold=0.85):
 
     except Exception as e:
         return {
-            "success": False,
-            "message": f"Lỗi trong quá trình xác thực: {str(e)}",
-            "result": "Không xác thực được"
+            "result": False,
+            "message": f"Lỗi trong quá trình xác thực: {str(e)}"
         }
 
 
@@ -249,10 +245,10 @@ def process_forgot_account(soDienThoai, authMethod, cccd=None, file=None):
             flash('Không tìm thấy tài khoản khách hàng!', 'error')
             return render_template('forgetAcc.html', soDienThoai=soDienThoai)
 
-        result_verify = verify_signature_with_augmentation(file,user.maKH)
+        result_verify = verify_signature_with_augmentation(file,user.MaKH)
 
             
-        if result_verify['result'] == "Trùng khớp":
+        if result_verify['result']:
             flash('Xác thực chữ ký thành công!')
             return render_template('forgetAcc.html',
                                    soDienThoai=soDienThoai,
@@ -306,7 +302,7 @@ def verify_signature():
                 password = account.MatKhau
 
                 result_verify = verify_signature_with_augmentation(file,ma_kh)
-                if result_verify['result'] == "Trùng khớp":
+                if result_verify['result']:
                     result = "Xác thực thành công"
                     cos_sim = result['cosine_similarity']
                     euclidean = result['euclidean_distance']
@@ -392,19 +388,19 @@ def verify_signature_to_change_kh():
 
     if not kh:
         flash('Không tìm thấy khách hàng!', 'error')
-        return render_template(back, MaKH=maKH)
+        return redirect(url_for(back, maKH=kh.MaKH))
 
     if not file:
         flash('Vui lòng tải lên chữ ký!', 'error')
-        return render_template(back, MaKH=maKH)
+        return redirect(url_for(back, maKH=kh.MaKH))
 
     result_verify = verify_signature_with_augmentation(file,maKH)
-    if result_verify['result'] == 'Trùng khớp':
+    if result_verify['result']:
         flash('Xác thực thành công!', 'success')
         return redirect(url_for(come, maKH=kh.MaKH))
 
     flash('Chữ ký không trùng khớp!', 'error')
-    return render_template(back, khach_hang=kh)
+    return redirect(url_for(back, maKH=kh.MaKH))
 
 @auth_bp.route('/change_status', methods=['POST'])
 def dong_mo_tai_khoan():
@@ -425,7 +421,7 @@ def dong_mo_tai_khoan():
 
     result_verify = verify_signature_with_augmentation(file, maKH)
 
-    if result_verify['result'] == 'Trùng khớp':
+    if result_verify['result']:
         if taikhoan.TrangThai == 1:
             taikhoan.TrangThai = 0
             flash('Đã **đóng tài khoản** thành công.', 'success')
@@ -433,8 +429,8 @@ def dong_mo_tai_khoan():
             taikhoan.TrangThai = 1
             flash('Tài khoản đã được **mở lại**.', 'success')
 
-        db.session.commit()  # ✅ commit ở ngoài if
-        return redirect(url_for('home.admin_khachhang'))  # ✅ luôn return
+        db.session.commit()
+        return redirect(url_for('home.admin_khachhang')) 
     else:
         flash('Chữ ký không hợp lệ!', 'error')
         return render_template(
