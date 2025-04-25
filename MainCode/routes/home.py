@@ -180,9 +180,9 @@ def validate_input(data):
 
 @home_bp.route('/admin/khachhang')
 def admin_khachhang():
-    ten = loadTenNhanVien()
-    khach_hang_list = KhachHang.query.all()  # Lấy tất cả khách hàng từ database
-    return render_template('admin/chinhsuaKH.html', khach_hang_list=khach_hang_list, ten=ten)
+
+    tai_khoan_list = TaiKhoan.query.all()  # Lấy tất cả khách hàng từ database
+    return render_template('admin/chinhsuaKH.html', tai_khoan_list=tai_khoan_list)
 
 
 @home_bp.route('/khachhang/timkiem', methods=['GET'])
@@ -195,8 +195,11 @@ def tim_kiem_khachhang():
             KhachHang.HoTen.ilike(f"%{search_query}%")).all()
     else:
         khach_hang_list = KhachHang.query.all()
+    for khach_hang in khach_hang_list:
+        tai_khoan_list = [
+            tk for kh in khach_hang_list for tk in TaiKhoan.query.filter_by(MaKH=kh.MaKH).all()]
 
-    return render_template('admin/chinhsuaKH.html', khach_hang_list=khach_hang_list, search_query=search_query)
+    return render_template('admin/chinhsuaKH.html', tai_khoan_list=tai_khoan_list, search_query=search_query)
 
 
 @home_bp.route('/khachhang/<maKH>')
