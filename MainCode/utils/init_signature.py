@@ -6,7 +6,7 @@ def initialize_signature_vectors():
     for ma_kh in os.listdir(base_dir):
         folder_path = os.path.join(base_dir, ma_kh)
         if os.path.isdir(folder_path):
-            if get_vector_from_db(ma_kh) is None:
+            if get_vector_from_db(folder_path,ma_kh) is None:
                 if any(f.lower().endswith(('.png', '.jpg', '.jpeg')) for f in os.listdir(folder_path)):
                     print(f"[INFO] Đang xử lý chữ ký cho khách hàng: {ma_kh}")
                     save_mean_signature_vector(ma_kh)
