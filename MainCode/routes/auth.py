@@ -33,7 +33,13 @@ def rotate_image(image, angle):
 def extract_augmented_features(image_path, angles=None):
     if angles is None:
         angles = [-15, -12, -9, -6, -3, 0, 3, 6, 9, 12]
-
+    # Nếu truyền vào là đường dẫn file
+    if isinstance(image_input, str):
+        image = cv2.imread(image_input)
+        if image is None:
+            raise ValueError(f"Không đọc được ảnh từ đường dẫn: {image_input}")
+    else:
+        image = image_input
     image = cv2.cvtColor(image_path, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (224, 224))
     feature_list = []
