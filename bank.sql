@@ -480,7 +480,8 @@ CREATE TABLE `taikhoan` (
   `MaKH` varchar(10) NOT NULL,
   `STK` varchar(50) NOT NULL,
   `NgayDangKy` date NOT NULL,
-  `TrangThai` int(2) NOT NULL
+  `TrangThai` int(2) NOT NULL,
+  `ThoiGianDong` DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
