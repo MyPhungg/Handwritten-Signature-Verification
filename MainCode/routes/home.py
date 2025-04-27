@@ -234,8 +234,8 @@ scheduler.start()
 
 @home_bp.route('/admin/khachhang')
 def admin_khachhang():
-    tai_khoan_list = TaiKhoan.query.all()  # Lấy tất cả khách hàng từ database
-    return render_template('admin/chinhsuaKH.html', tai_khoan_list=tai_khoan_list)
+    khach_hang_list = TaiKhoan.query.all()  # Lấy tất cả khách hàng từ database
+    return render_template('admin/chinhsuaKH.html', khach_hang_list=khach_hang_list)
 
 
 @home_bp.route('/khachhang/timkiem', methods=['GET'])
