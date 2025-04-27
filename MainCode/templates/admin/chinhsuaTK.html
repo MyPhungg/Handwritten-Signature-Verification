@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tài Khoản</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chinhSuaKhachHang.css') }}">
+</head>
+<body>
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="{{ url_for('auth.login') }}"><i class="fa-solid fa-right-from-bracket fa-lg"></i></a>
+        <div class="text-center mb-3">
+            <div class="rounded-circle bg-primary text-white"
+                 style="width: 80px; height: 80px; line-height: 80px; margin: auto;">A</div>
+            <p class="mt-2">Nhân viên A</p>
+        </div>
+        <a href="{{ url_for('home.admin_khachhang') }}"><div class="menu-item">Khách hàng</div></a>
+        <a href="{{ url_for('home.admin_uudai') }}"><div class="menu-item">Ưu đãi</div></a>
+        <a href="{{ url_for('home.danh_sach_cap_bac') }}"><div class="menu-item">Bậc thành viên</div></a>
+        <a href="{{ url_for('home.admin_taikhoan') }}"><div class="menu-item active">Tài khoản</div></a>
+    </div>
+
+    <!-- Main content -->
+    <div class="content flex-grow-1">
+        <h4 class="text-muted">Quản lý Tài khoản</h4>
+
+        <div class="card p-3">
+            <form action="{{ url_for('home.tim_kiem_taikhoan') }}" method="GET" class="d-flex">
+                <input type="text" class="form-control me-2" name="search" placeholder="Tìm kiếm theo tên khách hàng..." value="{{ request.args.get('search', '') }}">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </form>
+
+            <table class="table table-striped mt-3">
+                <thead class="table-primary">
+                <tr>
+                    <th>Mã TK</th>
+                    <th>Tên khách hàng</th>
+                    <th>Loại tài khoản</th>
+                    <th>Trạng thái</th>
+                    <th>Số dư</th>
+                    <th>Hành động</td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for tk in tai_khoan_list %}
+                <tr>
+                    <td>{{ tk.MaTK }}</td>
+                    <td>{{ tk.khachhang.HoTen }}</td>
+                    <td>{{ tk.loaitk.TenLoai }}</td>
+                    <td>
+                        {% if tk.TrangThai == 1 %}
+                            <span class="badge bg-success">Đang mở</span>
+                        {% else %}
+                            <span class="badge bg-danger">Đang đóng</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ "{:,.0f}".format(tk.SoDu) }} VNĐ</td>
+                    <td>
+                        {% if tk.TrangThai == 1 %}
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#closeModal_{{ tk.MaTK }}">Đóng tài khoản</button>
+                        {% else %}
+                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#openModal_{{ tk.MaTK }}">Mở tài khoản</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+{% for tk in tai_khoan_list %}
+<!-- Modal đóng tài khoản -->
+<div class="modal fade" id="closeModal_{{ tk.MaTK }}" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('auth.dong_mo_tai_khoan') }}" enctype="multipart/form-data" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận đóng tài khoản</h5>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn đóng tài khoản của <strong>{{ tk.khachhang.HoTen }}</strong>?</p>
+                <p>Số dư hiện tại: <strong>{{ "{:,.0f}".format(tk.SoDu) }} VNĐ</strong></p>
+                <input type="hidden" name="maTK" value="{{ tk.MaTK }}">
+                <input type="hidden" name="action" value="close">
+                <div class="mb-3">
+                    <label>Ảnh chữ ký xác nhận:</label>
+                    <input type="file" name="signature" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-danger">Đồng ý đóng</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal mở tài khoản -->
+<div class="modal fade" id="openModal_{{ tk.MaTK }}" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('auth.dong_mo_tai_khoan') }}" enctype="multipart/form-data" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác thực mở tài khoản</h5>
+            </div>
+            <div class="modal-body">
+                <p>Mở lại tài khoản cho <strong>{{ tk.khachhang.HoTen }}</strong>.</p>
+                <input type="hidden" name="maTK" value="{{ tk.MaTK }}">
+                <input type="hidden" name="action" value="open">
+                <div class="mb-3">
+                    <label>Ảnh chữ ký xác nhận:</label>
+                    <input type="file" name="signature" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Đồng ý mở</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endfor %}
+
+<!-- Thông báo flash -->
+<script>
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% for category, message in messages %}
+            alert("{{ message }}");
+        {% endfor %}
+    {% endwith %}
+</script>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
