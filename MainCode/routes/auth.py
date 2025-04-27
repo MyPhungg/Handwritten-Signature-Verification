@@ -419,11 +419,11 @@ def dong_mo_tai_khoan():
 
     if not kh or not taikhoan:
         flash('Không tìm thấy khách hàng hoặc tài khoản.', 'danger')
-        return redirect(url_for('home.admin_khachhang', khach_hang=kh))
+        return redirect(url_for('home.admin_taikhoan', khach_hang=kh))
 
     if not file:
         flash('Vui lòng tải lên ảnh chữ ký!', 'warning')
-        return redirect(url_for('home.admin_khachhang', khach_hang=kh))
+        return redirect(url_for('home.admin_taikhoan', khach_hang=kh))
 
     result_verify = verify_signature_with_augmentation(file, maKH)
 
@@ -436,15 +436,10 @@ def dong_mo_tai_khoan():
             flash('Tài khoản đã được **mở lại**.', 'success')
 
         db.session.commit()
-        return redirect(url_for('home.admin_khachhang')) 
+        return redirect(url_for('home.admin_taikhoan'))
     else:
         flash('Chữ ký không hợp lệ!', 'error')
-        return render_template(
-            'admin/chinhsuaKH.html',
-            tai_khoan_list=TaiKhoan.query.all(),
-            show_modal=maTK
-        )
-
+        redirect(url_for('home.admin_taikhoan'))
 
 
 
