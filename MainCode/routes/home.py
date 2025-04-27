@@ -4,7 +4,8 @@ from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuG
 from datetime import datetime, date
 from decimal import Decimal
 import re
-
+import random
+import string
 from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, LichSuTichDiem, NhanVien
 from datetime import datetime, date
 from decimal import Decimal
@@ -174,6 +175,59 @@ def validate_input(data):
             errors[field] = error_msg  # Lưu thông báo lỗi nếu không khớp regex
 
     return errors  # Trả về dict lỗi, rỗng nếu không có lỗi
+
+
+
+#-------------Quản lý tài khoản-------------------
+@home_bp.route('/admin/taikhoan')
+def admin_taikhoan():
+    tai_khoan_list = TaiKhoan.query.all()  # Lấy tất cả khách hàng từ database
+    return render_template('admin/chinhsuaTK.html', tai_khoan_list=tai_khoan_list)
+
+# TÌM KIẾM TÀI KHOẢN
+@home_bp.route('/taikhoan/timkiem', methods=['GET'])
+def tim_kiem_taikhoan():
+    search_query = request.args.get('search', '').strip()
+
+    if search_query:
+        tai_khoan_list = TaiKhoan.query.join(KhachHang).filter(
+            KhachHang.HoTen.ilike(f"%{search_query}%")
+        ).all()
+    else:
+        tai_khoan_list = TaiKhoan.query.all()
+
+    return render_template('admin/chinhsuaTK.html', tai_khoan_list=tai_khoan_list, search_query=search_query)
+
+# TỰ ĐỘNG ĐÓNG TÀI KHOẢN NẾU QUÁ 1 THÁNG CHƯA MỞ LẠI
+def dong_tai_khoan(maTK):
+    tai_khoan = TaiKhoan.query.get(maTK)
+    if tai_khoan:
+        tai_khoan.TrangThai = 0  # Đánh dấu tài khoản là đã đóng
+        tai_khoan.ThoiGianDong = datetime.now()  # Lưu thời gian đóng
+        db.session.commit()
+        
+def xoa_tai_khoan_cu():
+    # Lấy tất cả các tài khoản bị đóng
+    tai_khoan_dong = TaiKhoan.query.filter(TaiKhoan.TrangThai == 0).all()
+    
+    for tai_khoan in tai_khoan_dong:
+        if tai_khoan.ThoiGianDong and tai_khoan.ThoiGianDong < datetime.now() - timedelta(days=30):
+            # Nếu tài khoản bị đóng hơn 1 tháng, xóa nó
+            db.session.delete(tai_khoan)
+    
+    db.session.commit()
+    
+def xoa_tai_khoan_cu_job():
+    # Hàm gọi để xóa tài khoản cũ
+    xoa_tai_khoan_cu()
+
+# Khởi tạo scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(xoa_tai_khoan_cu_job, 'interval', days=1)  # Chạy mỗi ngày
+scheduler.start()   
+    
+#--------------------------------------------------#
+
 
 # ------------Quản lý khách Hàng-----------------
 
