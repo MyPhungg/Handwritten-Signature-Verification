@@ -21,11 +21,12 @@
         <a href="{{ url_for('home.admin_khachhang') }}"><div class="menu-item">Khách hàng</div></a>
         <a href="{{ url_for('home.admin_uudai') }}"><div class="menu-item">Ưu đãi</div></a>
         <a href="{{ url_for('home.danh_sach_cap_bac') }}"><div class="menu-item">Bậc thành viên</div></a>
+        <a href="{{ url_for('home.admin_taikhoan') }}"><div class="menu-item">Tài khoản</div></a>
     </div>
 
     <!-- Main content -->
     <div class="content flex-grow-1">
-        <h4 class="text-muted">Khách hàng</h4>
+        <h4 class="text-muted">Quản lý khách hàng</h4>
 
         <div class="card p-3">
             <form action="{{ url_for('home.tim_kiem_khachhang') }}" method="GET" class="d-flex">
@@ -40,31 +41,15 @@
                     <th>Mã KH</th>
                     <th>Tên khách hàng</th>
                     <th>Bậc thành viên</th>
-                    <th>Tài Khoản</th>
-                    <th>Trạng thái tài khoản</th>
                     <th>Hành động</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for khach_hang in tai_khoan_list %}
+                {% for khach_hang in khach_hang_list %}
                 <tr>
                     <td>{{ khach_hang.MaKH }}</td>
-                    <td>{{ khach_hang.khachhang.HoTen }}</td>
-                    <td>{{ khach_hang.khachhang.capbac.TenCapBac }}</td>
-                    <td>{{ khach_hang.loaitk.TenLoai }}</td>
-                    <td>
-                        {% if khach_hang.TrangThai == 1 %}
-                        <!-- Đang mở -->
-                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#openModal_{{ khach_hang.MaTK }}">
-                            Đóng
-                        </button>
-                        {% else %}
-                        <!-- Đang đóng -->
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#closeModal_{{ khach_hang.MaTK }}">
-                            Mở
-                        </button>
-                        {% endif %}
-                    </td>
+                    <td>{{ khach_hang.HoTen }}</td>
+                    <td>{{ khach_hang.capbac.TenCapBac }}</td>
                     <td>
                         <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#viewModal_{{ khach_hang.MaKH }}">Xem chi tiết</button>
                     </td>
@@ -76,66 +61,18 @@
     </div>
 </div>
 
-<!-- Modals -->
-{% for khach_hang in tai_khoan_list %}
-<!-- Modal đóng tài khoản -->
-<div class="modal fade" id="closeModal_{{ khach_hang.MaTK }}" tabindex="-1">
-    <div class="modal-dialog">
-        <form method="POST" action="{{ url_for('auth.dong_mo_tai_khoan') }}" enctype="multipart/form-data" class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Xác nhận đóng tài khoản</h5>
-            </div>
-            <div class="modal-body">
-                Tài khoản của {{ khach_hang.khachhang.HoTen }} có số dư {{ khach_hang.SoDu }}. Bạn chắc chắn muốn đóng?
-                <input type="hidden" name="maTK" value="{{ khach_hang.MaTK }}">
-                <input type="hidden" name="maKH" value="{{ khach_hang.MaKH }}">
-            </div>
-            <div class="mb-3">
-                <label for="viewSignature_{{ khach_hang.MaKH }}">Chọn ảnh chữ ký:</label>
-                <input type="file" name="signature" class="form-control" id="viewSignature_{{ khach_hang.MaKH }}" required>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Xác nhận</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Modal mở tài khoản (xác thực chữ ký) -->
-<div class="modal fade" id="openModal_{{ khach_hang.MaTK }}" tabindex="-1">
-    <div class="modal-dialog">
-        <form method="POST" action="{{ url_for('auth.dong_mo_tai_khoan') }}" enctype="multipart/form-data" class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Xác thực mở tài khoản - {{ khach_hang.khachhang.HoTen }}</h5>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" name="maTK" value="{{ khach_hang.MaTK }}">
-                <input type="hidden" name="maKH" value="{{ khach_hang.MaKH }}">
-                <div class="mb-3">
-                    <label for="viewSignature_{{ khach_hang.MaKH }}">Chọn ảnh chữ ký:</label>
-                    <input type="file" name="signature" class="form-control" id="viewSignature_{{ khach_hang.MaKH }}" required>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Xác nhận</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-            </div>
-        </form>
-    </div>
-</div>
-
+{% for khach_hang in khach_hang_list %}
 <!-- Modal xem chi tiết (cũng cần xác thực) -->
 <div class="modal fade" id="viewModal_{{ khach_hang.MaKH }}" tabindex="-1">
     <div class="modal-dialog">
         <form method="POST" action="{{ url_for('auth.verify_signature_to_change_kh') }}" enctype="multipart/form-data" class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Xác thực chữ ký để xem chi tiết - {{ khach_hang.khachhang.HoTen }}</h5>
+                <h5 class="modal-title">Xác thực chữ ký để xem chi tiết - {{ khach_hang.HoTen }}</h5>
             </div>
             <div class="modal-body">
                 <input type="hidden" name="maKH" value="{{ khach_hang.MaKH }}">
                 <input type="hidden" name="come" value="home.chi_tiet_khachhang">
-                <input type="hidden" name="back" value="home.admin_khachhang">
+                <input type="hidden" name="back" value="home.chi_tiet_khachhang">
                 <div class="mb-3">
                     <label for="viewSignature_{{ khach_hang.MaKH }}">Chọn ảnh chữ ký:</label>
                     <input type="file" name="signature" class="form-control" id="viewSignature_{{ khach_hang.MaKH }}" required>
