@@ -29,11 +29,14 @@
             <a href="{{ url_for('home.danh_sach_cap_bac') }}">
                 <div class="menu-item">Bậc thành viên</div>
             </a>
+            <a href="{{ url_for('home.admin_taikhoan') }}">
+                <div class="menu-item">Tài khoản</div>
+            </a>
         </div>
 
         <!-- Main content -->
         <div class="content">
-            <h4 class="text-muted">Ưu đãi</h4>
+            <h4 class="text-muted">Quản lý ưu đãi</h4>
 
             <!-- Thông báo từ Flask -->
             {% with messages = get_flashed_messages(with_categories=true) %}

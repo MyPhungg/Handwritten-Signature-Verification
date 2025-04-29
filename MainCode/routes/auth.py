@@ -38,12 +38,21 @@ def rotate_image(image, angle):
 # Hàm trích đặc trưng có xoay ảnh
 
 
-def extract_augmented_features(image_path, angles=None):
+def extract_augmented_features(image_input, angles=None):
     if angles is None:
         angles = [-15, -12, -9, -6, -3, 0, 3, 6, 9, 12]
 
-    image = cv2.cvtColor(image_path, cv2.COLOR_BGR2RGB)
+    # Nếu truyền vào là đường dẫn file
+    if isinstance(image_input, str):
+        image = cv2.imread(image_input)
+        if image is None:
+            raise ValueError(f"Không đọc được ảnh từ đường dẫn: {image_input}")
+    else:
+        image = image_input
+
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (224, 224))
+
     feature_list = []
 
     for angle in angles:
@@ -221,7 +230,7 @@ def process_forgot_account(soDienThoai, authMethod, cccd=None, file=None):
     # Tìm người dùng theo số điện thoại (ưu tiên Khách Hàng trước)
     user = KhachHang.query.filter_by(SoDienThoai=soDienThoai).first()
     if not user:
-        user = NhanVien.query.filter_by(SDT=soDienThoai).first()
+        user = NhanVien.query.filter_by(SoDienThoai=soDienThoai).first()
     if not user:
         flash('Không tồn tại tài khoản liên kết với số điện thoại này!', 'error')
         return render_template('forgetAcc.html', soDienThoai=soDienThoai)
@@ -378,7 +387,7 @@ def verify_cccd():
             TenDangNhap=username_input).first()
         if account_nv:
             nhanvien = NhanVien.query.filter_by(
-                MaNV=account_nv.MaNV, CCCD=cccd_input).first()
+                MaNV=account_nv.MaNV, SoCCCD=cccd_input).first()
             if nhanvien:
                 return render_template('forgetPass.html',
                                        result="Xác thực thành công (Nhân viên)",
@@ -439,11 +448,11 @@ def dong_mo_tai_khoan():
 
     if not kh or not taikhoan:
         flash('Không tìm thấy khách hàng hoặc tài khoản.', 'danger')
-        return redirect(url_for('home.admin_khachhang', khach_hang=kh))
+        return redirect(url_for('home.admin_taikhoan', khach_hang=kh))
 
     if not file:
         flash('Vui lòng tải lên ảnh chữ ký!', 'warning')
-        return redirect(url_for('home.admin_khachhang', khach_hang=kh))
+        return redirect(url_for('home.admin_taikhoan', khach_hang=kh))
 
     result_verify = verify_signature_with_augmentation(file, maKH)
 
@@ -456,11 +465,7 @@ def dong_mo_tai_khoan():
             flash('Tài khoản đã được **mở lại**.', 'success')
 
         db.session.commit()
-        return redirect(url_for('home.admin_khachhang'))
+        return redirect(url_for('home.admin_taikhoan'))
     else:
         flash('Chữ ký không hợp lệ!', 'error')
-        return render_template(
-            'admin/chinhsuaKH.html',
-            tai_khoan_list=TaiKhoan.query.all(),
-            show_modal=maTK
-        )
+        redirect(url_for('home.admin_taikhoan'))

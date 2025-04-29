@@ -185,6 +185,8 @@ class TaiKhoan(db.Model):
     STK = db.Column(db.String(50), nullable=False)
     NgayDangKy = db.Column(db.Date, nullable=False)
     TrangThai = db.Column(db.Integer, nullable=False)
+    # Thời gian đóng tài khoản
+    ThoiGianDong = db.Column(db.DateTime, nullable=True)
 
     loaitk = db.relationship('LoaiTK', backref='taikhoan')
     khachhang = db.relationship('KhachHang', backref='taikhoan')

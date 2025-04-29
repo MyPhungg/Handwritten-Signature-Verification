@@ -8,3 +8,54 @@
 # config.py để kết nối CSDL
 import re
 # auto_update hẹn giờ nâng cấp bậc (mỗi giờ)
+
+
+from flask import Flask
+from config import Config
+from models import db
+from routes.auth import auth_bp
+from routes.account import account_bp
+from routes.home import home_bp
+from routes.admin import admin_bp
+from flask import Blueprint, render_template, request, redirect, url_for
+from flask import session, flash
+from models import TaiKhoan
+from models import LoaiTK
+from flask import Blueprint, jsonify, render_template, flash, request, redirect, url_for, session
+from models import NhanVien, db, KhachHang, QuanLyCapBac
+from sqlalchemy import cast, or_
+from sqlalchemy.types import Integer
+from sqlalchemy.sql import func
+admin_bp = Blueprint('admin', __name__)
+from werkzeug.utils import secure_filename
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from models import AccountKH, KhachHang, AccountNV, NhanVien, SignatureVector, TaiKhoan
+from sklearn.metrics.pairwise import cosine_similarity
+from tensorflow.keras.models import model_from_json, Model
+from datetime import datetime
+import numpy as np
+import os
+import cv2
+import json
+from models import db
+
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, AccountKH
+from datetime import datetime, date
+from decimal import Decimal
+import re
+
+from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, LichSuTichDiem, NhanVien
+from datetime import datetime, date
+from decimal import Decimal
+from sqlalchemy import or_
+from sqlalchemy import event
+from sqlalchemy.sql import func
+from app import app
+import schedule
+import threading
+import time
+from models import KhachHang, cap_nhat_cap_bac,initialize_signature_vectors
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import SmallInteger
+from datetime import datetime
