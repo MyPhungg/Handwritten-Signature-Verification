@@ -4,6 +4,7 @@ from models import db
 from routes.auth import auth_bp
 from routes.account import account_bp
 from routes.home import home_bp
+from routes.admin import admin_bp
 
 
 def create_app():
@@ -22,5 +23,6 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(account_bp, url_prefix='/account')
     app.register_blueprint(home_bp, url_prefix='/home')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
 
     return app

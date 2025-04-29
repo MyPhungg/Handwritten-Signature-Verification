@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import SmallInteger
 from datetime import datetime
 db = SQLAlchemy()
 # Model accountkh
@@ -117,15 +118,18 @@ class LichSuGiaoDich(db.Model):
     MaKyHan = db.Column(db.String(10), nullable=False)
     TenDM = db.Column(db.String(100), nullable=False)
     taikhoan = db.relationship('TaiKhoan', backref='lichsugiaodich')
- 
+
 # Model lstichdiem
+
+
 class LichSuTichDiem(db.Model):
     __tablename__ = 'lichsutichdiem'
 
     MaADB = db.Column(db.String(10), primary_key=True)
     ThoiGian = db.Column(db.Date, nullable=False)
     Diem = db.Column(db.Integer, nullable=False)
-    MaKH = db.Column(db.String(10), db.ForeignKey('khachhang.MaKH'), nullable=False)
+    MaKH = db.Column(db.String(10), db.ForeignKey(
+        'khachhang.MaKH'), nullable=False)
 
     khachhang = db.relationship('KhachHang', backref='lichsutichdiem')
 
@@ -150,7 +154,8 @@ class NhanVien(db.Model):
         'nhanvien.MaNV'), nullable=False)
     SoCCCD = db.Column(db.String(12), nullable=False)
     SoDienThoai = db.Column(db.String(10), nullable=False)
-    isDelete = db.Column(SmallInteger,nullable=False)
+    isDelete = db.Column(SmallInteger, nullable=False, default=0)
+
     quanly = db.relationship('NhanVien', remote_side=[
         MaNV], backref='nhanvien')
 
@@ -180,11 +185,11 @@ class TaiKhoan(db.Model):
     STK = db.Column(db.String(50), nullable=False)
     NgayDangKy = db.Column(db.Date, nullable=False)
     TrangThai = db.Column(db.Integer, nullable=False)
-    ThoiGianDong = db.Column(db.DateTime, nullable=True)  # Thời gian đóng tài khoản
+    # Thời gian đóng tài khoản
+    ThoiGianDong = db.Column(db.DateTime, nullable=True)
 
     loaitk = db.relationship('LoaiTK', backref='taikhoan')
     khachhang = db.relationship('KhachHang', backref='taikhoan')
-
 
 
 class SignatureVector(db.Model):

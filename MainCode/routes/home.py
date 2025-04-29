@@ -177,14 +177,15 @@ def validate_input(data):
     return errors  # Trả về dict lỗi, rỗng nếu không có lỗi
 
 
-
-#-------------Quản lý tài khoản-------------------
+# -------------Quản lý tài khoản-------------------
 @home_bp.route('/admin/taikhoan')
 def admin_taikhoan():
     tai_khoan_list = TaiKhoan.query.all()  # Lấy tất cả khách hàng từ database
     return render_template('admin/chinhsuaTK.html', tai_khoan_list=tai_khoan_list)
 
 # TÌM KIẾM TÀI KHOẢN
+
+
 @home_bp.route('/taikhoan/timkiem', methods=['GET'])
 def tim_kiem_taikhoan():
     search_query = request.args.get('search', '').strip()
@@ -199,34 +200,39 @@ def tim_kiem_taikhoan():
     return render_template('admin/chinhsuaTK.html', tai_khoan_list=tai_khoan_list, search_query=search_query)
 
 # TỰ ĐỘNG ĐÓNG TÀI KHOẢN NẾU QUÁ 1 THÁNG CHƯA MỞ LẠI
+
+
 def dong_tai_khoan(maTK):
     tai_khoan = TaiKhoan.query.get(maTK)
     if tai_khoan:
         tai_khoan.TrangThai = 0  # Đánh dấu tài khoản là đã đóng
         tai_khoan.ThoiGianDong = datetime.now()  # Lưu thời gian đóng
         db.session.commit()
-        
+
+
 def xoa_tai_khoan_cu():
     # Lấy tất cả các tài khoản bị đóng
     tai_khoan_dong = TaiKhoan.query.filter(TaiKhoan.TrangThai == 0).all()
-    
+
     for tai_khoan in tai_khoan_dong:
         if tai_khoan.ThoiGianDong and tai_khoan.ThoiGianDong < datetime.now() - timedelta(days=30):
             # Nếu tài khoản bị đóng hơn 1 tháng, xóa nó
             db.session.delete(tai_khoan)
-    
+
     db.session.commit()
-    
+
+
 def xoa_tai_khoan_cu_job():
     # Hàm gọi để xóa tài khoản cũ
     xoa_tai_khoan_cu()
 
+
 # Khởi tạo scheduler
 scheduler = BackgroundScheduler()
 scheduler.add_job(xoa_tai_khoan_cu_job, 'interval', days=1)  # Chạy mỗi ngày
-scheduler.start()   
-    
-#--------------------------------------------------#
+scheduler.start()
+
+# --------------------------------------------------#
 
 
 # ------------Quản lý khách Hàng-----------------
@@ -249,8 +255,8 @@ def tim_kiem_khachhang():
     else:
         khach_hang_list = KhachHang.query.all()
     for khach_hang in khach_hang_list:
-        tai_khoan_list = [tk for kh in khach_hang_list for tk in TaiKhoan.query.filter_by(MaKH=kh.MaKH).all()]
-    
+        tai_khoan_list = [
+            tk for kh in khach_hang_list for tk in TaiKhoan.query.filter_by(MaKH=kh.MaKH).all()]
 
     return render_template('admin/chinhsuaKH.html', tai_khoan_list=tai_khoan_list, search_query=search_query)
 
@@ -448,10 +454,20 @@ def tim_kiem_uudai():
 # -------------------Quản lý ưu đãi -----------------
 
 
+def loadTenNhanVien():
+    maNV = session['MaNV']
+    info = NhanVien.query.filter_by(MaNV=maNV).first()
+    if not info:
+        flash('Không tìm thấy thông tin nhân viên! Vui lòng đăng nhập lại', 'error')
+        return redirect(url_for('auth.login'))
+    return info.HoTen
+
+
 @home_bp.route('/admin/uudai')
 def admin_uudai():
+    ten = loadTenNhanVien()
     uu_dai_list = KhuyenMai.query.all()  # Lấy tất cả ưu đãi từ CSDL
-    return render_template('admin/chinhsuaUuDai.html', uu_dai_list=uu_dai_list)
+    return render_template('admin/chinhsuaUuDai.html', uu_dai_list=uu_dai_list, ten=ten)
 
 
 @home_bp.route("/them_uudai", methods=["GET", "POST"])
@@ -619,9 +635,10 @@ def xoa_capbac():
 
 @home_bp.route('/admin/cap_bac')
 def danh_sach_cap_bac():
+    ten = loadTenNhanVien()
     cap_bac_list = CapBacKH.query.all()  # Lấy toàn bộ danh sách cấp bậc từ DB
     return render_template('admin/chinhsuaCapBac.html',
-                           cap_bac_list=cap_bac_list)
+                           cap_bac_list=cap_bac_list, ten=ten)
 
 
 @home_bp.route('/capbac/<maCB>')
@@ -759,4 +776,3 @@ def after_insert_lich_su_giao_dich(mapper, connection, target):
 
         # Cập nhật cấp bậc sau khi điểm thay đổi
         cap_nhat_cap_bac(tai_khoan.MaKH)
-

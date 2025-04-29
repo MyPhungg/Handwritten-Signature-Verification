@@ -1,4 +1,4 @@
-function validateForm(event) {
+async function validateForm(event) {
     event.preventDefault();
 
     const fields = [
@@ -35,7 +35,37 @@ function validateForm(event) {
             errorElement.textContent = ''; // Xóa lỗi nếu hợp lệ
         }
     });
+    // Kiểm tra trùng trong CSDL nếu dữ liệu đã hợp lệ
     if (isValid) {
-        event.target.submit();
+        const soCCCD = document.getElementById('cccd').value; // Lấy giá trị của CCCD
+        const soDienThoai = document.getElementById('sodienthoai').value; // Lấy giá trị của Số điện thoại
+        
+        const response = await fetch("/admin/kiemTraTrung", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                SoCCCD: soCCCD,
+                SoDienThoai: soDienThoai,
+            }),
+        });
+        
+        const result = await response.json();
+
+        if (result.trungCCCD) {
+            document.getElementById("cccd").classList.add("is-invalid");
+            document.getElementById("cccd-error").innerText = "Số CCCD đã tồn tại.";
+            isValid = false;
+        }
+
+        if (result.trungSDT) {
+            document.getElementById("sodienthoai").classList.add("is-invalid");
+            document.getElementById("sodienthoai-error").innerText = "Số điện thoại đã tồn tại.";
+            isValid = false;
+        }
+    }
+
+    // Nếu hợp lệ thì submit form
+    if (isValid) {
+        event.target.submit();  // Dùng event.target thay cho this.submit() để đảm bảo đúng đối tượng
     }
 }
