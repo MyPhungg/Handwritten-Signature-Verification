@@ -69,23 +69,15 @@
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                Dịch vụ
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="{{ url_for('home.xem_uu_dai') }}">Ưu đãi</a>
-                </li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li><a class="dropdown-item" href="#">Lịch sử giao dịch</a></li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li><a class="dropdown-item" href="#">Gửi tiết kiệm</a></li>
-              </ul>
-            </li>
-          </ul>
+              Dịch vụ
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{ url_for('home.xem_uu_dai') }}">Ưu đãi</a></li>
+              <li><a class="dropdown-item" href="/bieudochitieu.html" id="expense-btn">Biểu đồ chi tiêu</a></li>
+              <li><a class="dropdown-item" href="/lichsugiaodich.html" id="transaction-btn">Lịch sử giao dịch</a></li>
+              <li><a class="dropdown-item" href="sotietkiem.html" id="saving-btn">Mở sổ tiết kiệm</a></li>
+              <li><a class="dropdown-item" href="/thongke.html" onclick="loadTransactions()">Thống kê</a></li>
+            </ul>
           <li class="nav-item dropdown d-flex align-items-center">
             <a
               class="nav-link dropdown-toggle text-white"

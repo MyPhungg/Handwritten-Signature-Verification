@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biểu đồ Tiền Vào và Tiền Ra (Biểu đồ miền)</title>
+</head>
+<body>
+    <h1>Biểu đồ Tiền Vào và Tiền Ra theo Tháng (Biểu đồ Miền)</h1>
+    <div id="chart-container">
+        <!-- This is where the chart image will be shown -->
+        <img id="expense-chart" src="{{ url_for('money_area_chart_image') }}" alt="Expense Area Chart" />
+    </div>
+
+    <!-- Optionally, add a button to reload or refresh the chart -->
+    <button onclick="reloadChart()">Reload Chart</button>
+
+    <script>
+        // Function to reload the chart by refreshing the image source
+        function reloadChart() {
+            const chart = document.getElementById('expense-chart');
+            chart.src = chart.src.split('?')[0] + '?' + new Date().getTime(); // Append timestamp to avoid caching
+        }
+    </script>
+</body>
+</html>

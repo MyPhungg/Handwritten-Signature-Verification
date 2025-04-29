@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch sử giao dịch</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='giaodich.css') }}">
+</head>
+<body>
+    <button id="transaction-btn">Xem Lịch sử giao dịch </button>
+    <div class="transaction-history hidden" id="transaction-history">
+        <table id="transaction-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ngày Giao Dịch</th>
+                    <th>Chiều Giao Dịch</th>
+                    <th>Giá Trị Giao Dịch</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    </tbody>
+</table>
+
+
+    <script>
+    document.getElementById("transaction-btn").addEventListener("click", function() {
+        document.getElementById("transaction-history").classList.toggle("hidden");
+        loadTransactions(); // Gọi hàm tải giao dịch
+    });
+    
+    // Tải danh sách giao dịch từ Flask
+    async function loadTransactions() {
+        const response = await fetch('/api/transactions');
+        const transactions = await response.json();
+        console.log("Transactions loaded:", transactions);
+    
+        const tableBody = document.querySelector("#transaction-table tbody");
+        tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi render mới
+    
+        transactions.forEach(transaction => {
+            const row = document.createElement("tr");
+            const directionClass = transaction.ChieuGD === 1 ? "income" : "expense";
+            row.innerHTML = `
+                <td class="transaction-id">${transaction.id}</td>
+                <td class="transaction-date">${transaction.NgayGD}</td>
+                <td class="transaction-direction ${directionClass}">${transaction.ChieuGD === 1 ? 'Tiền vào' : 'Tiền ra'}</td>
+                <td class="${directionClass}">${transaction.GiaTriGD.toLocaleString()}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+    </script>
+</body>
+</html>
