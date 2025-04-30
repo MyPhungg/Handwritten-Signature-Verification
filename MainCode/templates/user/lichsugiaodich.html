@@ -18,6 +18,81 @@
     ></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='giaodich.css') }}">
 </head>
+<style>
+  
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Style cho các ô trong bảng */
+th, td {
+  padding: 12px 18px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Header của bảng */
+th {
+  background-color: #4CAF50;
+  color: white;
+  font-size: 1.1em;
+}
+
+/* Dòng chẵn của bảng */
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Dòng lẻ của bảng */
+tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+/* Hiệu ứng hover khi rê chuột vào dòng */
+tr:hover {
+  background-color: #d6f7d0;
+}
+
+/* Style cho các ô khi có dữ liệu */
+td {
+  font-size: 1em;
+  color: #333;
+}
+
+/* Cải thiện kiểu chữ */
+th, td {
+  font-family: 'Arial', sans-serif;
+}
+
+/* Nút thao tác trong bảng */
+button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 0.9em;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #e53935;
+}
+
+/* Style khi bảng không có dữ liệu */
+.no-data {
+  text-align: center;
+  font-size: 1.2em;
+  color: #888;
+  padding: 20px 0;
+}
+</style>
 <body>
     <nav class="navbar navbar-expand-lg bg-dark">
         <div class="container-fluid">

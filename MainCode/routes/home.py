@@ -1127,8 +1127,6 @@ def mo_so_tiet_kiem():
 
     flash('Mở sổ tiết kiệm thành công!', 'success')
     return render_template('user/sotietkiem.html', taikhoan=taikhoan)
-
-
 @home_bp.route('/tat_toan_so_tiet_kiem', methods=['POST'])
 def tat_toan_so_tiet_kiem():
     MaKH = request.form.get('MaKH')
