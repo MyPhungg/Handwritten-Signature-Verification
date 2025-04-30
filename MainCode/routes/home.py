@@ -1,7 +1,7 @@
 
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify, send_file
 from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, AccountKH
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from decimal import Decimal
 import re
 import random
@@ -252,19 +252,24 @@ def admin_khachhang():
 
 @home_bp.route('/khachhang/timkiem', methods=['GET'])
 def tim_kiem_khachhang():
-    search_query = request.args.get(
-        'search', '').strip()  # Lấy từ khóa tìm kiếm
+    search_query = request.args.get('search', '').strip()
 
     if search_query:
         khach_hang_list = KhachHang.query.filter(
             KhachHang.HoTen.ilike(f"%{search_query}%")).all()
     else:
         khach_hang_list = KhachHang.query.all()
-    for khach_hang in khach_hang_list:
-        tai_khoan_list = [
-            tk for kh in khach_hang_list for tk in TaiKhoan.query.filter_by(MaKH=kh.MaKH).all()]
 
-    return render_template('admin/chinhsuaKH.html', tai_khoan_list=tai_khoan_list, search_query=search_query)
+    # Lấy danh sách tài khoản tương ứng với các khách hàng tìm được
+    ma_kh_list = [kh.MaKH for kh in khach_hang_list]
+    tai_khoan_list = TaiKhoan.query.filter(TaiKhoan.MaKH.in_(ma_kh_list)).all()
+
+    return render_template(
+        'admin/chinhsuaKH.html',
+        khach_hang_list=khach_hang_list,
+        tai_khoan_list=tai_khoan_list,
+        search_query=search_query
+    )
 
 
 @home_bp.route('/khachhang/<maKH>')
@@ -277,17 +282,21 @@ def chi_tiet_khachhang(maKH):
 
 
 def generate_ma_kh():
-    # Lấy khách hàng có mã lớn nhất
-    last_kh = KhachHang.query.order_by(KhachHang.MaKH.desc()).first()
+    # Lấy khách hàng có mã lớn nhất theo số sau "KH"
+    last_kh = KhachHang.query.order_by(
+        db.cast(db.func.substr(KhachHang.MaKH, 3), db.Integer).desc()
+    ).first()
 
     if last_kh:
-        last_id = int(last_kh.MaKH[2:])  # Lấy số từ KH001 -> 001 -> 1
-        # Tăng lên 1, format thành KH002, KH003, ...
-        new_id = f"KH{last_id + 1:03d}"
+        # Trích số nguyên sau "KH"
+        last_id = int(last_kh.MaKH[2:])
+        new_id = f"KH{last_id + 1}"
     else:
-        new_id = "KH001"  # Nếu chưa có khách hàng nào
+        new_id = "KH1"
 
     return new_id
+
+
 
 
 @home_bp.route("/them_khachhang", methods=["GET", "POST"])
@@ -344,7 +353,7 @@ def them_khachhang():
             db.session.commit()
 
             flash("Thêm khách hàng thành công!", "success")
-            return redirect(url_for("home.chinhsua_khachhang", maKH=ma_kh))
+            return redirect(url_for("home.them_khachhang", maKH=ma_kh))
 
         except Exception as e:
             db.session.rollback()
