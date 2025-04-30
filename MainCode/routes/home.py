@@ -518,7 +518,7 @@ def them_uudai():
             db.session.add(uu_dai)
             db.session.commit()
             flash("Thêm ưu đãi thành công!", "success")
-            return redirect(url_for("home.chinhsua_uudai"))
+            return redirect(url_for("home.admin_uudai"))
 
         except Exception as e:
             db.session.rollback()
@@ -534,7 +534,7 @@ def xoa_uudai():
 
     if not uu_dai_ids:
         flash("Vui lòng chọn ít nhất một ưu đãi để xóa.", "warning")
-        return redirect(url_for('home.chinhsua_uudai'))
+        return redirect(url_for('home.admin_uudai'))
 
     try:
         for maKM in uu_dai_ids:
@@ -548,7 +548,7 @@ def xoa_uudai():
         db.session.rollback()
         flash("Lỗi khi xóa: " + str(e), "danger")
 
-    return redirect(url_for('home.chinhsua_uudai'))
+    return redirect(url_for('home.admin_uudai'))
 
 
 @home_bp.route('/uudai/sua/<maKM>', methods=['GET', 'POST'])
@@ -689,7 +689,7 @@ def them_capbac():
             db.session.add(capbac)
             db.session.commit()
             flash("Thêm cấp bậc thành công!", "success")
-            return redirect(url_for("home.chinhsua_capbac"))
+            return redirect(url_for("home.danh_sach_cap_bac"))
 
         except Exception as e:
             db.session.rollback()
