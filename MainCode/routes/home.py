@@ -7,11 +7,14 @@ import re
 import random
 import string
 from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, LichSuTichDiem, NhanVien
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from decimal import Decimal
 from sqlalchemy import or_
 from sqlalchemy import event
 from sqlalchemy.sql import func
+from apscheduler.schedulers.background import BackgroundScheduler
+import os
+from werkzeug.utils import secure_filename
 
 home_bp = Blueprint('home', __name__)
 
