@@ -199,3 +199,38 @@ class SignatureVector(db.Model):
     MaKH = db.Column(db.String(50), nullable=False)
     vector = db.Column(db.Text, nullable=False)  # lưu JSON string
     NgayTao = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# mtri
+class DanhMucChiTieu(db.Model):
+    __tablename__ = 'danhmucchitieu'
+    madm = db.Column(db.Integer, primary_key=True)
+    tendm = db.Column(db.String(100))
+
+
+class Savings(db.Model):
+    __tablename__ = 'savings'
+    id = db.Column(db.Integer, primary_key=True)
+    year = db.Column(db.Integer)
+    initial_balance = db.Column(db.Float)
+    interest_rate = db.Column(db.Float)
+
+
+class Transaction(db.Model):
+    __tablename__ = 'transactions'
+    id = db.Column(db.Integer, primary_key=True)
+    months = db.Column(db.Date)
+    money_in = db.Column(db.Float)
+    money_out = db.Column(db.Float)
+
+
+class SavingsSoTietKiem(db.Model):
+    __tablename__ = 'savingssotietkiem'
+
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    MaKH = db.Column(db.String(10), nullable=True)
+    SoTienGui = db.Column(db.Integer, nullable=True)
+    KyHan = db.Column(db.String(20), nullable=True)
+    LaiSuat = db.Column(db.Float, nullable=True)
+    NgayMo = db.Column(db.Date, nullable=True)
+    NgayKetThuc = db.Column(db.Date, nullable=True)

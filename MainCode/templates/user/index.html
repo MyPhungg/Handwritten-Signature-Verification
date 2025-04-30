@@ -1,0 +1,157 @@
+<!-- <!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý giao dịch</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='giaodich.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-left">
+            <a href="#">Trang chủ</a>
+        </div>
+        <div class="navbar-right">
+          
+            <div class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle text-white"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Dịch vụ
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="/bieudochitieu" id="expense-btn">Biểu đồ chi tiêu</a></li>
+                  <li><a class="dropdown-item" href="/lichsugiaodich" id="transaction-btn">Lịch sử giao dịch</a></li>
+                  <li><a class="dropdown-item" href="sotietkiem" id="saving-btn">Mở sổ tiết kiệm</a></li>
+                  <li><a class="dropdown-item" href="/thongke" onclick="loadTransactions()">Thống kê</a></li>
+                </ul>
+            </div>
+        </div>
+        <a href="#">Về chúng tôi</a>
+            <a href="#">Đăng nhập</a>
+    </div>
+    
+    <div class="slider">Slide bar</div>
+    
+ 
+
+<div class="container my-5">
+    <div class="text-center">
+      <h1>Chào mừng đến với trang chủ</h1>
+      <p>Đây là nội dung chính của trang chủ.</p>
+      <div id="aboutUs">
+        <h3>Dịch Vụ Gửi Tiết Kiệm tại PyBank</h3>
+        <p>
+          Trong thế giới tài chính hiện đại, việc gửi tiết kiệm không chỉ đơn
+          thuần là một phương thức giữ tiền mà còn là cách thông minh để gia
+          tăng tài sản theo thời gian. <strong>PyBank</strong> tự hào mang đến
+          <strong
+            >dịch vụ gửi tiết kiệm an toàn, linh hoạt và lãi suất hấp
+            dẫn</strong
+          >, giúp khách hàng dễ dàng đạt được các mục tiêu tài chính của mình.
+        </p>
+
+        <h5>Tại sao nên chọn gửi tiết kiệm tại PyBank?</h5>
+
+        <h6>1. Lãi Suất Hấp Dẫn, Sinh Lời Hiệu Quả</h6>
+        <p>
+          Với mức lãi suất cạnh tranh, PyBank cam kết tối đa hóa lợi nhuận cho
+          số tiền của bạn. Khách hàng có thể lựa chọn
+          <strong>lãi suất cố định hoặc lãi suất bậc thang</strong> để phù hợp
+          với nhu cầu cá nhân.
+        </p>
+
+        <h5>2. Đa Dạng Kỳ Hạn Gửi Tiết Kiệm</h5>
+        <ul>
+          <li>
+            <strong>Ngắn hạn:</strong> 1 tháng, 3 tháng, 6 tháng – phù hợp với
+            khách hàng muốn sử dụng vốn nhanh.
+          </li>
+          <li>
+            <strong>Dài hạn:</strong> 12 tháng, 24 tháng, 36 tháng – giúp
+            khách hàng tận dụng tối đa lãi suất.
+          </li>
+        </ul>
+
+        <h5>3. An Toàn Tuyệt Đối – Được Bảo Đảm 100%</h5>
+        <p>
+          Tiền gửi tại PyBank được bảo vệ bởi hệ thống bảo mật tiên tiến và
+          tuân thủ chặt chẽ các quy định tài chính. Khách hàng có thể hoàn
+          toàn yên tâm khi lựa chọn gửi tiết kiệm tại ngân hàng của chúng tôi.
+        </p>
+
+        <h5>4. Rút Gốc Linh Hoạt, Hưởng Lãi Suất Ưu Đãi</h5>
+        <p>
+          PyBank hỗ trợ khách hàng rút tiền trước hạn mà vẫn đảm bảo
+          <strong>một phần lợi nhuận</strong> theo chính sách ưu đãi, giúp bạn
+          linh hoạt sử dụng nguồn vốn khi cần thiết.
+        </p>
+
+        <h5>5. Quản Lý Tài Khoản Dễ Dàng, Giao Dịch Mọi Lúc Mọi Nơi</h5>
+        <p>
+          Với nền tảng ngân hàng số hiện đại, khách hàng có thể mở sổ tiết
+          kiệm trực tuyến, theo dõi số dư và tất toán tài khoản
+          <strong>mọi lúc, mọi nơi</strong> qua ứng dụng di động hoặc website
+          PyBank.
+        </p>
+
+        <div>
+          <h4>Hãy Để PyBank Giúp Bạn Xây Dựng Tương Lai Vững Chắc!</h4>
+          <p>
+            Dù bạn đang tiết kiệm cho
+            <strong
+              >một chuyến du lịch, mua nhà, học hành hay đầu tư lâu
+              dài</strong
+            >, PyBank luôn đồng hành cùng bạn trên hành trình tài chính.
+          </p>
+          <button onclick="alert('Cảm ơn bạn đã quan tâm!')">
+            Đăng Ký Ngay
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+<footer class="bg-dark text-white py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col">
+          <p>
+            PyBank là nền tảng ngân hàng số hiện đại, giúp bạn gửi tiết kiệm,
+            quản lý tài chính và giao dịch mọi lúc, mọi nơi chỉ với vài thao
+            tác đơn giản.
+          </p>
+          <p>
+            💰 Gửi tiết kiệm linh hoạt – Lãi suất hấp dẫn, kỳ hạn đa dạng,
+            giúp bạn tối ưu hóa số tiền nhàn rỗi.
+          </p>
+          <p>
+            🔒 An toàn & bảo mật – Công nghệ mã hóa tiên tiến, đảm bảo an toàn
+            tuyệt đối cho tài khoản của bạn.
+          </p>
+          <p>
+            🎯 Trải nghiệm thông minh – Giao diện thân thiện, thao tác đơn
+            giản, phù hợp với mọi đối tượng.
+          </p>
+          <p>PyBank – Tiết kiệm thông minh, tài chính vững vàng! 🚀</p>
+        </div>
+        <div class="col">
+          <p>PyBank - Ngân hàng số thông minh cho tương lai</p>
+          <p>Địa chỉ: 123 Đường ABC, Quận 1, TP. HCM</p>
+          <p>Email: support@xyz.com</p>
+          <p>Hotline: 0987 654 321</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin: 2%; text-align: center">
+      &copy; 2025 Trang Chủ. Mọi quyền được bảo lưu.
+    </p>
+  </footer>
+  <script src="{{ url_for('static', filename='giaodich.js') }}"></script>
+</body>
+</html> -->
