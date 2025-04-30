@@ -1,31 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
   <head>
-    <meta charset="utf-8" />
-    <title>Trang chủ</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>Biểu đồ chi tiêu</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
+      href="{{ url_for('static', filename='giaodich.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="{{url_for('static', filename='css/home.css')}}"
-    />
-    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
   </head>
+  <style>
+    #chart-container {
+      display: none; /* Mặc định ẩn */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50%;
+      height: 50%;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      z-index: 1000;
+    }
 
+    #expense-image {
+      width: 100%;
+      height: auto;
+    }
+
+    #close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+  </style>
   <body>
     <nav class="navbar navbar-expand-lg bg-dark">
       <div class="container-fluid">
@@ -34,6 +60,7 @@
             src="{{ url_for('static', filename='img/logoBank.jpg') }}"
             style="width: 50px; height: 50px"
             class="rounded"
+            href="{{url_for('home.home')}}"
           />
         </a>
         <button
@@ -61,7 +88,7 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link text-white" onclick="location.href='#aboutUs'"
+              <a class="nav-link text-white" href="{{url_for('home.home')}}"
                 >Về chúng tôi</a
               >
             </li>
@@ -143,72 +170,11 @@
         </div>
       </div>
     </nav>
-    <div class="border">
-      <div class="slider">
-        <div class="slides">
-          <img
-            src="{{ url_for('static', filename='img/anh3.jpg') }}"
-            alt="slide 1"
-          />
-          <img
-            src="{{ url_for('static', filename='img/anhdangnhap.jpg') }}"
-            alt="slide 2"
-          />
-          <img
-            src="{{ url_for('static', filename='img/img_bank.webp') }}"
-            alt="slide 3"
-          />
-        </div>
-        <!-- Navigation buttons -->
-        <button class="prev">❮</button>
-        <button class="next">❯</button>
-
-        <!-- Dots navigation -->
-        <div class="dots">
-          <div class="dot active" data-index="0"></div>
-          <div class="dot" data-index="1"></div>
-          <div class="dot" data-index="2"></div>
-        </div>
-      </div>
+    <button id="expense-btn">Biểu đồ chi tiêu</button>
+    <div id="chart-container">
+      <button id="close-btn">&times;</button>
+      <img id="expense-image" src="" alt="Biểu đồ chi tiêu" />
     </div>
-    <div class="container1">
-      <div class="section" id="aboutUs">
-        <h2>Giới thiệu Ngân hàng</h2>
-        <p>
-          Chào mừng đến với PyBank! Chúng tôi là ngân hàng mới nhất trên thị
-          trường, cam kết mang đến dịch vụ tài chính hiện đại, an toàn và tiện
-          lợi nhất cho mọi khách hàng. Mục tiêu của chúng tôi là đồng hành cùng
-          bạn trong mọi bước đường tài chính.
-        </p>
-      </div>
-
-      <div class="section">
-        <h2>Dịch vụ Tài chính</h2>
-        <ul>
-          <li>Tài khoản tiết kiệm</li>
-          <li>Tài khoản thanh toán</li>
-          <li>Thẻ tín dụng</li>
-        </ul>
-      </div>
-
-      <div class="section">
-        <h2>Khuyến mãi</h2>
-        <p>
-          Ưu đãi chào mừng! Khách hàng mở tài khoản mới tại PyBank trong tháng
-          đầu tiên sẽ nhận ngay quà tặng hấp dẫn và lãi suất tiết kiệm lên đến
-          8%/năm!
-        </p>
-      </div>
-
-      <div class="section">
-        <h2>Liên hệ</h2>
-        <p>PyBank - Ngân hàng số thông minh cho tương lai</p>
-        <p>Địa chỉ: 123 Đường ABC, Quận 1, TP. HCM</p>
-        <p>Email: support@xyz.com</p>
-        <p>Hotline: 0987 654 321</p>
-      </div>
-    </div>
-
     <footer class="bg-dark text-white py-5">
       <div class="container">
         <div class="row align-items-center">
@@ -245,45 +211,23 @@
         &copy; 2025 Trang Chủ. Mọi quyền được bảo lưu.
       </p>
     </footer>
-
     <script>
-      let currentIndex = 0; // Vị trí hiện tại của ảnh
-      const slides = document.querySelector(".slides");
-      const totalSlides = document.querySelectorAll(".slides img").length;
-      const dots = document.querySelectorAll(".dot");
+      document.getElementById("expense-btn").addEventListener("click", () => {
+        fetch("/home/api/expense_chart_image")
+          .then((response) => response.blob())
+          .then((imageBlob) => {
+            const imageUrl = URL.createObjectURL(imageBlob);
+            document.getElementById("expense-image").src = imageUrl;
+            document.getElementById("chart-container").style.display = "block";
+          })
+          .catch((error) => {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+            document.getElementById("chart-container").style.display = "block";
+          });
+      });
 
-      // Chuyển đến ảnh tiếp theo
-      function showNext() {
-        currentIndex = (currentIndex + 1) % totalSlides; // nếu đến ảnh cuối thì quay lại ảnh đầu
-        updateSlider();
-      }
-
-      // Chuyển đến ảnh trước
-      function showPrev() {
-        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides; // nếu đến ảnh đầu thì quay lại ảnh cuối
-        updateSlider();
-      }
-
-      // Cập nhật slider và dot
-      function updateSlider() {
-        // Cập nhật position của slides để hiển thị ảnh hiện tại
-        slides.style.transform = `translateX(-${currentIndex * 100}%)`;
-
-        // Cập nhật dot active
-        dots.forEach((dot) => dot.classList.remove("active")); // Gỡ bỏ tất cả class active
-        dots[currentIndex].classList.add("active"); // Thêm class active vào dot hiện tại
-      }
-
-      // Lắng nghe sự kiện click vào nút next/prev
-      document.querySelector(".next").addEventListener("click", showNext);
-      document.querySelector(".prev").addEventListener("click", showPrev);
-
-      // Lắng nghe sự kiện click vào dot
-      dots.forEach((dot) => {
-        dot.addEventListener("click", (e) => {
-          currentIndex = parseInt(e.target.getAttribute("data-index"));
-          updateSlider();
-        });
+      document.getElementById("close-btn").addEventListener("click", () => {
+        document.getElementById("chart-container").style.display = "none";
       });
     </script>
   </body>

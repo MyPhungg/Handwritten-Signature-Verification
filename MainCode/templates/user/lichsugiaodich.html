@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch sử giao dịch</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='giaodich.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{{url_for('home.home')}}">
+            <img
+              src="{{ url_for('static', filename='img/logoBank.jpg') }}"
+              style="width: 50px; height: 50px"
+              class="rounded"
+              href="{{url_for('home.home')}}"
+            />
+          </a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarScroll"
+            aria-controls="navbarScroll"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarScroll">
+            <ul
+              class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll"
+              style="--bs-scroll-height: 100px"
+            >
+              <li class="nav-item">
+                <a
+                  class="nav-link active text-white"
+                  aria-current="page"
+                  href="{{url_for('home.home')}}"
+                  >Trang chủ</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="{{url_for('home.home')}}"
+                  >Về chúng tôi</a
+                >
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle text-white"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Dịch vụ
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="{{ url_for('home.xem_uu_dai') }}"
+                      >Ưu đãi</a
+                    >
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="{{url_for('home.lichsugiaodich')}}"
+                      >Lịch sử giao dịch</a
+                    >
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
+                      >Sổ tiết kiệm</a
+                    >
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider" />
+                  </li>
+  
+                  <li>
+                    <a class="dropdown-item" href="{{url_for('home.thongke')}}"
+                      >Thống kê</a
+                    >
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <li class="nav-item dropdown d-flex align-items-center">
+              <a
+                class="nav-link dropdown-toggle text-white"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <i class="fa-solid fa-user"></i>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="{{url_for('home.infoUser')}}"
+                    >Thông tin tài khoản</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{{url_for('auth.logout')}}"
+                    >Đăng xuất</a
+                  >
+                </li>
+                <li></li>
+              </ul>
+            </li>
+          </div>
+        </div>
+      </nav>
+    <button id="transaction-btn">Xem Lịch sử giao dịch </button>
+    <div class="transaction-history hidden" id="transaction-history">
+        <table id="transaction-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ngày Giao Dịch</th>
+                    <th>Chiều Giao Dịch</th>
+                    <th>Giá Trị Giao Dịch</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    </tbody>
+</table>
+
+<footer class="bg-dark text-white py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col">
+          <p>
+            PyBank là nền tảng ngân hàng số hiện đại, giúp bạn gửi tiết kiệm,
+            quản lý tài chính và giao dịch mọi lúc, mọi nơi chỉ với vài thao
+            tác đơn giản.
+          </p>
+          <p>
+            💰 Gửi tiết kiệm linh hoạt – Lãi suất hấp dẫn, kỳ hạn đa dạng,
+            giúp bạn tối ưu hóa số tiền nhàn rỗi.
+          </p>
+          <p>
+            🔒 An toàn & bảo mật – Công nghệ mã hóa tiên tiến, đảm bảo an toàn
+            tuyệt đối cho tài khoản của bạn.
+          </p>
+          <p>
+            🎯 Trải nghiệm thông minh – Giao diện thân thiện, thao tác đơn
+            giản, phù hợp với mọi đối tượng.
+          </p>
+          <p>PyBank – Tiết kiệm thông minh, tài chính vững vàng! 🚀</p>
+        </div>
+        <div class="col">
+          <p>PyBank - Ngân hàng số thông minh cho tương lai</p>
+          <p>Địa chỉ: 123 Đường ABC, Quận 1, TP. HCM</p>
+          <p>Email: support@xyz.com</p>
+          <p>Hotline: 0987 654 321</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin: 2%; text-align: center">
+      &copy; 2025 Trang Chủ. Mọi quyền được bảo lưu.
+    </p>
+  </footer>
+    <script>
+    document.getElementById("transaction-btn").addEventListener("click", function() {
+        document.getElementById("transaction-history").classList.toggle("hidden");
+        loadTransactions(); // Gọi hàm tải giao dịch
+    });
+    
+    // Tải danh sách giao dịch từ Flask
+    async function loadTransactions() {
+        const response = await fetch('/home/api/transactions');
+        const transactions = await response.json();
+        console.log("Transactions loaded:", transactions);
+    
+        const tableBody = document.querySelector("#transaction-table tbody");
+        tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi render mới
+    
+        transactions.forEach(transaction => {
+            const row = document.createElement("tr");
+            const directionClass = transaction.ChieuGD === 1 ? "income" : "expense";
+            row.innerHTML = `
+                <td class="transaction-id">${transaction.id}</td>
+                <td class="transaction-date">${transaction.NgayGD}</td>
+                <td class="transaction-direction ${directionClass}">${transaction.ChieuGD === 1 ? 'Tiền vào' : 'Tiền ra'}</td>
+                <td class="${directionClass}">${transaction.GiaTriGD.toLocaleString()}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+    </script>
+</body>
+</html>
