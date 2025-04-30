@@ -15,6 +15,8 @@ import io
 from dateutil.relativedelta import relativedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 import mysql.connector
+import os
+from werkzeug.utils import secure_filename
 
 
 home_bp = Blueprint('home', __name__)
@@ -244,7 +246,7 @@ scheduler.start()
 
 @home_bp.route('/admin/khachhang')
 def admin_khachhang():
-    khach_hang_list = TaiKhoan.query.all()  # Lấy tất cả khách hàng từ database
+    khach_hang_list = KhachHang.query.all()  # Lấy tất cả khách hàng từ database
     return render_template('admin/chinhsuaKH.html', khach_hang_list=khach_hang_list)
 
 
