@@ -281,6 +281,7 @@ def process_forgot_account(soDienThoai, authMethod, cccd=None, file=None):
                                    show_result=True)
         else:
             flash('Chữ ký không trùng khớp!', 'error')
+            return render_template('forgetAcc.html', soDienThoai=soDienThoai)
     else:
         flash('Không tìm thấy chữ ký gốc trong hệ thống!', 'error')
 
@@ -299,7 +300,9 @@ def forgetAccSubmit():
         elif authMethod == 'signature':
             file = request.files.get('signature')
             return process_forgot_account(soDienThoai, authMethod, file=file)
-
+        else:
+            flash('Phương thức xác nhận không hợp lệ', 'error')
+            return redirect(url_for('auth.forgetAcc'))
     flash('Vui lòng chọn phương thức xác nhận', 'error')
     return redirect(url_for('auth.forgetAcc'))
 

@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask import session, flash
 from models import TaiKhoan
-from models import LoaiTK
+from models import LoaiTK, db
+import random
+from datetime import datetime
 
 account_bp = Blueprint('account', __name__)
 
@@ -36,3 +38,39 @@ def chooseAcc():
         .all()
     )
     return render_template('chooseAcc.html', dsTaiKhoan=dsTaiKhoan)
+
+# tạo số tài khoản
+
+
+def generate_account_number(length=12):
+    account_number = ''.join(random.choices('0123456789', k=length))
+    return account_number
+
+
+@account_bp.route('/taoAccMoi', methods=['POST', 'GET'])
+def taoTaiKhoan():
+    if request.method == 'POST':
+        # Đếm số lượng nhân viên hiện có
+        so_luong_tai_khoan = TaiKhoan.query.count()
+        maTK = f"TK{so_luong_tai_khoan + 1}"
+
+        maKH = session['MaKH']
+        soTaiKhoan = request.form['SoTaiKhoan']
+        maLoaiTK = request.form['maLoaiTK']
+        soDu = 0
+        ngayDangKy = (datetime.now()).strftime("%Y-%m-%d %H-%M-%S")
+        taiKhoanMoi = TaiKhoan(
+            MaTK=maTK,
+            LoaiTK=maLoaiTK,
+            SoDu=soDu,
+            MaKH=maKH,
+            STK=soTaiKhoan,
+            NgayDangKy=ngayDangKy,
+            TrangThai=1)
+        db.session.add(taiKhoanMoi)
+        db.session.commit()
+        return redirect(url_for('account.chooseAcc'))
+    SoTaiKhoan = generate_account_number()
+    dsLoaiTK = LoaiTK.query.filter(LoaiTK.MaLoai != 'ML2').all()
+
+    return render_template('user/taoAccMoi.html', SoTaiKhoan=SoTaiKhoan, dsLoaiTK=dsLoaiTK)

@@ -115,8 +115,6 @@ class LichSuGiaoDich(db.Model):
     HinhThuc = db.Column(db.String(100), nullable=False)
     TKGD = db.Column(db.String(50), db.ForeignKey(
         'taikhoan.MaTK'), nullable=False)
-    MaKyHan = db.Column(db.String(10), nullable=False)
-    TenDM = db.Column(db.String(100), nullable=False)
     taikhoan = db.relationship('TaiKhoan', backref='lichsugiaodich')
 
 # Model lstichdiem
@@ -196,41 +194,38 @@ class SignatureVector(db.Model):
     __tablename__ = 'signature_vectors'
 
     MaVector = db.Column(db.Integer, primary_key=True)
-    MaKH = db.Column(db.String(50), nullable=False)
+    MaKH = db.Column(db.String(10), db.ForeignKey(
+        'khachhang.MaKH'), nullable=False)
     vector = db.Column(db.Text, nullable=False)  # lưu JSON string
     NgayTao = db.Column(db.DateTime, default=datetime.utcnow)
 
-
-# mtri
-class DanhMucChiTieu(db.Model):
-    __tablename__ = 'danhmucchitieu'
-    madm = db.Column(db.Integer, primary_key=True)
-    tendm = db.Column(db.String(100))
-
-
-class Savings(db.Model):
-    __tablename__ = 'savings'
-    id = db.Column(db.Integer, primary_key=True)
-    year = db.Column(db.Integer)
-    initial_balance = db.Column(db.Float)
-    interest_rate = db.Column(db.Float)
-
-
-class Transaction(db.Model):
-    __tablename__ = 'transactions'
-    id = db.Column(db.Integer, primary_key=True)
-    months = db.Column(db.Date)
-    money_in = db.Column(db.Float)
-    money_out = db.Column(db.Float)
+    khachhang = db.relationship('KhachHang', backref='signature_vectors')
 
 
 class SavingsSoTietKiem(db.Model):
     __tablename__ = 'savingssotietkiem'
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    MaKH = db.Column(db.String(10), nullable=True)
-    SoTienGui = db.Column(db.Integer, nullable=True)
-    KyHan = db.Column(db.String(20), nullable=True)
-    LaiSuat = db.Column(db.Float, nullable=True)
-    NgayMo = db.Column(db.Date, nullable=True)
-    NgayKetThuc = db.Column(db.Date, nullable=True)
+    MaTK = db.Column(db.String(10), db.ForeignKey(
+        'taikhoan.MaTK'), nullable=False)
+    SoTienGui = db.Column(db.Integer, nullable=False)
+    MaKyHan = db.Column(db.String(10), db.ForeignKey(
+        'kyhan.MaKyHan'), nullable=False)
+    NgayMo = db.Column(db.Date, nullable=False)
+    NgayKetThuc = db.Column(db.Date, nullable=False)
+    MaTKNguon = db.Column(db.String(10), db.ForeignKey(
+        'taikhoan.MaTK'), nullable=False)
+
+    taikhoannguon = db.relationship(
+        'TaiKhoan', backref='taikhoannguontietkiem', foreign_keys=[MaTKNguon])
+    taikhoan = db.relationship(
+        'TaiKhoan', backref='savingssotietkiem', foreign_keys=[MaTKNguon])
+    kyhan = db.relationship('KyHan', backref='savingssotietkiem')
+
+
+class KyHan(db.Model):
+    __tablename__ = 'kyhan'
+
+    MaKyHan = db.Column(db.String(10), primary_key=True)
+    KyHan = db.Column(db.Integer, nullable=False)       # đơn vị: tháng
+    LaiSuat = db.Column(db.Float, nullable=False)       # đơn vị: phần trăm

@@ -1,22 +1,23 @@
-
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify, send_file
-from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, AccountKH
-from datetime import datetime, date
-from decimal import Decimal
-import re
-import random
-import string
-from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, LichSuTichDiem, NhanVien, SavingsSoTietKiem
-from sqlalchemy import or_
-from sqlalchemy import event
-from sqlalchemy.sql import func
-import matplotlib.pyplot as plt
-import io
-from dateutil.relativedelta import relativedelta
-from apscheduler.schedulers.background import BackgroundScheduler
-import mysql.connector
-import os
 from werkzeug.utils import secure_filename
+import os
+import mysql.connector
+from apscheduler.schedulers.background import BackgroundScheduler
+from dateutil.relativedelta import relativedelta
+import io
+import matplotlib.pyplot as plt
+from sqlalchemy.sql import func
+from sqlalchemy import event
+from sqlalchemy import or_
+from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, LichSuTichDiem, NhanVien, SavingsSoTietKiem
+import string
+import random
+import re
+from decimal import Decimal
+from datetime import datetime, date
+from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, AccountKH
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify, send_file
+import matplotlib
+matplotlib.use('Agg')
 
 
 home_bp = Blueprint('home', __name__)
@@ -25,13 +26,10 @@ home_bp = Blueprint('home', __name__)
 # Kiểm tra xem đã chọn tại khoản chưa
 @home_bp.route('/home')
 def home():
-    if 'MaTK' not in session:
-        flash('Vui lòng chọn tài khoản trước!', 'error')
-        return redirect(url_for('account.chooseAcc'))
-
-    maTK = session['MaTK']
-    tk = TaiKhoan.query.get(maTK)
-    return render_template('user/home.html', tk=tk)
+    isLogin = 'MaKH' in session
+    maTK = session['MaTK'] if isLogin else None
+    tk = TaiKhoan.query.get(maTK) if maTK else None
+    return render_template('user/home.html', isLogin=isLogin, tk=tk)
 
 
 # Hiển thị thông tin người dùng
@@ -92,21 +90,7 @@ def changeInfoUser():
             for field, message in errors.items():
                 flash(message, 'error')
             return redirect(url_for('home.inputForm'))
-            # hoten = request.form.get('hoten')
-            # cccd = request.form.get('cccd')
-            # noicapcccd = request.form.get('noicapcccd')
-            # quoctich = request.form.get('quoctich')
-            # noicutru = request.form.get('noicutru')
-            # diachithuongtru = request.form.get('diachithuongtru')
-            # sodienthoai = request.form.get('sodienthoai')
-            # email = request.form.get('email')
-            # ngaysinh = request.form.get('ngaysinh')
-            # ngaycapcccd = request.form.get('ngaycapcccd')
-            # cogiatriden = request.form.get('cogiatriden')
-            # dantoc = request.form.get('dantoc')
-            # diachihientai = request.form.get('diachihientai')
-            # gioitinh = request.form.get('gioitinh')
-            # nghenghiep = request.form.get('nghenghiep')
+
         # Nếu tất cả validate thành công
         maKH = session['MaKH']
         khachhang = KhachHang.query.filter_by(MaKH=maKH).first()
@@ -170,6 +154,41 @@ patterns = {
     "gioitinh": (re.compile(r"^(Nam|Nữ|Khác)$"), "Giới tính chỉ có thể là Nam, Nữ hoặc Khác"),
     "nghenghiep": (re.compile(r"^[\w\sÀ-ỹ]+$", re.UNICODE), "Nghề nghiệp chỉ chứa chữ cái và dấu cách"),
 }
+
+# Nạp tiền
+
+
+@home_bp.route('/napTien', methods=['POST', 'GET'])
+def napTien():
+    if request.method == 'POST':
+        # Lấy MaGD
+        so_luong_giao_dich = LichSuGiaoDich.query.count()
+        maGD = f"GD{so_luong_giao_dich+1}"
+        noiDung = request.form['noiDung']
+        soTien = request.form['soTien']
+        chieuGD = 1
+        ngayGD = (datetime.now()).strftime("%Y-%m-%d %H-%M-%S")
+        TKGD = session['MaTK']
+        hinhThuc = "Nạp tiền"
+        giao_dich_moi = LichSuGiaoDich(
+            MaGD=maGD,
+            NgayGD=ngayGD,
+            ChieuGD=chieuGD,
+            NoiDungGD=noiDung,
+            GiaTriGD=soTien,
+            HinhThuc=hinhThuc,
+            TKGD=TKGD
+        )
+        taikhoan = TaiKhoan.query.get(TKGD)
+        taikhoan.SoDu += int(soTien)
+        db.session.add(giao_dich_moi)
+        cap_nhat_diem_va_cap_bac(TKGD, int(soTien))
+        db.session.commit()
+        flash('Nạp tiền thành công!', 'success')
+        return redirect(url_for('home.napTien'))
+    maTK = session['MaTK']
+    taikhoan = TaiKhoan.query.get(maTK)
+    return render_template('user/NapTien.html', taikhoan=taikhoan)
 
 
 def validate_input(data):
@@ -735,8 +754,6 @@ def tim_kiem_capbac():
 def cap_nhat_cap_bac(ma_kh):
     """Kiểm tra và cập nhật cấp bậc khách hàng dựa trên điểm tích lũy"""
     lich_su = LichSuTichDiem.query.filter_by(MaKH=ma_kh).first()
-
-    # Nếu không có lịch sử tích điểm, thoát ra.
     if not lich_su:
         return
 
@@ -746,45 +763,39 @@ def cap_nhat_cap_bac(ma_kh):
     # Lấy danh sách cấp bậc sắp xếp theo mức đạt được
     danh_sach_cap_bac = CapBacKH.query.order_by(CapBacKH.MucDatDuoc).all()
 
-    # Duyệt qua từng cấp bậc để tìm cấp bậc thích hợp
     for cap_bac in danh_sach_cap_bac:
         if diem_tich_luy >= cap_bac.MucDatDuoc:
             cap_bac_moi = cap_bac.MaCapBac
         else:
-            break  # Dừng lại khi điểm tích lũy không đủ cho cấp bậc tiếp theo
+            break
+
     khach_hang = KhachHang.query.filter_by(MaKH=ma_kh).first()
-    # Nếu cấp bậc mới được tìm thấy và khác với cấp bậc hiện tại
-    if cap_bac_moi:
-        if khach_hang and khach_hang.MaCapBac != cap_bac_moi:
-            khach_hang.MaCapBac = cap_bac_moi
-            db.session.commit()
+
+    # Cập nhật nếu cần, KHÔNG commit ở đây
+    if cap_bac_moi and khach_hang and khach_hang.MaCapBac != cap_bac_moi:
+        khach_hang.MaCapBac = cap_bac_moi
 
 
-@event.listens_for(LichSuGiaoDich, 'after_insert')
-def after_insert_lich_su_giao_dich(mapper, connection, target):
-    """ Cập nhật điểm tích lũy và cấp bậc khách hàng khi có giao dịch mới """
-    tai_khoan = TaiKhoan.query.filter_by(MaTK=target.TKGD).first()
+def cap_nhat_diem_va_cap_bac(ma_tk: str, gia_tri_giao_dich: int):
+    """Cập nhật điểm tích lũy và cấp bậc khách hàng dựa trên mã tài khoản và giá trị giao dịch"""
+    tai_khoan = TaiKhoan.query.get(ma_tk)
+    if not tai_khoan:
+        return
 
-    if tai_khoan:
-        lich_su = LichSuTichDiem.query.filter_by(MaKH=tai_khoan.MaKH).first()
+    ma_kh = tai_khoan.MaKH
+    lich_su = LichSuTichDiem.query.filter_by(MaKH=ma_kh).first()
 
-        # Nếu không có lịch sử tích điểm, tạo mới
-        if not lich_su:
-            lich_su = LichSuTichDiem(MaKH=tai_khoan.MaKH, Diem=0)
-            db.session.add(lich_su)
+    if not lich_su:
+        lich_su = LichSuTichDiem(MaKH=ma_kh, ThoiGian=datetime.today(), Diem=0)
+        db.session.add(lich_su)
 
-        # Tính toán điểm tích lũy từ giá trị giao dịch
-        # Mỗi 1000 đơn vị giao dịch tương ứng với 1 điểm
-        lich_su.Diem += target.GiaTriGD // 1000
+    lich_su.Diem += gia_tri_giao_dich // 1000
+    lich_su.ThoiGian = datetime.today()
 
-        # Commit thay đổi điểm tích lũy
-        db.session.commit()
-
-        # Cập nhật cấp bậc sau khi điểm thay đổi
-        cap_nhat_cap_bac(tai_khoan.MaKH)
-
+    cap_nhat_cap_bac(ma_kh)
 
 # Trí
+
 
 def get_connection():
     return mysql.connector.connect(
@@ -795,7 +806,7 @@ def get_connection():
     )
 
 
-def get_transaction_data(as_list=False):
+def get_transaction_data(maTK, as_list=False):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -803,8 +814,10 @@ def get_transaction_data(as_list=False):
                SUM(CASE WHEN ChieuGD=1 THEN GiaTriGD ELSE 0 END),
                SUM(CASE WHEN ChieuGD=0 THEN GiaTriGD ELSE 0 END)
         FROM lichsugiaodich
+        WHERE TKGD = %s
         GROUP BY month
-    """)
+    """, (maTK,))
+
     results = cursor.fetchall()
 
     months = [row[0] for row in results]
@@ -813,7 +826,7 @@ def get_transaction_data(as_list=False):
 
     if as_list:
         cursor.execute(
-            "SELECT magd, NgayGD, ChieuGD, GiaTriGD FROM lichsugiaodich")
+            "SELECT MaGD, NgayGD, ChieuGD, GiaTriGD FROM lichsugiaodich")
         all_tx = cursor.fetchall()
         transactions = [{"id": r[0], "NgayGD": r[1].strftime(
             "%Y-%m-%d"), "ChieuGD": r[2], "GiaTriGD": float(r[3])} for r in all_tx]
@@ -830,72 +843,7 @@ def get_transaction_data(as_list=False):
     }
 
 
-def get_savings_data():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT NgayMo, SoTienGui, LaiSuat FROM savingssotietkiem")
-    rows = cursor.fetchall()
-
-    years = []
-    savings_growth = []
-
-    for row in rows:
-        start_year = row[0].year
-        sotien = row[1]
-        laisuat = row[2]
-        years.append(start_year)
-        growth = sotien * (1 + laisuat)
-        savings_growth.append(growth)
-
-    cursor.close()
-    conn.close()
-
-    return {
-        "years": years,
-        "savings_growth": savings_growth
-    }
-
-
-def get_danhmuc_data():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT MaDM, TenDM FROM danhmucchitieu")
-    rows = cursor.fetchall()
-    data = [{"MaDM": r[0], "TenDM": r[1]} for r in rows]
-    cursor.close()
-    conn.close()
-    return data
-
-
-def get_expense_data():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT dm.TenDM, SUM(gd.GiaTriGD)
-        FROM lichsugiaodich gd
-        JOIN danhmucchitieu dm ON gd.MaDM = dm.MaDM
-        WHERE gd.ChieuGD = 0
-        GROUP BY dm.TenDM
-    """)
-    rows = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    return [{"category": row[0], "total": float(row[1])} for row in rows]
-
-
 # mtri
-
-
-@home_bp.route('/services')
-def services():
-    return render_template('user/home.html')
-
-
-@home_bp.route('/bieudochitieu')
-def bieudochitieu():
-    return render_template('user/bieudochitieu.html')
-
 
 @home_bp.route('/thongke')
 def thongke():
@@ -914,81 +862,6 @@ def lichsugiaodich():
     return render_template('user/lichsugiaodich.html')
 
 
-# ================== API DỮ LIỆU ==================
-
-@home_bp.route('/api/thongke')
-def api_thongke():
-    transaction_data = get_transaction_data()
-    savings_data = get_savings_data()
-    danhmuc_data = get_danhmuc_data()
-
-    data = {
-        "months": transaction_data["months"],
-        "money_in": transaction_data["money_in"],
-        "money_out": transaction_data["money_out"],
-        "years": savings_data["years"],
-        "savings_growth": savings_data["savings_growth"],
-        "danh_muc_chi_tieu": danhmuc_data
-    }
-    return jsonify(data)
-
-
-@home_bp.route('/api/transactions')
-def api_transactions():
-    return jsonify(get_transaction_data(as_list=True))
-
-
-@home_bp.route('/api/danhmucchitieu')
-def api_danhmucchitieu():
-    return jsonify({"danhmucchitieu": get_danhmuc_data()})
-
-
-@home_bp.route('/api/expense-chart-data')
-def api_expense_chart_data():
-    return jsonify(get_expense_data())
-
-
-@home_bp.route('/api/thongke-charts')
-def thongke_charts():
-    transaction_data = get_transaction_data()
-    savings_data = get_savings_data()
-
-    months = transaction_data["months"]
-    money_in = transaction_data["money_in"]
-    money_out = transaction_data["money_out"]
-
-    fig, ax = plt.subplots()
-    ax.plot(months, money_in, label='Tiền vào', color='b', marker='o')
-    ax.plot(months, money_out, label='Tiền ra', color='r', marker='x')
-    ax.set_title('Biểu đồ thu chi theo tháng')
-    ax.set_xlabel('Tháng')
-    ax.set_ylabel('Số tiền (triệu VND)')
-    ax.legend()
-
-    img_io_revenue = io.BytesIO()
-    plt.savefig(img_io_revenue, format='png')
-    img_io_revenue.seek(0)
-
-    years = savings_data["years"]
-    savings_growth = savings_data["savings_growth"]
-
-    fig, ax = plt.subplots()
-    ax.plot(years, savings_growth, label='Số dư tiết kiệm', color='g', marker='o')
-    ax.set_title('Biểu đồ tăng trưởng tiết kiệm')
-    ax.set_xlabel('Năm')
-    ax.set_ylabel('Số dư tiết kiệm (triệu VND)')
-    ax.legend()
-
-    img_io_savings = io.BytesIO()
-    plt.savefig(img_io_savings, format='png')
-    img_io_savings.seek(0)
-
-    return jsonify({
-        'revenue_chart': img_io_revenue.getvalue().decode('utf-8'),
-        'savings_chart': img_io_savings.getvalue().decode('utf-8')
-    })
-
-
 def generate_ma_tk():
     count = TaiKhoan.query.count()
     return f'TK{count + 1}'
@@ -1001,27 +874,37 @@ def generate_STK():
             return stk
 
 
-@home_bp.route('/api/expense_chart_image')
+# biểu đồ chi tiêu (bieudochitieu.html)
+@home_bp.route('/expense_chart_image')
 def expense_chart_image():
-    categories = ['Ăn uống', 'Mua sắm', 'Giải trí', 'Di chuyển']
-    expenses = [200, 300, 150, 100]
+    maTK = session['MaTK']
+    data = (LichSuGiaoDich.query
+            .with_entities(func.distinct(LichSuGiaoDich.HinhThuc), func.sum(LichSuGiaoDich.GiaTriGD))
+            .filter(LichSuGiaoDich.TKGD == maTK)
+            .group_by(LichSuGiaoDich.HinhThuc)
+            .all())
+    categories = [item[0] for item in data]
+    expenses = [item[1] for item in data]
 
     fig, ax = plt.subplots()
     ax.pie(expenses, labels=categories, autopct='%1.1f%%', startangle=90)
     ax.axis('equal')
 
     img_io = io.BytesIO()
-    plt.savefig(img_io, format='png')
+    fig.savefig(img_io, format='png', dpi=150, bbox_inches="tight")
+    plt.close(fig)
     img_io.seek(0)
 
     return send_file(img_io, mimetype='image/png')
 
 
-@home_bp.route('/api/money_area_chart_image')
-def money_area_chart_image():
-    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May']
-    money_in = [3000, 4000, 3500, 4500, 5000]
-    money_out = [1500, 2000, 1800, 2100, 2500]
+@home_bp.route('/money_area_chart_image')
+def money_area_chart_image():  # biểu đồ tiền vào ra (ở thongke)
+    maTK = session['MaTK']
+    data = get_transaction_data(maTK)
+    months = data['months']
+    money_in = data['money_in']
+    money_out = data['money_out']
 
     total_in = sum(money_in)
     total_out = sum(money_out)
@@ -1053,8 +936,9 @@ def money_area_chart_image():
                 wrap=True, horizontalalignment='center', fontsize=12, color='black')
 
     img_io = io.BytesIO()
-    plt.tight_layout()
-    plt.savefig(img_io, format='png', dpi=150, bbox_inches="tight")
+    plt.subplots_adjust(top=0.88, bottom=0.2)
+    fig.savefig(img_io, format='png', dpi=150, bbox_inches="tight")
+    plt.close(fig)
     img_io.seek(0)
 
     return send_file(img_io, mimetype='image/png')

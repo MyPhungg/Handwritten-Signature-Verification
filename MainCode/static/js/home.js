@@ -62,6 +62,17 @@ async function validateForm(event) {
             document.getElementById("sodienthoai-error").innerText = "Số điện thoại đã tồn tại.";
             isValid = false;
         }
+
+        if (!result.trungCCCD) {
+            document.getElementById("cccd").classList.remove("is-invalid");
+            document.getElementById("cccd-error").innerText = "";
+        }
+        
+        if (!result.trungSDT) {
+            document.getElementById("sodienthoai").classList.remove("is-invalid");
+            document.getElementById("sodienthoai-error").innerText = "";
+        }
+        
     }
 
     // Nếu hợp lệ thì submit form

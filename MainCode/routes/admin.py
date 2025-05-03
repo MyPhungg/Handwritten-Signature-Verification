@@ -169,10 +169,11 @@ def kiemTraTrung():
         sdt_trung = db.session.query(NhanVien).filter(
             NhanVien.SoDienThoai == soDienThoai, NhanVien.MaNV != maNV).first()
     else:
-        cccd_trung = db.session.query(NhanVien).filter(
-            NhanVien.SoCCCD == soCCCD).first()
-        sdt_trung = db.session.query(NhanVien).filter(
-            NhanVien.SoDienThoai == soDienThoai).first()
+        maKH = session['MaKH']
+        cccd_trung = db.session.query(KhachHang).filter(
+            KhachHang.SoCCCD == soCCCD, KhachHang.MaKH != maKH).first()
+        sdt_trung = db.session.query(KhachHang).filter(
+            KhachHang.SoDienThoai == soDienThoai, KhachHang.MaKH != maKH).first()
 
     return jsonify({
         "trungCCCD": cccd_trung is not None,
