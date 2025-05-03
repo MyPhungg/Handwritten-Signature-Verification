@@ -922,6 +922,13 @@ def generate_STK():
             return stk
 
 
+@home_bp.route('/api/transactions')
+def api_transactions():
+    maTK = session['MaTK']
+
+    return jsonify(get_transaction_data(maTK, as_list=True))
+
+
 # biểu đồ chi tiêu (bieudochitieu.html)
 @home_bp.route('/expense_chart_image')
 def expense_chart_image():
