@@ -194,6 +194,7 @@ class SignatureVector(db.Model):
     __tablename__ = 'signature_vectors'
 
     MaVector = db.Column(db.Integer, primary_key=True)
+
     MaKH = db.Column(db.String(10), db.ForeignKey(
         'khachhang.MaKH'), nullable=False)
     vector = db.Column(db.Text, nullable=False)  # lưu JSON string

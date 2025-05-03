@@ -65,8 +65,8 @@ def extract_augmented_features(image_input, angles=None):
     mean_feature = np.mean(feature_list, axis=0)
     return mean_feature
 
-# Lưu vector chữ ký vào DB (ảnh đã xoay và lấy trung bình)
 
+# Lưu vector chữ ký vào DB (ảnh đã xoay và lấy trung bình)
 
 def save_mean_signature_vector(folder_path, ma_kh):
     if not os.path.exists(folder_path):
@@ -125,7 +125,7 @@ def get_vector_from_db(ma_kh):
 # Xác thực chữ ký dựa trên cosine + euclidean
 
 
-def compare_vectors(feature1, feature2, threshold=0.85):
+def compare_vectors(feature1, feature2, threshold=0.97):
     cos_sim = cosine_similarity([feature1], [feature2])[0][0]
     euclidean = np.linalg.norm(feature1 - feature2)
     result = True if cos_sim > threshold else False
@@ -138,7 +138,7 @@ def compare_vectors(feature1, feature2, threshold=0.85):
 
 # Hàm xác thực chữ ký (ảnh test được xoay và trích trung bình đặc trưng)
 
-def verify_signature_with_augmentation(file, ma_kh, threshold=0.85):
+def verify_signature_with_augmentation(file, ma_kh):
     """
     Xác thực chữ ký bằng cách xoay ảnh, trích xuất đặc trưng trung bình và so sánh với vector từ DB.
     Trả về True nếu khớp, False nếu không.
@@ -167,7 +167,7 @@ def verify_signature_with_augmentation(file, ma_kh, threshold=0.85):
             }
 
         # Bước 4: So sánh vector
-        return compare_vectors(test_vector, reference_vector, threshold)
+        return compare_vectors(test_vector, reference_vector)
 
     except Exception as e:
         return {
@@ -451,11 +451,12 @@ def dong_mo_tai_khoan():
 
     if not kh or not taikhoan:
         flash('Không tìm thấy khách hàng hoặc tài khoản.', 'danger')
-        return redirect(url_for('home.admin_taikhoan', khach_hang=kh))
+
+        return redirect(url_for('home.admin_taikhoan'))
 
     if not file:
         flash('Vui lòng tải lên ảnh chữ ký!', 'warning')
-        return redirect(url_for('home.admin_taikhoan', khach_hang=kh))
+        return redirect(url_for('home.admin_taikhoan'))
 
     result_verify = verify_signature_with_augmentation(file, maKH)
 
@@ -467,8 +468,8 @@ def dong_mo_tai_khoan():
             taikhoan.TrangThai = 1
             flash('Tài khoản đã được **mở lại**.', 'success')
 
-        db.session.commit()
-        return redirect(url_for('home.admin_taikhoan'))
+        db.session.commit()  # ✅ commit ở ngoài if
+        return redirect(url_for('home.admin_taikhoan'))  # ✅ luôn return
     else:
         flash('Chữ ký không hợp lệ!', 'error')
-        redirect(url_for('home.admin_taikhoan'))
+        return redirect(url_for('home.admin_taikhoan'))

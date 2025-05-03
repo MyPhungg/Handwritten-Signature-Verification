@@ -20,6 +20,7 @@
 
   <body>
     <div class="d-flex">
+<<<<<<< HEAD
       <!-- Sidebar -->
       <div class="sidebar">
         <a href="{{ url_for('auth.login') }}"
@@ -31,25 +32,27 @@
             style="width: 80px; height: 80px; line-height: 80px; margin: auto"
           ></div>
           <p class="mt-2">{{ten}}</p>
-
+          </div>
+          <a href="{{ url_for('home.admin_khachhang') }}">
+              <div class="menu-item">Khách hàng</div>
+          </a>
+          <a href="{{ url_for('home.admin_uudai') }}">
+              <div class="menu-item">Ưu đãi</div>
+          </a>
+          <a href="{{ url_for('home.danh_sach_cap_bac') }}">
+              <div class="menu-item">Bậc thành viên</div>
+          </a>
+          <a href="{{ url_for('home.admin_taikhoan') }}">
+              <div class="menu-item">Tài khoản</div>
+          </a>
         </div>
-        <a href="{{ url_for('home.admin_khachhang') }}">
-          <div class="menu-item">Khách hàng</div>
-        </a>
-        <a href="{{ url_for('home.admin_uudai') }}">
-          <div class="menu-item">Ưu đãi</div>
-        </a>
-        <a href="{{ url_for('home.danh_sach_cap_bac') }}">
-          <div class="menu-item">Bậc thành viên</div>
-        </a>
-        <a href="{{ url_for('home.admin_taikhoan') }}"><div class="menu-item active">Tài khoản</div></a>
+        
       </div>
 
-      <!-- Main content -->
+        <!-- Main content -->
       <div class="content">
-        <h4 class="text-muted">Bậc thành viên</h4>
-
-
+        <h4 class="text-muted">Quản lý bậc thành viên</h4>
+      
         <!-- Thông báo từ Flask -->
         {% with messages = get_flashed_messages(with_categories=true) %} {% if
         messages %} {% for category, message in messages %}
@@ -139,5 +142,8 @@
 =======
 </body>
 
+<<<<<<< HEAD
 >>>>>>> 5af7d4f4ae760d877aec69c1c4ef59d2df15c4b8
+=======
+>>>>>>> main
 </html>

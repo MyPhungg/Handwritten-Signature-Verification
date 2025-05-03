@@ -271,19 +271,48 @@ def admin_khachhang():
 
 @home_bp.route('/khachhang/timkiem', methods=['GET'])
 def tim_kiem_khachhang():
-    search_query = request.args.get(
-        'search', '').strip()  # Lấy từ khóa tìm kiếm
+    search_query = request.args.get('search', '').strip()
 
     if search_query:
         khach_hang_list = KhachHang.query.filter(
             KhachHang.HoTen.ilike(f"%{search_query}%")).all()
     else:
         khach_hang_list = KhachHang.query.all()
-    for khach_hang in khach_hang_list:
-        tai_khoan_list = [
-            tk for kh in khach_hang_list for tk in TaiKhoan.query.filter_by(MaKH=kh.MaKH).all()]
 
-    return render_template('admin/chinhsuaKH.html', tai_khoan_list=tai_khoan_list, search_query=search_query)
+    # Lấy danh sách tài khoản tương ứng với các khách hàng tìm được
+    ma_kh_list = [kh.MaKH for kh in khach_hang_list]
+    tai_khoan_list = TaiKhoan.query.filter(TaiKhoan.MaKH.in_(ma_kh_list)).all()
+
+    return render_template(
+        'admin/chinhsuaKH.html',
+        khach_hang_list=khach_hang_list,
+        tai_khoan_list=tai_khoan_list,
+        search_query=search_query
+    )
+
+
+@home_bp.route('/admin/xoa_khachhang', methods=['POST'])
+def xoa_khachhang():
+    # Lấy danh sách mã khách hàng từ form
+    khach_hang_ids = request.form.getlist("xoa_khachhang")
+
+    if not khach_hang_ids:
+        flash("Vui lòng chọn ít nhất một khách hàng để xóa.", "warning")
+        return redirect(url_for('home.admin_khachhang'))
+
+    try:
+        for maKH in khach_hang_ids:
+            khach_hang = KhachHang.query.filter_by(MaKH=maKH).first()
+            if khach_hang:
+                db.session.delete(khach_hang)
+
+        db.session.commit()
+        flash("Xóa khách hàng thành công!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Lỗi khi xóa khách hàng: " + str(e), "danger")
+
+    return redirect(url_for('home.admin_khachhang'))
 
 
 @home_bp.route('/khachhang/<maKH>')
@@ -296,15 +325,17 @@ def chi_tiet_khachhang(maKH):
 
 
 def generate_ma_kh():
-    # Lấy khách hàng có mã lớn nhất
-    last_kh = KhachHang.query.order_by(KhachHang.MaKH.desc()).first()
+    # Lấy khách hàng có mã lớn nhất theo số sau "KH"
+    last_kh = KhachHang.query.order_by(
+        db.cast(db.func.substr(KhachHang.MaKH, 3), db.Integer).desc()
+    ).first()
 
     if last_kh:
-        last_id = int(last_kh.MaKH[2:])  # Lấy số từ KH001 -> 001 -> 1
-        # Tăng lên 1, format thành KH002, KH003, ...
-        new_id = f"KH{last_id + 1:03d}"
+        # Trích số nguyên sau "KH"
+        last_id = int(last_kh.MaKH[2:])
+        new_id = f"KH{last_id + 1}"
     else:
-        new_id = "KH001"  # Nếu chưa có khách hàng nào
+        new_id = "KH1"
 
     return new_id
 
@@ -313,7 +344,7 @@ def generate_ma_kh():
 def them_khachhang():
     if request.method == "POST":
         try:
-            ma_kh = generate_ma_kh()  # 🔥 Tự động sinh MaKH
+            ma_kh = generate_ma_kh()  # Tự động sinh MaKH
             ho_ten = request.form.get("HoTen")
             ngay_sinh = datetime.strptime(
                 request.form.get("NgaySinh"), "%Y-%m-%d")
@@ -333,8 +364,8 @@ def them_khachhang():
             nghe_nghiep = request.form.get("NgheNghiep")
             email = request.form.get("Email")
 
-            ma_nvql = "NV1"  # 🔥 Mặc định là NV1
-            ma_cap_bac = "CB1"  # 🔥 Mặc định là CB1
+            ma_nvql = "NV1"  # Mặc định là NV1
+            ma_cap_bac = "CB1"  # Mặc định là CB1
             chu_ky = request.form.get("ChuKy") or "DEFAULT_CHUKY"
 
             khach_hang = KhachHang(
@@ -363,7 +394,7 @@ def them_khachhang():
             db.session.commit()
 
             flash("Thêm khách hàng thành công!", "success")
-            return redirect(url_for("home.chinhsua_khachhang", maKH=ma_kh))
+            return redirect(url_for("home.them_khachhang", maKH=ma_kh))
 
         except Exception as e:
             db.session.rollback()
@@ -443,7 +474,7 @@ def xem_uu_dai():
             KhuyenMai.CapBacThanhVien == user.MaCapBac),
         func.date(KhuyenMai.ThoiGian) >= today
     ).all()
-    return render_template('user/offers.html', uu_dai_list=uu_dai_list, current_date=today)
+    return render_template('user/offers.html', uu_dai_list=uu_dai_list, tk=tai_khoan, current_date=today)
 
 
 @home_bp.route('/uudai/<maKM>')
@@ -528,7 +559,7 @@ def them_uudai():
             db.session.add(uu_dai)
             db.session.commit()
             flash("Thêm ưu đãi thành công!", "success")
-            return redirect(url_for("home.chinhsua_uudai"))
+            return redirect(url_for("home.admin_uudai"))
 
         except Exception as e:
             db.session.rollback()
@@ -544,7 +575,7 @@ def xoa_uudai():
 
     if not uu_dai_ids:
         flash("Vui lòng chọn ít nhất một ưu đãi để xóa.", "warning")
-        return redirect(url_for('home.chinhsua_uudai'))
+        return redirect(url_for('home.admin_uudai'))
 
     try:
         for maKM in uu_dai_ids:
@@ -558,7 +589,7 @@ def xoa_uudai():
         db.session.rollback()
         flash("Lỗi khi xóa: " + str(e), "danger")
 
-    return redirect(url_for('home.chinhsua_uudai'))
+    return redirect(url_for('home.admin_uudai'))
 
 
 @home_bp.route('/uudai/sua/<maKM>', methods=['GET', 'POST'])
@@ -699,7 +730,7 @@ def them_capbac():
             db.session.add(capbac)
             db.session.commit()
             flash("Thêm cấp bậc thành công!", "success")
-            return redirect(url_for("home.chinhsua_capbac"))
+            return redirect(url_for("home.danh_sach_cap_bac"))
 
         except Exception as e:
             db.session.rollback()
@@ -827,6 +858,7 @@ def get_transaction_data(maTK, as_list=False):
     if as_list:
         cursor.execute(
             "SELECT MaGD, NgayGD, ChieuGD, GiaTriGD FROM lichsugiaodich")
+
         all_tx = cursor.fetchall()
         transactions = [{"id": r[0], "NgayGD": r[1].strftime(
             "%Y-%m-%d"), "ChieuGD": r[2], "GiaTriGD": float(r[3])} for r in all_tx]
@@ -859,7 +891,9 @@ def sotietkiem():
 
 @home_bp.route('/lichsugiaodich')
 def lichsugiaodich():
-    return render_template('user/lichsugiaodich.html')
+    matk = session['MaTK']
+    tk = TaiKhoan.query.filter_by(MaTK=matk).first()
+    return render_template('user/lichsugiaodich.html', tk=tk)
 
 
 def generate_ma_tk():
@@ -893,6 +927,7 @@ def expense_chart_image():
     img_io = io.BytesIO()
     fig.savefig(img_io, format='png', dpi=150, bbox_inches="tight")
     plt.close(fig)
+
     img_io.seek(0)
 
     return send_file(img_io, mimetype='image/png')
@@ -939,6 +974,7 @@ def money_area_chart_image():  # biểu đồ tiền vào ra (ở thongke)
     plt.subplots_adjust(top=0.88, bottom=0.2)
     fig.savefig(img_io, format='png', dpi=150, bbox_inches="tight")
     plt.close(fig)
+
     img_io.seek(0)
 
     return send_file(img_io, mimetype='image/png')
@@ -1004,32 +1040,110 @@ def mo_so_tiet_kiem():
     return render_template('user/sotietkiem.html', taikhoan=taikhoan)
 
 
-@home_bp.route('/tat_toan_so_tiet_kiem', methods=['POST'])
-def tat_toan_so_tiet_kiem():
-    MaKH = request.form.get('MaKH')
-    MaTK = request.form.get('MaTK')
+@home_bp.route('/tat_toan_sotietkiem', methods=['POST'])
+def tat_toan_sotietkiem():
+    # Lấy ID người dùng từ session
+    makh = session['MaKH']
+    matk = session['MaTK']
+    if not makh or not matk:
+        return redirect(url_for('home.tattoan'))
 
-    # Lấy đúng sổ tiết kiệm cần tất toán
-    stk = TaiKhoan.query.filter_by(MaKH=MaKH, MaTK=MaTK, LoaiTK='ML2').first()
-    saving = SavingsSoTietKiem.query.filter_by(MaKH=MaKH, MaTK=MaTK).first()
+    # Tìm sổ tiết kiệm của người dùng kèm tài khoản
+    sotk = SavingsSoTietKiem.query.filter_by(MaTK=matk).first()
+    taikhoantietkiem = TaiKhoan.query.filter_by(MaTK=matk).first()
+    if not sotk:
+        flash('Không tìm thấy sổ tiết kiệm', 'error')
+        return redirect(url_for('home.tattoan'))
 
-    if not stk or not saving:
-        flash('Không tìm thấy sổ tiết kiệm.', 'error')
-        return redirect(url_for('home.sotietkiem'))  # hoặc trang hiện tại
+    # Tìm tài khoản gốc (tài khoản thanh toán) của người dùng
+    taikhoan = TaiKhoan.query.filter_by(MaKH=makh, MaTK=sotk.MaTKNguon).first()
+    if not taikhoan:
 
-    if saving.NgayKetThuc > date.today():
-        flash('Sổ tiết kiệm chưa đến hạn tất toán!', 'warning')
         return redirect(url_for('home.sotietkiem'))
+    if sotk.NgayKetThuc > date.today():
+        flash("Chưa đến ngày tất toán!", 'warning')
+        # hoặc redirect
+        return render_template('user/tattoan.html', sotietkiem=sotk)
 
-    # Chuyển tiền về tài khoản thanh toán gốc (ML1)
-    taikhoan_goc = TaiKhoan.query.filter_by(MaKH=MaKH, LoaiTK='ML1').first()
-    if taikhoan_goc:
-        taikhoan_goc.SoDu += saving.SoTienGui * (1 + saving.LaiSuat / 100)
+    # lai suat
+    laisuat = sotk.SoTienGui * (1 + sotk.kyhan.LaiSuat / 100)
+    # Cộng số dư từ sổ tiết kiệm vào tài khoản gốc
+    taikhoan.SoDu += laisuat
+
+    # cập nhật lsgd
+    lsgd = LichSuGiaoDich(
+        MaGD=generate_ma_gd,
+        NgayGD=date.today(),
+        ChieuGD=1,
+        NoiDungGD="Tất toán sổ tiết kiệm",
+        GiaTriGD=laisuat,
+        HinhThuc="tt",
+        TKGD=sotk.MaTKNguon
+    )
 
     # Xoá sổ tiết kiệm
-    db.session.delete(saving)
-    db.session.delete(stk)
-    db.session.commit()
+    db.session.delete(sotk)
+    db.session.delete(taikhoantietkiem)
+    db.session.add(lsgd)
+    cap_nhat_diem_va_cap_bac(lsgd.TKGD, int(laisuat))
 
-    flash('Tất toán sổ tiết kiệm thành công!', 'success')
-    return redirect(url_for('home.sotietkiem'))
+    db.session.commit()
+    flash('Tất toán thành công. Tài khoản đã đóng.', 'success')
+    return redirect(url_for('account.chooseAcc'))
+
+
+def generate_ma_gd():
+    # Lấy ls có mã lớn nhất theo số sau "GD"
+    last_gd = LichSuGiaoDich.query.order_by(
+        db.cast(db.func.substr(LichSuGiaoDich.MaGD, 3), db.Integer).desc()
+    ).first()
+
+    if last_gd:
+        # Trích số nguyên sau "KH"
+        last_id = int(last_gd.MaGD[2:])
+        new_id = f"GD{last_id + 1}"
+    else:
+        new_id = "GD1"
+
+    return new_id
+
+
+@home_bp.route('/tattoan')
+def tattoan():
+    matk = session['MaTK']
+    sotietkiem = SavingsSoTietKiem.query.filter_by(MaTK=matk).first()
+    return render_template('user/tattoan.html', sotietkiem=sotietkiem)
+
+# ham nap tien
+
+
+@home_bp.route('/napTien', methods=['POST', 'GET'])
+def napTien():
+    if request.method == 'POST':
+        # Lấy MaGD
+        so_luong_giao_dich = LichSuGiaoDich.query.count()
+        maGD = f"GD{so_luong_giao_dich+1}"
+        noiDung = request.form['noiDung']
+        soTien = request.form['soTien']
+        chieuGD = 1
+        ngayGD = (datetime.now()).strftime("%Y-%m-%d %H-%M-%S")
+        TKGD = session['MaTK']
+        hinhThuc = "Nạp tiền"
+        giao_dich_moi = LichSuGiaoDich(
+            MaGD=maGD,
+            NgayGD=ngayGD,
+            ChieuGD=chieuGD,
+            NoiDungGD=noiDung,
+            GiaTriGD=soTien,
+            HinhThuc=hinhThuc,
+            TKGD=TKGD
+        )
+        taikhoan = TaiKhoan.query.get(TKGD)
+        taikhoan.SoDu += int(soTien)
+        db.session.add(giao_dich_moi)
+        cap_nhat_diem_va_cap_bac(TKGD, int(soTien))
+        db.session.commit()
+        return redirect(url_for('home.napTien'))
+    maTK = session['MaTK']
+    taikhoan = TaiKhoan.query.get(maTK)
+    return render_template('user/NapTien.html', taikhoan=taikhoan)

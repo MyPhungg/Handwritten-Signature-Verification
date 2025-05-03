@@ -87,6 +87,8 @@
                 <p>Bạn có chắc chắn muốn đóng tài khoản của <strong>{{ tk.khachhang.HoTen }}</strong>?</p>
                 <p>Số dư hiện tại: <strong>{{ "{:,.0f}".format(tk.SoDu) }} VNĐ</strong></p>
                 <input type="hidden" name="maTK" value="{{ tk.MaTK }}">
+
+                <input type="hidden" name="maKH" value="{{ tk.khachhang.MaKH }}">
                 <input type="hidden" name="action" value="close">
                 <div class="mb-3">
                     <label>Ảnh chữ ký xác nhận:</label>

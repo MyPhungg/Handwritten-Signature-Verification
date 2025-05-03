@@ -30,9 +30,42 @@
 
         <div class="card p-3">
             <form action="{{ url_for('home.tim_kiem_khachhang') }}" method="GET" class="d-flex">
-                <input type="text" class="form-control me-2" name="search" placeholder="Tìm kiếm tên khách hàng..." value="{{ request.args.get('search', '') }}">
-                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-                <a href="{{ url_for('home.them_khachhang') }}" class="btn btn-success ms-2">Thêm</a>
+                <form action="{{ url_for('home.xoa_khachhang') }}" method="POST">
+                    <div class="d-flex align-items-center gap-2">
+                      <!-- Tìm kiếm -->
+                      <input
+                        type="text"
+                        class="form-control me-2"
+                        name="search"
+                        placeholder="Tìm kiếm tên khách hàng..."
+                        value="{{ request.args.get('search', '') }}"
+                      />
+                      <button
+                        formaction="{{ url_for('home.tim_kiem_khachhang') }}"
+                        formmethod="GET"
+                        class="btn btn-primary btn-lg"
+                      >
+                        Tìm kiếm
+                      </button>
+                
+                      <!-- Thêm khách hàng -->
+                      <a
+                        href="{{ url_for('home.them_khachhang') }}"
+                        class="btn btn-success btn-lg d-flex align-items-center justify-content-center"
+                      >
+                        Thêm
+                      </a>
+                
+                      <!-- Nút xóa khách hàng -->
+                      <button
+                        type="submit"
+                        class="btn btn-danger btn-lg d-flex align-items-center justify-content-center"
+                      >
+                        Xóa
+                      </button>
+                    </div>
+                
+                    <!-- Bảng danh sách khách hàng -->
             </form>
 
             <table class="table table-striped mt-3">
