@@ -1,67 +1,318 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tất toán sổ tiết kiệm</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-  <div class="container mt-5">
-    <div class="card shadow">
-      <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">Tất Toán Sổ Tiết Kiệm</h4>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tất toán sổ tiết kiệm</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{url_for('home.home')}}">
+          <img
+            src="{{ url_for('static', filename='img/logoBank.jpg') }}"
+            style="width: 50px; height: 50px"
+            class="rounded"
+          />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarScroll"
+          aria-controls="navbarScroll"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarScroll">
+          <ul
+            class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll"
+            style="--bs-scroll-height: 100px"
+          >
+            <li class="nav-item">
+              <a
+                class="nav-link active text-white"
+                aria-current="page"
+                href="{{url_for('home.home')}}"
+                >Trang chủ</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" onclick="location.href='#aboutUs'"
+                >Về chúng tôi</a
+              >
+            </li>
+            {% if isLogin %}
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle text-white"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Dịch vụ
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{url_for('home.lichsugiaodich')}}"
+                    >Lịch sử giao dịch</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+
+                <li>
+                  {% if tk.LoaiTK == 'ML2' %}
+                  <a class="dropdown-item" href="{{url_for('home.tattoan')}}"
+                    >Tất toán sổ tiết kiệm</a
+                  >
+                  {% else %}
+                  <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
+                    >Mở sổ tiết kiệm</a
+                  >
+                  {% endif %}
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+
+                <li>
+                  <a class="dropdown-item" href="{{url_for('home.thongke')}}"
+                    >Thống kê</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{ url_for('home.xem_uu_dai') }}"
+                    >Ưu đãi</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{ url_for('account.taoTaiKhoan') }}"
+                    >Tạo tài khoản mới</a
+                  >
+                </li>
+                {% if tk.LoaiTK != 'ML2' %}
+
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{{ url_for('home.napTien') }}"
+                    >Nạp tiền vào thẻ</a
+                  >
+                </li>
+                {% endif %}
+              </ul>
+            </li>
+
+            {% endif %}
+          </ul>
+          <li class="nav-item dropdown d-flex align-items-center">
+            <a
+              class="nav-link dropdown-toggle text-white"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="fa-solid fa-user"></i>
+            </a>
+
+            {% if isLogin %}
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="{{url_for('home.infoUser')}}"
+                  >Thông tin tài khoản</a
+                >
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{url_for('account.chooseAcc')}}"
+                  >Chuyển tài khoản</a
+                >
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{url_for('auth.logout')}}"
+                  >Đăng xuất</a
+                >
+              </li>
+              <li></li>
+            </ul>
+            {% else %}
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="{{url_for('auth.login')}}"
+                  >Đăng nhập</a
+                >
+              </li>
+              <li></li>
+            </ul>
+
+            {% endif %}
+          </li>
+        </div>
       </div>
-      <div class="card-body">
-        <form action="{{ url_for('home.tat_toan_sotietkiem') }}" method="POST">
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label class="form-label">Số tiền gửi</label>
-              <input type="text" class="form-control" value="{{ sotietkiem.SoTienGui }}" readonly>
+    </nav>
+    <div class="container mt-5">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Tất Toán Sổ Tiết Kiệm</h4>
+        </div>
+        <div class="card-body">
+          <form
+            action="{{ url_for('home.tat_toan_sotietkiem') }}"
+            method="POST"
+          >
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Số tiền gửi</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  value="{{ sotietkiem.SoTienGui }}"
+                  readonly
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Ngày mở sổ</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  value="{{ sotietkiem.NgayMo }}"
+                  readonly
+                />
+              </div>
             </div>
-            <div class="col-md-6">
-              <label class="form-label">Ngày mở sổ</label>
-              <input type="text" class="form-control" value="{{ sotietkiem.NgayMo }}" readonly>
-            </div>
-          </div>
 
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label class="form-label">Ngày kết thúc</label>
-              <input type="text" class="form-control" value="{{ sotietkiem.NgayKetThuc }}" readonly>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Ngày kết thúc</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  value="{{ sotietkiem.NgayKetThuc }}"
+                  readonly
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Kỳ hạn</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  value="{{ sotietkiem.kyhan.KyHan }}"
+                  readonly
+                />
+              </div>
             </div>
-            <div class="col-md-6">
-              <label class="form-label">Kỳ hạn</label>
-              <input type="text" class="form-control" value="{{ sotietkiem.kyhan.KyHan }}" readonly>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Lãi suất (%)</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  value="{{ sotietkiem.kyhan.LaiSuat }}"
+                  readonly
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Tài khoản nguồn</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  value="{{ sotietkiem.MaTKNguon }}"
+                  readonly
+                />
+              </div>
             </div>
-          </div>
 
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <label class="form-label">Lãi suất (%)</label>
-              <input type="text" class="form-control" value="{{ sotietkiem.kyhan.LaiSuat }}" readonly>
+            <!-- Hidden fields for processing -->
+            <input type="hidden" name="MaKH" value="{{ sotietkiem.MaKH }}" />
+            <input
+              type="hidden"
+              name="MaTK"
+              value="{{ sotietkiem.MaTKNguon }}"
+            />
+
+            <div class="text-end mt-4">
+              <a href="{{ url_for('home.home') }}" class="btn btn-success"
+                >Quay lại</a
+              >
+              <button type="submit" class="btn btn-danger">Tất toán</button>
             </div>
-            <div class="col-md-6">
-              <label class="form-label">Tài khoản nguồn</label>
-              <input type="text" class="form-control" value="{{ sotietkiem.MaTKNguon }}" readonly>
-            </div>
-          </div>
-
-          <!-- Hidden fields for processing -->
-          <input type="hidden" name="MaKH" value="{{ sotietkiem.MaKH }}">
-          <input type="hidden" name="MaTK" value="{{ sotietkiem.MaTKNguon }}">
-
-          <div class="text-end mt-4">
-            <a href="{{ url_for('home.home') }}" class="btn btn-success">Quay lại</a>
-            <button type="submit" class="btn btn-danger">Tất toán</button>
-
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
+    <script>
+      {% with messages = get_flashed_messages(with_categories=True) %}
+          {% for category, message in messages %}
+              alert("{{ message }}");
+          {% endfor %}
+      {% endwith %}
+    </script>
+    <footer class="bg-dark text-white py-5">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col">
+            <p>
+              PyBank là nền tảng ngân hàng số hiện đại, giúp bạn gửi tiết kiệm,
+              quản lý tài chính và giao dịch mọi lúc, mọi nơi chỉ với vài thao
+              tác đơn giản.
+            </p>
+            <p>
+              💰 Gửi tiết kiệm linh hoạt – Lãi suất hấp dẫn, kỳ hạn đa dạng,
+              giúp bạn tối ưu hóa số tiền nhàn rỗi.
+            </p>
+            <p>
+              🔒 An toàn & bảo mật – Công nghệ mã hóa tiên tiến, đảm bảo an toàn
+              tuyệt đối cho tài khoản của bạn.
+            </p>
+            <p>
+              🎯 Trải nghiệm thông minh – Giao diện thân thiện, thao tác đơn
+              giản, phù hợp với mọi đối tượng.
+            </p>
+            <p>PyBank – Tiết kiệm thông minh, tài chính vững vàng! 🚀</p>
+          </div>
+          <div class="col">
+            <p>PyBank - Ngân hàng số thông minh cho tương lai</p>
+            <p>Địa chỉ: 123 Đường ABC, Quận 1, TP. HCM</p>
+            <p>Email: support@xyz.com</p>
+            <p>Hotline: 0987 654 321</p>
+          </div>
+        </div>
+      </div>
 
-  <!-- Bootstrap JS (optional, for features like modal) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+      <p style="margin: 2%; text-align: center">
+        &copy; 2025 Trang Chủ. Mọi quyền được bảo lưu.
+      </p>
+    </footer>
+    <!-- Bootstrap JS (optional, for features like modal) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

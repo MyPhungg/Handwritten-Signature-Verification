@@ -59,6 +59,7 @@
                 >Về chúng tôi</a
               >
             </li>
+            {% if isLogin %}
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle text-white"
@@ -69,7 +70,41 @@
               >
                 Dịch vụ
               </a>
-              <ul class="dropdown-menu">
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{url_for('home.lichsugiaodich')}}"
+                    >Lịch sử giao dịch</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+
+                <li>
+                  {% if tk.LoaiTK == 'ML2' %}
+                  <a class="dropdown-item" href="{{url_for('home.tattoan')}}"
+                    >Tất toán sổ tiết kiệm</a
+                  >
+                  {% else %}
+                  <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
+                    >Mở sổ tiết kiệm</a
+                  >
+                  {% endif %}
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+
+                <li>
+                  <a class="dropdown-item" href="{{url_for('home.thongke')}}"
+                    >Thống kê</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
                 <li>
                   <a
                     class="dropdown-item"
@@ -83,43 +118,12 @@
                 <li>
                   <a
                     class="dropdown-item"
-                    href="{{url_for('home.lichsugiaodich')}}"
-                    >Lịch sử giao dịch</a
-                  >
-                </li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-
-                  {% if tk.LoaiTK == 'ML2' %}
-                  <a class="dropdown-item" href="{{url_for('home.tattoan')}}"
-                    >Tất toán sổ tiết kiệm</a>
-                  {% else %}
-                  <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
-                    >Mở sổ tiết kiệm</a>
-                  {% endif %}
-                </li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-
-                <li>
-                  <a class="dropdown-item" href="{{url_for('home.thongke')}}"
-                    >Thống kê</a
-                  >
-                </li>
-
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item"
-                    
+                    href="{{ url_for('account.taoTaiKhoan') }}"
                     >Tạo tài khoản mới</a
                   >
                 </li>
+                {% if tk.LoaiTK != 'ML2' %}
+
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
@@ -128,8 +132,11 @@
                     >Nạp tiền vào thẻ</a
                   >
                 </li>
+                {% endif %}
               </ul>
             </li>
+
+            {% endif %}
           </ul>
           <li class="nav-item dropdown d-flex align-items-center">
             <a
@@ -141,10 +148,20 @@
             >
               <i class="fa-solid fa-user"></i>
             </a>
+
+            {% if isLogin %}
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
                 <a class="dropdown-item" href="{{url_for('home.infoUser')}}"
                   >Thông tin tài khoản</a
+                >
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{url_for('account.chooseAcc')}}"
+                  >Chuyển tài khoản</a
                 >
               </li>
               <li>
@@ -157,6 +174,17 @@
               </li>
               <li></li>
             </ul>
+            {% else %}
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="{{url_for('auth.login')}}"
+                  >Đăng nhập</a
+                >
+              </li>
+              <li></li>
+            </ul>
+
+            {% endif %}
           </li>
         </div>
       </div>
@@ -229,12 +257,5 @@
         &copy; 2025 Trang Chủ. Mọi quyền được bảo lưu.
       </p>
     </footer>
-    <script>
-      // Function to reload the chart by refreshing the image source
-      function reloadChart() {
-        const chart = document.getElementById("expense-chart");
-        chart.src = chart.src.split("?")[0] + "?" + new Date().getTime(); // Append timestamp to avoid caching
-      }
-    </script>
   </body>
 </html>
