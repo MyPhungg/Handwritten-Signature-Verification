@@ -3,11 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<<<<<<< HEAD
+
     <title>Thống kê</title>
-=======
-    <title>Biểu đồ Tiền Vào và Tiền Ra (Biểu đồ miền)</title>
->>>>>>> main
+
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -62,6 +60,7 @@
                 >Về chúng tôi</a
               >
             </li>
+            {% if isLogin %}
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle text-white"
@@ -72,7 +71,41 @@
               >
                 Dịch vụ
               </a>
-              <ul class="dropdown-menu">
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{url_for('home.lichsugiaodich')}}"
+                    >Lịch sử giao dịch</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+
+                <li>
+                  {% if tk.LoaiTK == 'ML2' %}
+                  <a class="dropdown-item" href="{{url_for('home.tattoan')}}"
+                    >Tất toán sổ tiết kiệm</a
+                  >
+                  {% else %}
+                  <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
+                    >Mở sổ tiết kiệm</a
+                  >
+                  {% endif %}
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+
+                <li>
+                  <a class="dropdown-item" href="{{url_for('home.thongke')}}"
+                    >Thống kê</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
                 <li>
                   <a
                     class="dropdown-item"
@@ -86,49 +119,12 @@
                 <li>
                   <a
                     class="dropdown-item"
-                    href="{{url_for('home.lichsugiaodich')}}"
-                    >Lịch sử giao dịch</a
-                  >
-                </li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-<<<<<<< HEAD
-                  <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
-                    >Sổ tiết kiệm</a
-                  >
-=======
-                  {% if tk.LoaiTK == 'ML2' %}
-                  <a class="dropdown-item" href="{{url_for('home.tattoan')}}"
-                    >Tất toán sổ tiết kiệm</a>
-                  {% else %}
-                  <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
-                    >Mở sổ tiết kiệm</a>
-                  {% endif %}
->>>>>>> main
-                </li>
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-
-                <li>
-                  <a class="dropdown-item" href="{{url_for('home.thongke')}}"
-                    >Thống kê</a
-                  >
-                </li>
-<<<<<<< HEAD
-=======
-                <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item"
-                    
+                    href="{{ url_for('account.taoTaiKhoan') }}"
                     >Tạo tài khoản mới</a
                   >
                 </li>
+                {% if tk.LoaiTK != 'ML2' %}
+
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
@@ -137,9 +133,11 @@
                     >Nạp tiền vào thẻ</a
                   >
                 </li>
->>>>>>> main
+                {% endif %}
               </ul>
             </li>
+
+            {% endif %}
           </ul>
           <li class="nav-item dropdown d-flex align-items-center">
             <a
@@ -151,10 +149,20 @@
             >
               <i class="fa-solid fa-user"></i>
             </a>
+
+            {% if isLogin %}
             <ul class="dropdown-menu dropdown-menu-end">
               <li>
                 <a class="dropdown-item" href="{{url_for('home.infoUser')}}"
                   >Thông tin tài khoản</a
+                >
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{url_for('account.chooseAcc')}}"
+                  >Chuyển tài khoản</a
                 >
               </li>
               <li>
@@ -167,11 +175,21 @@
               </li>
               <li></li>
             </ul>
+            {% else %}
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="{{url_for('auth.login')}}"
+                  >Đăng nhập</a
+                >
+              </li>
+              <li></li>
+            </ul>
+
+            {% endif %}
           </li>
         </div>
       </div>
     </nav>
-<<<<<<< HEAD
     <div class="container py-5">
       <h2 class="text-center mb-4">Thống kê bằng biểu đồ</h2>
 
@@ -203,21 +221,7 @@
         </div>
       </div>
     </div>
-=======
-    <h1>Biểu đồ Tiền Vào và Tiền Ra theo Tháng (Biểu đồ Miền)</h1>
-    <div id="chart-container">
-      <!-- This is where the chart image will be shown -->
-      <img
-        id="expense-chart"
-        src="{{ url_for('home.money_area_chart_image') }}"
-        alt="Expense Area Chart"
-      />
-    </div>
 
-    <!-- Optionally, add a button to reload or refresh the chart -->
-    <button onclick="reloadChart()">Reload Chart</button>
-
->>>>>>> main
     <footer class="bg-dark text-white py-5">
       <div class="container">
         <div class="row align-items-center">
@@ -254,12 +258,5 @@
         &copy; 2025 Trang Chủ. Mọi quyền được bảo lưu.
       </p>
     </footer>
-    <script>
-      // Function to reload the chart by refreshing the image source
-      function reloadChart() {
-        const chart = document.getElementById("expense-chart");
-        chart.src = chart.src.split("?")[0] + "?" + new Date().getTime(); // Append timestamp to avoid caching
-      }
-    </script>
   </body>
 </html>

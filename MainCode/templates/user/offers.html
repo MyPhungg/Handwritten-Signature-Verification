@@ -54,16 +54,19 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link text-white" href="#aboutUs">Về chúng tôi</a>
+              <a class="nav-link text-white" href="{{url_for('home.home')}}"
+                >Về chúng tôi</a
+              >
             </li>
 
-            <!-- Dịch vụ dropdown -->
+            {% if isLogin %}
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle text-white"
                 href="#"
                 role="button"
                 data-bs-toggle="dropdown"
+                aria-expanded="false"
               >
                 Dịch vụ
               </a>
@@ -71,17 +74,14 @@
                 <li>
                   <a
                     class="dropdown-item"
-                    href="{{ url_for('home.xem_uu_dai') }}"
-                    >Ưu đãi</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item"
                     href="{{url_for('home.lichsugiaodich')}}"
                     >Lịch sử giao dịch</a
                   >
                 </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+
                 <li>
                   {% if tk.LoaiTK == 'ML2' %}
                   <a class="dropdown-item" href="{{url_for('home.tattoan')}}"
@@ -106,8 +106,24 @@
                   <hr class="dropdown-divider" />
                 </li>
                 <li>
-                  <a class="dropdown-item">Tạo tài khoản mới</a>
+                  <a
+                    class="dropdown-item"
+                    href="{{ url_for('home.xem_uu_dai') }}"
+                    >Ưu đãi</a
+                  >
                 </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{ url_for('account.taoTaiKhoan') }}"
+                    >Tạo tài khoản mới</a
+                  >
+                </li>
+                {% if tk.LoaiTK != 'ML2' %}
+
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
@@ -116,33 +132,60 @@
                     >Nạp tiền vào thẻ</a
                   >
                 </li>
+                {% endif %}
               </ul>
             </li>
 
-            <!-- User dropdown -->
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle text-white"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                <i class="fa-solid fa-user"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <a class="dropdown-item" href="{{ url_for('home.infoUser') }}"
-                    >Thông tin tài khoản</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{{ url_for('auth.logout') }}"
-                    >Đăng xuất</a
-                  >
-                </li>
-              </ul>
-            </li>
+            {% endif %}
           </ul>
+          <li class="nav-item dropdown d-flex align-items-center">
+            <a
+              class="nav-link dropdown-toggle text-white"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="fa-solid fa-user"></i>
+            </a>
+
+            {% if isLogin %}
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="{{url_for('home.infoUser')}}"
+                  >Thông tin tài khoản</a
+                >
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{url_for('account.chooseAcc')}}"
+                  >Chuyển tài khoản</a
+                >
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a class="dropdown-item" href="{{url_for('auth.logout')}}"
+                  >Đăng xuất</a
+                >
+              </li>
+              <li></li>
+            </ul>
+            {% else %}
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="{{url_for('auth.login')}}"
+                  >Đăng nhập</a
+                >
+              </li>
+              <li></li>
+            </ul>
+
+            {% endif %}
+          </li>
         </div>
       </div>
     </nav>

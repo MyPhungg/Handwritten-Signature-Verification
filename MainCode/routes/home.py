@@ -54,7 +54,10 @@ def infoUser():
     if not info or not infoCard:
         flash('Không tìm thấy thông tin khách hàng hoặc thẻ!', 'error')
         return redirect(url_for('home.home'))
-    return render_template('user/infoUser.html', info=info, infoCard=infoCard)
+    isLogin = 'MaKH' in session
+    maTK = session['MaTK'] if isLogin else None
+    tk = TaiKhoan.query.get(maTK) if maTK else None
+    return render_template('user/infoUser.html', info=info, infoCard=infoCard, isLogin=isLogin, tk=tk)
 
 
 # Tải thông tin vào trang đổi thông tin
@@ -71,7 +74,10 @@ def inputForm():
     if not info:
         flash('Không tìm thấy thông tin khách hàng!', 'error')
         return redirect(url_for('home.home'))
-    return render_template('user/changeInfoUser.html', info=info)
+    isLogin = 'MaKH' in session
+    maTK = session['MaTK'] if isLogin else None
+    tk = TaiKhoan.query.get(maTK) if maTK else None
+    return render_template('user/changeInfoUser.html', info=info, isLogin=isLogin, tk=tk)
 
 # Đổi thông tin người dùng
 
@@ -186,9 +192,10 @@ def napTien():
         db.session.commit()
         flash('Nạp tiền thành công!', 'success')
         return redirect(url_for('home.napTien'))
-    maTK = session['MaTK']
-    taikhoan = TaiKhoan.query.get(maTK)
-    return render_template('user/NapTien.html', taikhoan=taikhoan)
+    isLogin = 'MaKH' in session
+    maTK = session['MaTK'] if isLogin else None
+    tk = TaiKhoan.query.get(maTK) if maTK else None
+    return render_template('user/NapTien.html', isLogin=isLogin, tk=tk)
 
 
 def validate_input(data):
@@ -456,10 +463,11 @@ def xem_uu_dai():
         return redirect(url_for('auth.login'))
 
     ma_kh = session['MaKH']
-    ma_tk = session['MaTK']
 
     user = KhachHang.query.get(ma_kh)
 
+    isLogin = 'MaKH' in session
+    ma_tk = session['MaTK'] if isLogin else None
     # Lấy loại tài khoản từ mã tài khoản đã chọn
     tai_khoan = TaiKhoan.query.get(ma_tk)
 
@@ -474,7 +482,8 @@ def xem_uu_dai():
             KhuyenMai.CapBacThanhVien == user.MaCapBac),
         func.date(KhuyenMai.ThoiGian) >= today
     ).all()
-    return render_template('user/offers.html', uu_dai_list=uu_dai_list, tk=tai_khoan, current_date=today)
+
+    return render_template('user/offers.html', uu_dai_list=uu_dai_list, tk=tai_khoan, current_date=today, isLogin=isLogin)
 
 
 @home_bp.route('/uudai/<maKM>')
@@ -879,21 +888,26 @@ def get_transaction_data(maTK, as_list=False):
 
 @home_bp.route('/thongke')
 def thongke():
-    return render_template('user/thongke.html')
+    isLogin = 'MaKH' in session
+    maTK = session['MaTK'] if isLogin else None
+    tk = TaiKhoan.query.get(maTK) if maTK else None
+    return render_template('user/thongke.html', isLogin=isLogin, tk=tk)
 
 
 @home_bp.route('/sotietkiem')
 def sotietkiem():
-    maTK = session['MaTK']
-    taikhoan = TaiKhoan.query.filter_by(MaTK=maTK).first()
-    return render_template('user/sotietkiem.html', taikhoan=taikhoan)
+    isLogin = 'MaKH' in session
+    maTK = session['MaTK'] if isLogin else None
+    tk = TaiKhoan.query.get(maTK) if maTK else None
+    return render_template('user/sotietkiem.html', tk=tk)
 
 
 @home_bp.route('/lichsugiaodich')
 def lichsugiaodich():
-    matk = session['MaTK']
-    tk = TaiKhoan.query.filter_by(MaTK=matk).first()
-    return render_template('user/lichsugiaodich.html', tk=tk)
+    isLogin = 'MaKH' in session
+    maTK = session['MaTK'] if isLogin else None
+    tk = TaiKhoan.query.get(maTK) if maTK else None
+    return render_template('user/lichsugiaodich.html', tk=tk, isLogin=isLogin)
 
 
 def generate_ma_tk():
@@ -1064,32 +1078,32 @@ def tat_toan_sotietkiem():
         flash("Chưa đến ngày tất toán!", 'warning')
         # hoặc redirect
         return render_template('user/tattoan.html', sotietkiem=sotk)
+    else:
+        # lai suat
+        laisuat = sotk.SoTienGui * (1 + sotk.kyhan.LaiSuat / 100)
+        # Cộng số dư từ sổ tiết kiệm vào tài khoản gốc
+        taikhoan.SoDu += laisuat
 
-    # lai suat
-    laisuat = sotk.SoTienGui * (1 + sotk.kyhan.LaiSuat / 100)
-    # Cộng số dư từ sổ tiết kiệm vào tài khoản gốc
-    taikhoan.SoDu += laisuat
+        # cập nhật lsgd
+        lsgd = LichSuGiaoDich(
+            MaGD=generate_ma_gd(),
+            NgayGD=date.today(),
+            ChieuGD=1,
+            NoiDungGD="Tất toán sổ tiết kiệm",
+            GiaTriGD=laisuat,
+            HinhThuc="Tất toán sổ tiết kiệm",
+            TKGD=sotk.MaTKNguon
+        )
 
-    # cập nhật lsgd
-    lsgd = LichSuGiaoDich(
-        MaGD=generate_ma_gd,
-        NgayGD=date.today(),
-        ChieuGD=1,
-        NoiDungGD="Tất toán sổ tiết kiệm",
-        GiaTriGD=laisuat,
-        HinhThuc="tt",
-        TKGD=sotk.MaTKNguon
-    )
+        # Xoá sổ tiết kiệm
+        db.session.delete(sotk)
+        db.session.delete(taikhoantietkiem)
+        db.session.add(lsgd)
+        cap_nhat_diem_va_cap_bac(lsgd.TKGD, int(laisuat))
 
-    # Xoá sổ tiết kiệm
-    db.session.delete(sotk)
-    db.session.delete(taikhoantietkiem)
-    db.session.add(lsgd)
-    cap_nhat_diem_va_cap_bac(lsgd.TKGD, int(laisuat))
-
-    db.session.commit()
-    flash('Tất toán thành công. Tài khoản đã đóng.', 'success')
-    return redirect(url_for('account.chooseAcc'))
+        db.session.commit()
+        flash('Tất toán thành công. Tài khoản đã đóng.', 'success')
+        return redirect(url_for('account.chooseAcc'))
 
 
 def generate_ma_gd():
@@ -1113,37 +1127,3 @@ def tattoan():
     matk = session['MaTK']
     sotietkiem = SavingsSoTietKiem.query.filter_by(MaTK=matk).first()
     return render_template('user/tattoan.html', sotietkiem=sotietkiem)
-
-# ham nap tien
-
-
-@home_bp.route('/napTien', methods=['POST', 'GET'])
-def napTien():
-    if request.method == 'POST':
-        # Lấy MaGD
-        so_luong_giao_dich = LichSuGiaoDich.query.count()
-        maGD = f"GD{so_luong_giao_dich+1}"
-        noiDung = request.form['noiDung']
-        soTien = request.form['soTien']
-        chieuGD = 1
-        ngayGD = (datetime.now()).strftime("%Y-%m-%d %H-%M-%S")
-        TKGD = session['MaTK']
-        hinhThuc = "Nạp tiền"
-        giao_dich_moi = LichSuGiaoDich(
-            MaGD=maGD,
-            NgayGD=ngayGD,
-            ChieuGD=chieuGD,
-            NoiDungGD=noiDung,
-            GiaTriGD=soTien,
-            HinhThuc=hinhThuc,
-            TKGD=TKGD
-        )
-        taikhoan = TaiKhoan.query.get(TKGD)
-        taikhoan.SoDu += int(soTien)
-        db.session.add(giao_dich_moi)
-        cap_nhat_diem_va_cap_bac(TKGD, int(soTien))
-        db.session.commit()
-        return redirect(url_for('home.napTien'))
-    maTK = session['MaTK']
-    taikhoan = TaiKhoan.query.get(maTK)
-    return render_template('user/NapTien.html', taikhoan=taikhoan)
