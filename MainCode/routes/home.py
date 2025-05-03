@@ -866,7 +866,7 @@ def get_transaction_data(maTK, as_list=False):
 
     if as_list:
         cursor.execute(
-            "SELECT MaGD, NgayGD, ChieuGD, GiaTriGD FROM lichsugiaodich")
+            "SELECT MaGD, NgayGD, ChieuGD, GiaTriGD FROM lichsugiaodich WHERE TKGD = %s", (maTK,))
 
         all_tx = cursor.fetchall()
         transactions = [{"id": r[0], "NgayGD": r[1].strftime(
@@ -920,6 +920,13 @@ def generate_STK():
         stk = ''.join([str(random.randint(0, 9)) for _ in range(10)])
         if not TaiKhoan.query.filter_by(STK=stk).first():
             return stk
+
+
+@home_bp.route('/api/transactions')
+def api_transactions():
+    maTK = session['MaTK']
+
+    return jsonify(get_transaction_data(maTK, as_list=True))
 
 
 # biểu đồ chi tiêu (bieudochitieu.html)
