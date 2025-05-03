@@ -44,12 +44,25 @@
             <div class="mb-3"><label class="form-label">Số Điện Thoại:</label><input type="text" name="SoDienThoai" class="form-control" required></div>
             <div class="mb-3"><label class="form-label">Nghề Nghiệp:</label><input type="text" name="NgheNghiep" class="form-control" required></div>
             <div class="mb-3"><label class="form-label">Email:</label><input type="email" name="Email" class="form-control" required></div>
-            <div class="mb-3"><label class="form-label">Chữ Ký:</label><input type="text" name="ChuKy" class="form-control"></div>
-            
+            <div class="mb-3">
+                <label class="form-label">Chữ Ký:</label>
+                <input type="file" name="ChuKy" id="chuKyInput" class="form-control" accept="image/*">
+                <img id="preview">
+            </div>
+
             <button type="submit" class="btn btn-success w-100">Thêm Khách Hàng</button>
             <a href="{{ url_for('home.admin_khachhang') }}" class="btn btn-secondary w-100 mt-2">Quay Lại</a>
         </form>
     </div>
-    
+    <script>
+        document.getElementById('chuKyInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const preview = document.getElementById('preview');
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+            }
+        });
+        </script>
 </body>
 </html>

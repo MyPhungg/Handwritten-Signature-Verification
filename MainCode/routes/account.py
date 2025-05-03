@@ -36,3 +36,9 @@ def chooseAcc():
         .all()
     )
     return render_template('chooseAcc.html', dsTaiKhoan=dsTaiKhoan)
+
+account_bp.route('/taoTaiKhoan', methods=['GET','POST'])
+def taoTaiKhoan():
+    matk=session['MaTK']
+    tk = TaiKhoan.query.filter_by(MaTK=matk).first()
+    return redirect('home.home',tk=tk)

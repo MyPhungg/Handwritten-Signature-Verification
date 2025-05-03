@@ -1,16 +1,23 @@
 
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify, send_file
 from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, AccountKH
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from decimal import Decimal
 import re
-
-from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, LichSuTichDiem, NhanVien
-from datetime import datetime, date
-from decimal import Decimal
+import random
+import string
+from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, LichSuTichDiem, NhanVien, SavingsSoTietKiem
 from sqlalchemy import or_
 from sqlalchemy import event
 from sqlalchemy.sql import func
+import matplotlib.pyplot as plt
+import io
+from dateutil.relativedelta import relativedelta
+from apscheduler.schedulers.background import BackgroundScheduler
+import mysql.connector
+import os
+from werkzeug.utils import secure_filename
+
 
 home_bp = Blueprint('home', __name__)
 
@@ -175,30 +182,94 @@ def validate_input(data):
 
     return errors  # Trả về dict lỗi, rỗng nếu không có lỗi
 
+
+# -------------Quản lý tài khoản-------------------
+@home_bp.route('/admin/taikhoan')
+def admin_taikhoan():
+    tai_khoan_list = TaiKhoan.query.all()  # Lấy tất cả khách hàng từ database
+    return render_template('admin/chinhsuaTK.html', tai_khoan_list=tai_khoan_list)
+
+# TÌM KIẾM TÀI KHOẢN
+
+
+@home_bp.route('/taikhoan/timkiem', methods=['GET'])
+def tim_kiem_taikhoan():
+    search_query = request.args.get('search', '').strip()
+
+    if search_query:
+        tai_khoan_list = TaiKhoan.query.join(KhachHang).filter(
+            KhachHang.HoTen.ilike(f"%{search_query}%")
+        ).all()
+    else:
+        tai_khoan_list = TaiKhoan.query.all()
+
+    return render_template('admin/chinhsuaTK.html', tai_khoan_list=tai_khoan_list, search_query=search_query)
+
+# TỰ ĐỘNG ĐÓNG TÀI KHOẢN NẾU QUÁ 1 THÁNG CHƯA MỞ LẠI
+
+
+def dong_tai_khoan(maTK):
+    tai_khoan = TaiKhoan.query.get(maTK)
+    if tai_khoan:
+        tai_khoan.TrangThai = 0  # Đánh dấu tài khoản là đã đóng
+        tai_khoan.ThoiGianDong = datetime.now()  # Lưu thời gian đóng
+        db.session.commit()
+
+
+def xoa_tai_khoan_cu():
+    # Lấy tất cả các tài khoản bị đóng
+    tai_khoan_dong = TaiKhoan.query.filter(TaiKhoan.TrangThai == 0).all()
+
+    for tai_khoan in tai_khoan_dong:
+        if tai_khoan.ThoiGianDong and tai_khoan.ThoiGianDong < datetime.now() - timedelta(days=30):
+            # Nếu tài khoản bị đóng hơn 1 tháng, xóa nó
+            db.session.delete(tai_khoan)
+
+    db.session.commit()
+
+
+def xoa_tai_khoan_cu_job():
+    # Hàm gọi để xóa tài khoản cũ
+    xoa_tai_khoan_cu()
+
+
+# Khởi tạo scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(xoa_tai_khoan_cu_job, 'interval', days=1)  # Chạy mỗi ngày
+scheduler.start()
+
+# --------------------------------------------------#
+
+
 # ------------Quản lý khách Hàng-----------------
 
 
 @home_bp.route('/admin/khachhang')
 def admin_khachhang():
-    tai_khoan_list = TaiKhoan.query.all()  # Lấy tất cả khách hàng từ database
-    return render_template('admin/chinhsuaKH.html', tai_khoan_list=tai_khoan_list)
+    khach_hang_list = KhachHang.query.all()  # Lấy tất cả khách hàng từ database
+    return render_template('admin/chinhsuaKH.html', khach_hang_list=khach_hang_list)
 
 
 @home_bp.route('/khachhang/timkiem', methods=['GET'])
 def tim_kiem_khachhang():
-    search_query = request.args.get(
-        'search', '').strip()  # Lấy từ khóa tìm kiếm
+    search_query = request.args.get('search', '').strip()
 
     if search_query:
         khach_hang_list = KhachHang.query.filter(
             KhachHang.HoTen.ilike(f"%{search_query}%")).all()
     else:
         khach_hang_list = KhachHang.query.all()
-    for khach_hang in khach_hang_list:
-        tai_khoan_list = [tk for kh in khach_hang_list for tk in TaiKhoan.query.filter_by(MaKH=kh.MaKH).all()]
-    
 
-    return render_template('admin/chinhsuaKH.html', tai_khoan_list=tai_khoan_list, search_query=search_query)
+    # Lấy danh sách tài khoản tương ứng với các khách hàng tìm được
+    ma_kh_list = [kh.MaKH for kh in khach_hang_list]
+    tai_khoan_list = TaiKhoan.query.filter(TaiKhoan.MaKH.in_(ma_kh_list)).all()
+
+    return render_template(
+        'admin/chinhsuaKH.html',
+        khach_hang_list=khach_hang_list,
+        tai_khoan_list=tai_khoan_list,
+        search_query=search_query
+    )
 
 
 @home_bp.route('/khachhang/<maKH>')
@@ -211,17 +282,21 @@ def chi_tiet_khachhang(maKH):
 
 
 def generate_ma_kh():
-    # Lấy khách hàng có mã lớn nhất
-    last_kh = KhachHang.query.order_by(KhachHang.MaKH.desc()).first()
+    # Lấy khách hàng có mã lớn nhất theo số sau "KH"
+    last_kh = KhachHang.query.order_by(
+        db.cast(db.func.substr(KhachHang.MaKH, 3), db.Integer).desc()
+    ).first()
 
     if last_kh:
-        last_id = int(last_kh.MaKH[2:])  # Lấy số từ KH001 -> 001 -> 1
-        # Tăng lên 1, format thành KH002, KH003, ...
-        new_id = f"KH{last_id + 1:03d}"
+        # Trích số nguyên sau "KH"
+        last_id = int(last_kh.MaKH[2:])
+        new_id = f"KH{last_id + 1}"
     else:
-        new_id = "KH001"  # Nếu chưa có khách hàng nào
+        new_id = "KH1"
 
     return new_id
+
+
 
 
 @home_bp.route("/them_khachhang", methods=["GET", "POST"])
@@ -278,7 +353,7 @@ def them_khachhang():
             db.session.commit()
 
             flash("Thêm khách hàng thành công!", "success")
-            return redirect(url_for("home.chinhsua_khachhang", maKH=ma_kh))
+            return redirect(url_for("home.them_khachhang", maKH=ma_kh))
 
         except Exception as e:
             db.session.rollback()
@@ -394,10 +469,20 @@ def tim_kiem_uudai():
 # -------------------Quản lý ưu đãi -----------------
 
 
+def loadTenNhanVien():
+    maNV = session['MaNV']
+    info = NhanVien.query.filter_by(MaNV=maNV).first()
+    if not info:
+        flash('Không tìm thấy thông tin nhân viên! Vui lòng đăng nhập lại', 'error')
+        return redirect(url_for('auth.login'))
+    return info.HoTen
+
+
 @home_bp.route('/admin/uudai')
 def admin_uudai():
+    ten = loadTenNhanVien()
     uu_dai_list = KhuyenMai.query.all()  # Lấy tất cả ưu đãi từ CSDL
-    return render_template('admin/chinhsuaUuDai.html', uu_dai_list=uu_dai_list)
+    return render_template('admin/chinhsuaUuDai.html', uu_dai_list=uu_dai_list, ten=ten)
 
 
 @home_bp.route("/them_uudai", methods=["GET", "POST"])
@@ -433,7 +518,7 @@ def them_uudai():
             db.session.add(uu_dai)
             db.session.commit()
             flash("Thêm ưu đãi thành công!", "success")
-            return redirect(url_for("home.chinhsua_uudai"))
+            return redirect(url_for("home.admin_uudai"))
 
         except Exception as e:
             db.session.rollback()
@@ -449,7 +534,7 @@ def xoa_uudai():
 
     if not uu_dai_ids:
         flash("Vui lòng chọn ít nhất một ưu đãi để xóa.", "warning")
-        return redirect(url_for('home.chinhsua_uudai'))
+        return redirect(url_for('home.admin_uudai'))
 
     try:
         for maKM in uu_dai_ids:
@@ -463,7 +548,7 @@ def xoa_uudai():
         db.session.rollback()
         flash("Lỗi khi xóa: " + str(e), "danger")
 
-    return redirect(url_for('home.chinhsua_uudai'))
+    return redirect(url_for('home.admin_uudai'))
 
 
 @home_bp.route('/uudai/sua/<maKM>', methods=['GET', 'POST'])
@@ -565,9 +650,10 @@ def xoa_capbac():
 
 @home_bp.route('/admin/cap_bac')
 def danh_sach_cap_bac():
+    ten = loadTenNhanVien()
     cap_bac_list = CapBacKH.query.all()  # Lấy toàn bộ danh sách cấp bậc từ DB
     return render_template('admin/chinhsuaCapBac.html',
-                           cap_bac_list=cap_bac_list)
+                           cap_bac_list=cap_bac_list, ten=ten)
 
 
 @home_bp.route('/capbac/<maCB>')
@@ -603,7 +689,7 @@ def them_capbac():
             db.session.add(capbac)
             db.session.commit()
             flash("Thêm cấp bậc thành công!", "success")
-            return redirect(url_for("home.chinhsua_capbac"))
+            return redirect(url_for("home.danh_sach_cap_bac"))
 
         except Exception as e:
             db.session.rollback()
@@ -658,8 +744,6 @@ def tim_kiem_capbac():
 def cap_nhat_cap_bac(ma_kh):
     """Kiểm tra và cập nhật cấp bậc khách hàng dựa trên điểm tích lũy"""
     lich_su = LichSuTichDiem.query.filter_by(MaKH=ma_kh).first()
-
-    # Nếu không có lịch sử tích điểm, thoát ra.
     if not lich_su:
         return
 
@@ -669,40 +753,476 @@ def cap_nhat_cap_bac(ma_kh):
     # Lấy danh sách cấp bậc sắp xếp theo mức đạt được
     danh_sach_cap_bac = CapBacKH.query.order_by(CapBacKH.MucDatDuoc).all()
 
-    # Duyệt qua từng cấp bậc để tìm cấp bậc thích hợp
     for cap_bac in danh_sach_cap_bac:
         if diem_tich_luy >= cap_bac.MucDatDuoc:
             cap_bac_moi = cap_bac.MaCapBac
         else:
-            break  # Dừng lại khi điểm tích lũy không đủ cho cấp bậc tiếp theo
+            break
+
     khach_hang = KhachHang.query.filter_by(MaKH=ma_kh).first()
-    # Nếu cấp bậc mới được tìm thấy và khác với cấp bậc hiện tại
-    if cap_bac_moi:
-        if khach_hang and khach_hang.MaCapBac != cap_bac_moi:
-            khach_hang.MaCapBac = cap_bac_moi
-            db.session.commit()
+
+    # Cập nhật nếu cần, KHÔNG commit ở đây
+    if cap_bac_moi and khach_hang and khach_hang.MaCapBac != cap_bac_moi:
+        khach_hang.MaCapBac = cap_bac_moi
 
 
-@event.listens_for(LichSuGiaoDich, 'after_insert')
-def after_insert_lich_su_giao_dich(mapper, connection, target):
-    """ Cập nhật điểm tích lũy và cấp bậc khách hàng khi có giao dịch mới """
-    tai_khoan = TaiKhoan.query.filter_by(MaTK=target.TKGD).first()
 
-    if tai_khoan:
-        lich_su = LichSuTichDiem.query.filter_by(MaKH=tai_khoan.MaKH).first()
+def cap_nhat_diem_va_cap_bac(ma_tk: str, gia_tri_giao_dich: int):
+    """Cập nhật điểm tích lũy và cấp bậc khách hàng dựa trên mã tài khoản và giá trị giao dịch"""
+    tai_khoan = TaiKhoan.query.get(ma_tk)
+    if not tai_khoan:
+        return
 
-        # Nếu không có lịch sử tích điểm, tạo mới
-        if not lich_su:
-            lich_su = LichSuTichDiem(MaKH=tai_khoan.MaKH, Diem=0)
-            db.session.add(lich_su)
+    ma_kh = tai_khoan.MaKH
+    lich_su = LichSuTichDiem.query.filter_by(MaKH=ma_kh).first()
+    
+    if not lich_su:
+        lich_su = LichSuTichDiem(MaKH=ma_kh,ThoiGian=datetime.today(), Diem=0)
+        db.session.add(lich_su)
 
-        # Tính toán điểm tích lũy từ giá trị giao dịch
-        # Mỗi 1000 đơn vị giao dịch tương ứng với 1 điểm
-        lich_su.Diem += target.GiaTriGD // 1000
+    lich_su.Diem += gia_tri_giao_dich // 1000
+    lich_su.ThoiGian = datetime.today()
 
-        # Commit thay đổi điểm tích lũy
+    cap_nhat_cap_bac(ma_kh)
+
+
+
+# Trí
+
+def get_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="bank"
+    )
+
+
+def get_transaction_data(as_list=False):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT DATE_FORMAT(NgayGD, '%Y-%m') AS month,
+               SUM(CASE WHEN ChieuGD=1 THEN GiaTriGD ELSE 0 END),
+               SUM(CASE WHEN ChieuGD=0 THEN GiaTriGD ELSE 0 END)
+        FROM lichsugiaodich
+        GROUP BY month
+    """)
+    results = cursor.fetchall()
+
+    months = [row[0] for row in results]
+    money_in = [float(row[1]) for row in results]
+    money_out = [float(row[2]) for row in results]
+
+    if as_list:
+        cursor.execute(
+            "SELECT magd, NgayGD, ChieuGD, GiaTriGD FROM lichsugiaodich")
+        all_tx = cursor.fetchall()
+        transactions = [{"id": r[0], "NgayGD": r[1].strftime(
+            "%Y-%m-%d"), "ChieuGD": r[2], "GiaTriGD": float(r[3])} for r in all_tx]
+        cursor.close()
+        conn.close()
+        return transactions
+
+    cursor.close()
+    conn.close()
+    return {
+        "months": months,
+        "money_in": money_in,
+        "money_out": money_out
+    }
+
+
+def get_savings_data():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT NgayMo, SoTienGui, LaiSuat FROM savingssotietkiem")
+    rows = cursor.fetchall()
+
+    years = []
+    savings_growth = []
+
+    for row in rows:
+        start_year = row[0].year
+        sotien = row[1]
+        laisuat = row[2]
+        years.append(start_year)
+        growth = sotien * (1 + laisuat)
+        savings_growth.append(growth)
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "years": years,
+        "savings_growth": savings_growth
+    }
+
+
+def get_danhmuc_data():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT MaDM, TenDM FROM danhmucchitieu")
+    rows = cursor.fetchall()
+    data = [{"MaDM": r[0], "TenDM": r[1]} for r in rows]
+    cursor.close()
+    conn.close()
+    return data
+
+
+def get_expense_data():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT dm.TenDM, SUM(gd.GiaTriGD)
+        FROM lichsugiaodich gd
+        JOIN danhmucchitieu dm ON gd.MaDM = dm.MaDM
+        WHERE gd.ChieuGD = 0
+        GROUP BY dm.TenDM
+    """)
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return [{"category": row[0], "total": float(row[1])} for row in rows]
+
+
+# mtri
+
+
+@home_bp.route('/services')
+def services():
+    return render_template('user/home.html')
+
+
+@home_bp.route('/bieudochitieu')
+def bieudochitieu():
+    return render_template('user/bieudochitieu.html')
+
+
+@home_bp.route('/thongke')
+def thongke():
+    return render_template('user/thongke.html')
+
+
+@home_bp.route('/sotietkiem')
+def sotietkiem():
+    maTK = session['MaTK']
+    taikhoan = TaiKhoan.query.filter_by(MaTK=maTK).first()
+    return render_template('user/sotietkiem.html', taikhoan=taikhoan)
+
+
+@home_bp.route('/lichsugiaodich')
+def lichsugiaodich():
+    return render_template('user/lichsugiaodich.html')
+
+
+# ================== API DỮ LIỆU ==================
+
+@home_bp.route('/api/thongke')
+def api_thongke():
+    transaction_data = get_transaction_data()
+    savings_data = get_savings_data()
+    danhmuc_data = get_danhmuc_data()
+
+    data = {
+        "months": transaction_data["months"],
+        "money_in": transaction_data["money_in"],
+        "money_out": transaction_data["money_out"],
+        "years": savings_data["years"],
+        "savings_growth": savings_data["savings_growth"],
+        "danh_muc_chi_tieu": danhmuc_data
+    }
+    return jsonify(data)
+
+
+@home_bp.route('/api/transactions')
+def api_transactions():
+    return jsonify(get_transaction_data(as_list=True))
+
+
+@home_bp.route('/api/danhmucchitieu')
+def api_danhmucchitieu():
+    return jsonify({"danhmucchitieu": get_danhmuc_data()})
+
+
+@home_bp.route('/api/expense-chart-data')
+def api_expense_chart_data():
+    return jsonify(get_expense_data())
+
+
+@home_bp.route('/api/thongke-charts')
+def thongke_charts():
+    transaction_data = get_transaction_data()
+    savings_data = get_savings_data()
+
+    months = transaction_data["months"]
+    money_in = transaction_data["money_in"]
+    money_out = transaction_data["money_out"]
+
+    fig, ax = plt.subplots()
+    ax.plot(months, money_in, label='Tiền vào', color='b', marker='o')
+    ax.plot(months, money_out, label='Tiền ra', color='r', marker='x')
+    ax.set_title('Biểu đồ thu chi theo tháng')
+    ax.set_xlabel('Tháng')
+    ax.set_ylabel('Số tiền (triệu VND)')
+    ax.legend()
+
+    img_io_revenue = io.BytesIO()
+    plt.savefig(img_io_revenue, format='png')
+    img_io_revenue.seek(0)
+
+    years = savings_data["years"]
+    savings_growth = savings_data["savings_growth"]
+
+    fig, ax = plt.subplots()
+    ax.plot(years, savings_growth, label='Số dư tiết kiệm', color='g', marker='o')
+    ax.set_title('Biểu đồ tăng trưởng tiết kiệm')
+    ax.set_xlabel('Năm')
+    ax.set_ylabel('Số dư tiết kiệm (triệu VND)')
+    ax.legend()
+
+    img_io_savings = io.BytesIO()
+    plt.savefig(img_io_savings, format='png')
+    img_io_savings.seek(0)
+
+    return jsonify({
+        'revenue_chart': img_io_revenue.getvalue().decode('utf-8'),
+        'savings_chart': img_io_savings.getvalue().decode('utf-8')
+    })
+
+
+def generate_ma_tk():
+    count = TaiKhoan.query.count()
+    return f'TK{count + 1}'
+
+
+def generate_STK():
+    while True:
+        stk = ''.join([str(random.randint(0, 9)) for _ in range(10)])
+        if not TaiKhoan.query.filter_by(STK=stk).first():
+            return stk
+
+
+@home_bp.route('/api/expense_chart_image')
+def expense_chart_image():
+    categories = ['Ăn uống', 'Mua sắm', 'Giải trí', 'Di chuyển']
+    expenses = [200, 300, 150, 100]
+
+    fig, ax = plt.subplots()
+    ax.pie(expenses, labels=categories, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')
+
+    img_io = io.BytesIO()
+    plt.savefig(img_io, format='png')
+    img_io.seek(0)
+
+    return send_file(img_io, mimetype='image/png')
+
+
+@home_bp.route('/api/money_area_chart_image')
+def money_area_chart_image():
+    months = ['Jan', 'Feb', 'Mar', 'Apr', 'May']
+    money_in = [3000, 4000, 3500, 4500, 5000]
+    money_out = [1500, 2000, 1800, 2100, 2500]
+
+    total_in = sum(money_in)
+    total_out = sum(money_out)
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.fill_between(months, money_in, color='#90CAF9',
+                    alpha=0.5, label='Tiền Vào', linewidth=2)
+    ax.fill_between(months, money_out, color='#FFCCBC',
+                    alpha=0.5, label='Tiền Ra', linewidth=2)
+
+    ax.plot(months, money_in, color='#42A5F5', linewidth=2)
+    ax.plot(months, money_out, color='#FF7043', linewidth=2)
+
+    ax.set_facecolor('white')
+    fig.patch.set_facecolor('white')
+
+    ax.set_title('Biểu đồ Tiền Vào và Tiền Ra', fontsize=16, fontweight='bold')
+    ax.set_xlabel('Tháng', fontsize=12)
+    ax.set_ylabel('Số Tiền (VND)', fontsize=12)
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.tick_params(axis='both', which='major', labelsize=10)
+
+    ax.legend(frameon=False, fontsize=11)
+
+    plt.figtext(0.5, -0.05,
+                f"Tổng Thu: {total_in:,} VND    Tổng Chi: {total_out:,} VND",
+                wrap=True, horizontalalignment='center', fontsize=12, color='black')
+
+    img_io = io.BytesIO()
+    plt.tight_layout()
+    plt.savefig(img_io, format='png', dpi=150, bbox_inches="tight")
+    img_io.seek(0)
+
+    return send_file(img_io, mimetype='image/png')
+
+
+@home_bp.route('/mo-so-tiet-kiem', methods=['POST'])
+def mo_so_tiet_kiem():
+    maTK = session['MaTK']
+    so_tien_gui = int(request.form['amount'])
+    ky_han = request.form['term']
+
+    taikhoan = TaiKhoan.query.filter_by(MaTK=maTK).first()
+    if taikhoan is None:
+        flash('Tài khoản không tồn tại!', 'error')
+        return render_template('user/sotietkiem.html', taikhoan=taikhoan)
+
+    if taikhoan.SoDu < so_tien_gui:
+        flash('Số dư tài khoản không đủ!', 'error')
+        return render_template('user/sotietkiem.html', taikhoan=taikhoan)
+
+    # Trừ tiền
+    taikhoan.SoDu -= so_tien_gui
+
+    # Ngày mở và ngày kết thúc
+    ngay_mo = date.today()
+    if ky_han == '1 tháng':
+        ngay_ket_thuc = ngay_mo + relativedelta(months=1)
+        lai_suat = 3
+    elif ky_han == '6 tháng':
+        ngay_ket_thuc = ngay_mo + relativedelta(months=6)
+        lai_suat = 4
+    elif ky_han == '1 năm':
+        ngay_ket_thuc = ngay_mo + relativedelta(years=1)
+        lai_suat = 5
+    else:
+        ngay_ket_thuc = ngay_mo
+        lai_suat = 0
+
+    newtktietkiem = TaiKhoan(MaTK=generate_ma_tk(),
+                             LoaiTK="ML2",
+                             SoDu=so_tien_gui,
+                             MaKH=taikhoan.MaKH,
+                             STK=generate_STK(),
+                             NgayDangKy=ngay_mo,
+                             TrangThai=1,
+                             ThoiGianDong=''
+                             )
+
+    # Tạo sổ tiết kiệm
+    saving = SavingsSoTietKiem(
+        MaKH=taikhoan.MaKH,
+        SoTienGui=so_tien_gui,
+        KyHan=ky_han,
+        LaiSuat=lai_suat,
+        NgayMo=ngay_mo,
+        NgayKetThuc=ngay_ket_thuc
+    )
+    db.session.add(saving)
+    db.session.add(newtktietkiem)
+    db.session.commit()
+
+    flash('Mở sổ tiết kiệm thành công!', 'success')
+    return render_template('user/sotietkiem.html', taikhoan=taikhoan)
+
+
+@home_bp.route('/tat_toan_sotietkiem', methods=['POST'])
+def tat_toan_sotietkiem():
+    # Lấy ID người dùng từ session
+    makh = session['MaKH']
+    matk = session['MaTK']
+    if not makh or not matk:
+        return redirect(url_for('home.tattoan'))
+
+
+    # Tìm sổ tiết kiệm của người dùng kèm tài khoản
+    sotk = SavingsSoTietKiem.query.filter_by(MaTK=matk).first()
+    taikhoantietkiem = TaiKhoan.query.filter_by(MaTK=matk).first()
+    if not sotk:
+        flash('Không tìm thấy sổ tiết kiệm','error')
+        return redirect(url_for('home.tattoan'))
+
+    # Tìm tài khoản gốc (tài khoản thanh toán) của người dùng
+    taikhoan = TaiKhoan.query.filter_by(MaKH=makh, MaTK=sotk.MaTKNguon).first()
+    if not taikhoan:
+        
+      return redirect(url_for('home.sotietkiem'))
+    if sotk.NgayKetThuc > date.today():
+        flash("Chưa đến ngày tất toán!", 'warning')
+        return render_template('user/tattoan.html', sotietkiem=sotk)  # hoặc redirect
+
+    # lai suat
+    laisuat = sotk.SoTienGui * (1 + sotk.kyhan.LaiSuat / 100)
+    # Cộng số dư từ sổ tiết kiệm vào tài khoản gốc
+    taikhoan.SoDu += laisuat
+
+    #cập nhật lsgd
+    lsgd = LichSuGiaoDich(
+        MaGD = generate_ma_gd,
+        NgayGD = date.today(),
+        ChieuGD = 1,
+        NoiDungGD = "Tất toán sổ tiết kiệm",
+        GiaTriGD = laisuat,
+        HinhThuc = "tt",
+        TKGD = sotk.MaTKNguon
+    )
+
+    # Xoá sổ tiết kiệm
+    db.session.delete(sotk)
+    db.session.delete(taikhoantietkiem)
+    db.session.add(lsgd)
+    cap_nhat_diem_va_cap_bac(lsgd.TKGD, int(laisuat))
+
+    db.session.commit()
+    flash('Tất toán thành công. Tài khoản đã đóng.', 'success')
+    return redirect(url_for('account.chooseAcc'))
+
+def generate_ma_gd():
+    # Lấy ls có mã lớn nhất theo số sau "GD"
+    last_gd = LichSuGiaoDich.query.order_by(
+        db.cast(db.func.substr(LichSuGiaoDich.MaGD, 3), db.Integer).desc()
+    ).first()
+
+    if last_gd:
+        # Trích số nguyên sau "KH"
+        last_id = int(last_gd.MaGD[2:])
+        new_id = f"GD{last_id + 1}"
+    else:
+        new_id = "GD1"
+
+    return new_id
+
+@home_bp.route('/tattoan')
+def tattoan():
+    matk = session['MaTK']
+    sotietkiem = SavingsSoTietKiem.query.filter_by(MaTK=matk).first()
+    return render_template('user/tattoan.html',sotietkiem=sotietkiem)
+
+# ham nap tien
+@home_bp.route('/napTien', methods=['POST', 'GET'])
+def napTien():
+    if request.method == 'POST':
+        # Lấy MaGD
+        so_luong_giao_dich = LichSuGiaoDich.query.count()
+        maGD = f"GD{so_luong_giao_dich+1}"
+        noiDung = request.form['noiDung']
+        soTien = request.form['soTien']
+        chieuGD = 1
+        ngayGD = (datetime.now()).strftime("%Y-%m-%d %H-%M-%S")
+        TKGD = session['MaTK']
+        hinhThuc = "Nạp tiền"
+        giao_dich_moi = LichSuGiaoDich(
+            MaGD=maGD,
+            NgayGD=ngayGD,
+            ChieuGD=chieuGD,
+            NoiDungGD=noiDung,
+            GiaTriGD=soTien,
+            HinhThuc=hinhThuc,
+            TKGD=TKGD
+        )
+        taikhoan = TaiKhoan.query.get(TKGD)
+        taikhoan.SoDu += int(soTien)
+        db.session.add(giao_dich_moi)
+        cap_nhat_diem_va_cap_bac(TKGD, int(soTien))
         db.session.commit()
-
-        # Cập nhật cấp bậc sau khi điểm thay đổi
-        cap_nhat_cap_bac(tai_khoan.MaKH)
-
+        return redirect(url_for('home.napTien'))
+    maTK = session['MaTK']
+    taikhoan = TaiKhoan.query.get(maTK)
+    return render_template('user/NapTien.html', taikhoan=taikhoan)

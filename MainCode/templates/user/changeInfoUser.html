@@ -92,16 +92,39 @@
               </a>
               <ul class="dropdown-menu">
                 <li>
-                  <a class="dropdown-item" href="../user/offers.html">Ưu đãi</a>
+                  <a
+                    class="dropdown-item"
+                    href="{{ url_for('home.xem_uu_dai') }}"
+                    >Ưu đãi</a
+                  >
                 </li>
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
-                <li><a class="dropdown-item" href="#">Lịch sử giao dịch</a></li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{{url_for('home.lichsugiaodich')}}"
+                    >Lịch sử giao dịch</a
+                  >
+                </li>
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
-                <li><a class="dropdown-item" href="#">Gửi tiết kiệm</a></li>
+                <li>
+                  <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
+                    >Sổ tiết kiệm</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+
+                <li>
+                  <a class="dropdown-item" href="{{url_for('home.thongke')}}"
+                    >Thống kê</a
+                  >
+                </li>
               </ul>
             </li>
           </ul>
@@ -323,7 +346,7 @@
                     >Ngày sinh:</label
                   >
                   <input
-                    type="text"
+                    type="date"
                     class="form-control"
                     id="ngaysinh"
                     name="ngaysinh"
@@ -344,7 +367,7 @@
                     >Ngày cấp CCCD:</label
                   >
                   <input
-                    type="text"
+                    type="date"
                     class="form-control"
                     id="ngaycapcccd"
                     name="ngaycapcccd"
@@ -365,7 +388,7 @@
                     >Có giá trị đến:</label
                   >
                   <input
-                    type="text"
+                    type="date"
                     class="form-control"
                     id="cogiatriden"
                     name="cogiatriden"
