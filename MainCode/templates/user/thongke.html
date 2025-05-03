@@ -90,9 +90,13 @@
                   <hr class="dropdown-divider" />
                 </li>
                 <li>
+                  {% if tk.LoaiTK == 'ML2' %}
+                  <a class="dropdown-item" href="{{url_for('home.tattoan')}}"
+                    >Tất toán sổ tiết kiệm</a>
+                  {% else %}
                   <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
-                    >Sổ tiết kiệm</a
-                  >
+                    >Mở sổ tiết kiệm</a>
+                  {% endif %}
                 </li>
                 <li>
                   <hr class="dropdown-divider" />
@@ -101,6 +105,24 @@
                 <li>
                   <a class="dropdown-item" href="{{url_for('home.thongke')}}"
                     >Thống kê</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    
+                    >Tạo tài khoản mới</a
+                  >
+                </li>
+                <li>
+                  <hr class="dropdown-divider" />
+                </li>
+                <li>
+                  <a class="dropdown-item" href="{{ url_for('home.napTien') }}"
+                    >Nạp tiền vào thẻ</a
                   >
                 </li>
               </ul>

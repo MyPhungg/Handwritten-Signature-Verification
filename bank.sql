@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th4 23, 2025 lúc 11:08 AM
+-- Thời gian đã tạo: Th5 02, 2025 lúc 07:01 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -139,28 +139,6 @@ INSERT INTO `chitietkhuyenmai` (`MaKM`, `MaCapBac`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `danhmucchitieu`
---
-
-CREATE TABLE `danhmucchitieu` (
-  `MaDM` varchar(10) NOT NULL,
-  `TenDM` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Đang đổ dữ liệu cho bảng `danhmucchitieu`
---
-
-INSERT INTO `danhmucchitieu` (`MaDM`, `TenDM`) VALUES
-('1', 'Chuyển khoản'),
-('10', 'Chi tiêu bảo hiểm'),
-('11', 'Chi tiêu du lịch'),
-('ck', 'Chuyển khoản'),
-('tm', 'Tiền mặt');
-
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `khachhang`
 --
 
@@ -191,7 +169,7 @@ CREATE TABLE `khachhang` (
 --
 
 INSERT INTO `khachhang` (`MaKH`, `HoTen`, `NgaySinh`, `SoCCCD`, `NgayCapCCCD`, `NoiCapCCCD`, `CoGiaTriDen`, `QuocTich`, `DanToc`, `NoiCuTru`, `DiaChiHienTai`, `DiaChiThuongTru`, `GioiTinh`, `SoDienThoai`, `NgheNghiep`, `Email`, `MaNVQL`, `MaCapBac`, `ChuKy`) VALUES
-('KH1', 'Nguyễn Văn A', '1995-06-16', '123456789012', '2020-01-01', 'Hà Nội', '2030-01-01', 'Việt Nam', 'Kinh', '', 'Hà Nội', 'Hà Nội', 'Nam', '0123456789', 'Kinh doanh', 'b@gmail.com', 'NV1', 'CB1', ''),
+('KH1', 'Nguyễn Văn A', '1995-06-16', '023456789012', '2020-01-01', 'Hà Nội', '2030-01-01', 'Việt Nam', 'Kinh', 'Hà Nội', 'Hà Nội', 'Hà Nội', 'Nam', '0123456789', 'Kinh doanh', 'b@gmail.com', 'NV1', 'CB1', ''),
 ('KH10', 'Tạ Thị J', '1983-03-19', '999000111222', '2012-12-05', 'Quảng Nam', '2022-12-05', 'Việt Nam', 'Kinh', 'Quảng Nam', 'Quảng Nam', 'Quảng Nam', 'Nữ', '0988889999', 'Giảng viên', 'j@gmail.com', 'NV8', 'CB4', '00100001.png'),
 ('KH11', 'Nguyễn Văn K', '1992-07-14', '112233445566', '2011-07-10', 'Hà Giang', '2021-07-10', 'Việt Nam', 'Kinh', 'Hà Giang', 'Hà Giang', 'Hà Giang', 'Nam', '0999990000', 'Công an', 'k@gmail.com', 'NV1', 'CB1', '00100001.png'),
 ('KH12', 'Trần Thị L', '1999-06-21', '667788990011', '2021-01-10', 'Phú Yên', '2031-01-10', 'Việt Nam', 'Kinh', 'Phú Yên', 'Phú Yên', 'Phú Yên', 'Nữ', '0101010101', 'Dược sĩ', 'l@gmail.com', 'NV2', 'CB1', '00100001.png'),
@@ -252,7 +230,7 @@ INSERT INTO `khuyenmai` (`MaKM`, `NoiDung`, `ThoiGian`, `LoaiTKApDung`, `LoaiKM`
 CREATE TABLE `kyhan` (
   `MaKyHan` varchar(10) NOT NULL,
   `KyHan` int(11) NOT NULL,
-  `LaiSuat` int(11) NOT NULL
+  `LaiSuat` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -260,9 +238,10 @@ CREATE TABLE `kyhan` (
 --
 
 INSERT INTO `kyhan` (`MaKyHan`, `KyHan`, `LaiSuat`) VALUES
-('kh1', 1, 3),
-('kh2', 2, 4),
-('kh3', 3, 5);
+('H1', 1, 1.7),
+('H2', 3, 2),
+('H3', 6, 3),
+('H4', 12, 4.7);
 
 -- --------------------------------------------------------
 
@@ -277,21 +256,19 @@ CREATE TABLE `lichsugiaodich` (
   `NoiDungGD` varchar(100) NOT NULL,
   `GiaTriGD` int(11) NOT NULL,
   `HinhThuc` varchar(100) NOT NULL,
-  `TKGD` varchar(50) NOT NULL,
-  `MaKyHan` varchar(10) NOT NULL,
-  `TenDM` varchar(100) NOT NULL
+  `TKGD` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `lichsugiaodich`
 --
 
-INSERT INTO `lichsugiaodich` (`MaGD`, `NgayGD`, `ChieuGD`, `NoiDungGD`, `GiaTriGD`, `HinhThuc`, `TKGD`, `MaKyHan`, `TenDM`) VALUES
-('GD0101', '2024-01-05', 1, 'Thu nhập tháng 1', 500000, 'tm', 'tk1', 'kh1', ''),
-('GD0102', '2024-01-20', 0, 'Chi tiêu tháng 1', -300000, 'tm', 'tk1', 'kh1', ''),
-('GD0201', '2024-02-05', 1, 'Thu nhập tháng 2', 520000, 'tm', 'tk2', 'kh2', ''),
-('GD0202', '2024-02-20', 0, 'Chi tiêu tháng 2', -350000, 'tm', 'tk2', 'kh2', ''),
-('GD0301', '2024-03-05', 1, 'Thu nhập tháng 3', 510000, 'ck', 'tk3', 'kh3', '');
+INSERT INTO `lichsugiaodich` (`MaGD`, `NgayGD`, `ChieuGD`, `NoiDungGD`, `GiaTriGD`, `HinhThuc`, `TKGD`) VALUES
+('GD0101', '2024-01-05', 1, 'Thu nhập tháng 1', 500000, 'tm', 'tk1'),
+('GD0102', '2024-01-20', 0, 'Chi tiêu tháng 1', -300000, 'tm', 'tk1'),
+('GD0201', '2024-02-05', 1, 'Thu nhập tháng 2', 520000, 'tm', 'tk2'),
+('GD0202', '2024-02-20', 0, 'Chi tiêu tháng 2', -350000, 'tm', 'tk2'),
+('GD0301', '2024-03-05', 1, 'Thu nhập tháng 3', 510000, 'ck', 'tk3');
 
 -- --------------------------------------------------------
 
@@ -362,25 +339,27 @@ CREATE TABLE `nhanvien` (
   `MaNV` varchar(10) NOT NULL,
   `HoTen` varchar(50) NOT NULL,
   `MaNVQL` varchar(10) NOT NULL,
-  `CCCD` varchar(20) NOT NULL,
-  `SDT` varchar(10) NOT NULL
+  `SoCCCD` varchar(20) NOT NULL,
+  `SoDienThoai` varchar(10) NOT NULL,
+  `isDelete` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `nhanvien`
 --
 
-INSERT INTO `nhanvien` (`MaNV`, `HoTen`, `MaNVQL`, `CCCD`, `SDT`) VALUES
-('NV1', 'Nguyễn Văn A', 'NV1', '092200004299', ''),
-('NV10', 'Tô Thị J', 'NV6', '', ''),
-('NV2', 'Trần Thị B', 'NV1', '', ''),
-('NV3', 'Lê Văn C', 'NV1', '', ''),
-('NV4', 'Phạm Thị D', 'NV2', '', ''),
-('NV5', 'Hoàng Văn E', 'NV2', '', ''),
-('NV6', 'Đặng Thị F', 'NV3', '', ''),
-('NV7', 'Bùi Văn G', 'NV3', '', ''),
-('NV8', 'Vũ Thị H', 'NV4', '', ''),
-('NV9', 'Lý Văn I', 'NV5', '', '');
+INSERT INTO `nhanvien` (`MaNV`, `HoTen`, `MaNVQL`, `SoCCCD`, `SoDienThoai`, `isDelete`) VALUES
+('NV1', 'Nguyễn Văn A', 'NV1', '092200004299', '', 0),
+('NV10', 'Tô Thị J', 'NV6', '', '', 0),
+('NV11', 'Mỹ Phụngg', 'NV1', '123456789012', '0123456789', 1),
+('NV2', 'Trần Thị B', 'NV1', '', '', 0),
+('NV3', 'Lê Văn C', 'NV1', '', '', 0),
+('NV4', 'Phạm Thị D', 'NV2', '', '', 0),
+('NV5', 'Hoàng Văn E', 'NV2', '', '', 0),
+('NV6', 'Đặng Thị F', 'NV3', '', '', 0),
+('NV7', 'Bùi Văn G', 'NV3', '', '', 0),
+('NV8', 'Vũ Thị H', 'NV4', '', '', 0),
+('NV9', 'Lý Văn I', 'NV5', '', '', 0);
 
 -- --------------------------------------------------------
 
@@ -412,38 +391,17 @@ INSERT INTO `quanlycapbac` (`MaCapBac`, `MaNV`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `savings`
---
-
-CREATE TABLE `savings` (
-  `id` int(11) NOT NULL,
-  `year` int(4) DEFAULT NULL,
-  `initial_balance` decimal(10,2) NOT NULL,
-  `interest_rate` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Đang đổ dữ liệu cho bảng `savings`
---
-
-INSERT INTO `savings` (`id`, `year`, `initial_balance`, `interest_rate`) VALUES
-(11, 20151, 3000000.00, 2500000.00),
-(12, 2015, 3000000.00, 5.00);
-
--- --------------------------------------------------------
-
---
 -- Cấu trúc bảng cho bảng `savingssotietkiem`
 --
 
 CREATE TABLE `savingssotietkiem` (
   `ID` int(11) NOT NULL,
-  `MaKH` varchar(10) DEFAULT NULL,
-  `SoTienGui` int(11) DEFAULT NULL,
-  `KyHan` varchar(20) DEFAULT NULL,
-  `LaiSuat` float DEFAULT NULL,
+  `MaTK` varchar(10) DEFAULT NULL,
+  `MaKyHan` varchar(10) NOT NULL,
+  `SoTienGui` int(11) NOT NULL,
   `NgayMo` date DEFAULT NULL,
-  `NgayKetThuc` date DEFAULT NULL
+  `NgayKetThuc` date DEFAULT NULL,
+  `MaTKNguon` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -480,34 +438,38 @@ CREATE TABLE `taikhoan` (
   `MaKH` varchar(10) NOT NULL,
   `STK` varchar(50) NOT NULL,
   `NgayDangKy` date NOT NULL,
-  `TrangThai` int(2) NOT NULL
+  `TrangThai` int(2) NOT NULL,
+  `ThoiGianDong` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `taikhoan`
 --
 
-INSERT INTO `taikhoan` (`MaTK`, `LoaiTK`, `SoDu`, `MaKH`, `STK`, `NgayDangKy`, `TrangThai`) VALUES
-('TK1', 'ML1', 5000000, 'KH1', '12345678901', '2024-03-01', 1),
-('TK10', 'ML1', 2500000, 'KH6', '55544433322', '2024-03-12', 0),
-('TK11', 'ML3', 17000000, 'KH7', '88899900011', '2024-02-28', 1),
-('TK12', 'ML2', 9000000, 'KH8', '22233344455', '2024-03-08', 1),
-('TK13', 'ML1', 3500000, 'KH9', '11100099988', '2024-02-18', 1),
-('TK14', 'ML2', 11000000, 'KH10', '44433322211', '2024-01-22', 1),
-('TK15', 'ML3', 14000000, 'KH10', '99900011122', '2024-03-03', 1),
-('TK16', 'ML1', 5000000, 'KH11', '66655544433', '2024-02-14', 1),
-('TK17', 'ML2', 7200000, 'KH12', '33322211177', '2024-03-06', 1),
-('TK18', 'ML3', 13000000, 'KH13', '22211100099', '2024-01-25', 1),
-('TK19', 'ML1', 4500000, 'KH14', '11122233355', '2024-03-09', 1),
-('TK2', 'ML2', 10000000, 'KH1', '98765432102', '2024-03-05', 1),
-('TK20', 'ML2', 10500000, 'KH15', '77766655544', '2024-02-17', 1),
-('TK3', 'ML1', 3000000, 'KH2', '11122233344', '2024-02-20', 1),
-('TK4', 'ML3', 15000000, 'KH2', '55566677788', '2024-02-22', 1),
-('TK5', 'ML1', 2000000, 'KH3', '99988877766', '2024-01-15', 1),
-('TK6', 'ML2', 8000000, 'KH3', '44455566677', '2024-01-18', 1),
-('TK7', 'ML1', 7500000, 'KH4', '33322211100', '2024-03-10', 1),
-('TK8', 'ML3', 12000000, 'KH4', '66677788899', '2024-02-25', 1),
-('TK9', 'ML2', 6000000, 'KH5', '77788899900', '2024-01-30', 1);
+INSERT INTO `taikhoan` (`MaTK`, `LoaiTK`, `SoDu`, `MaKH`, `STK`, `NgayDangKy`, `TrangThai`, `ThoiGianDong`) VALUES
+('TK1', 'ML1', 5000000, 'KH1', '12345678901', '2024-03-01', 1, NULL),
+('TK10', 'ML1', 2500000, 'KH6', '55544433322', '2024-03-12', 0, NULL),
+('TK11', 'ML3', 17000000, 'KH7', '88899900011', '2024-02-28', 1, NULL),
+('TK12', 'ML2', 9000000, 'KH8', '22233344455', '2024-03-08', 1, NULL),
+('TK13', 'ML1', 3500000, 'KH9', '11100099988', '2024-02-18', 1, NULL),
+('TK14', 'ML2', 11000000, 'KH10', '44433322211', '2024-01-22', 1, NULL),
+('TK15', 'ML3', 14000000, 'KH10', '99900011122', '2024-03-03', 1, NULL),
+('TK16', 'ML1', 5000000, 'KH11', '66655544433', '2024-02-14', 1, NULL),
+('TK17', 'ML2', 7200000, 'KH12', '33322211177', '2024-03-06', 1, NULL),
+('TK18', 'ML3', 13000000, 'KH13', '22211100099', '2024-01-25', 1, NULL),
+('TK19', 'ML1', 4500000, 'KH14', '11122233355', '2024-03-09', 1, NULL),
+('TK2', 'ML2', 5999889, 'KH1', '98765432102', '2024-03-05', 1, NULL),
+('TK20', 'ML2', 10500000, 'KH15', '77766655544', '2024-02-17', 1, NULL),
+('TK21', 'ML2', 2000000, 'KH1', '2181540621', '2025-04-30', 1, '0000-00-00 00:00:00'),
+('TK22', 'ML2', 2000000, 'KH1', '0956346518', '2025-04-30', 1, '0000-00-00 00:00:00'),
+('TK23', 'ML2', 111, 'KH1', '7474851410', '2025-04-30', 1, '0000-00-00 00:00:00'),
+('TK3', 'ML1', 3000000, 'KH2', '11122233344', '2024-02-20', 1, NULL),
+('TK4', 'ML3', 15000000, 'KH2', '55566677788', '2024-02-22', 1, NULL),
+('TK5', 'ML1', 2000000, 'KH3', '99988877766', '2024-01-15', 1, NULL),
+('TK6', 'ML2', 8000000, 'KH3', '44455566677', '2024-01-18', 1, NULL),
+('TK7', 'ML1', 7500000, 'KH4', '33322211100', '2024-03-10', 1, NULL),
+('TK8', 'ML3', 12000000, 'KH4', '66677788899', '2024-02-25', 1, NULL),
+('TK9', 'ML2', 6000000, 'KH5', '77788899900', '2024-01-30', 1, NULL);
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -541,12 +503,6 @@ ALTER TABLE `chitietkhuyenmai`
   ADD KEY `MaCapBac` (`MaCapBac`);
 
 --
--- Chỉ mục cho bảng `danhmucchitieu`
---
-ALTER TABLE `danhmucchitieu`
-  ADD PRIMARY KEY (`MaDM`);
-
---
 -- Chỉ mục cho bảng `khachhang`
 --
 ALTER TABLE `khachhang`
@@ -573,9 +529,7 @@ ALTER TABLE `kyhan`
 --
 ALTER TABLE `lichsugiaodich`
   ADD PRIMARY KEY (`MaGD`),
-  ADD KEY `TKGD` (`TKGD`),
-  ADD KEY `lichsugiaodich_ibfk_2` (`MaKyHan`),
-  ADD KEY `HinhThuc` (`HinhThuc`);
+  ADD KEY `TKGD` (`TKGD`);
 
 --
 -- Chỉ mục cho bảng `lichsutichdiem`
@@ -605,17 +559,13 @@ ALTER TABLE `quanlycapbac`
   ADD KEY `MaNV` (`MaNV`);
 
 --
--- Chỉ mục cho bảng `savings`
---
-ALTER TABLE `savings`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Chỉ mục cho bảng `savingssotietkiem`
 --
 ALTER TABLE `savingssotietkiem`
   ADD PRIMARY KEY (`ID`),
-  ADD KEY `fk_MaKH` (`MaKH`);
+  ADD KEY `fk_MaKH` (`MaTK`),
+  ADD KEY `MaTKNguon` (`MaTKNguon`),
+  ADD KEY `MaKyHan` (`MaKyHan`);
 
 --
 -- Chỉ mục cho bảng `signature_vectors`
@@ -639,7 +589,7 @@ ALTER TABLE `taikhoan`
 -- AUTO_INCREMENT cho bảng `savingssotietkiem`
 --
 ALTER TABLE `savingssotietkiem`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT cho bảng `signature_vectors`
@@ -688,9 +638,7 @@ ALTER TABLE `khuyenmai`
 -- Các ràng buộc cho bảng `lichsugiaodich`
 --
 ALTER TABLE `lichsugiaodich`
-  ADD CONSTRAINT `lichsugiaodich_ibfk_1` FOREIGN KEY (`TKGD`) REFERENCES `taikhoan` (`MaTK`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `lichsugiaodich_ibfk_2` FOREIGN KEY (`MaKyHan`) REFERENCES `kyhan` (`MaKyHan`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `lichsugiaodich_ibfk_3` FOREIGN KEY (`HinhThuc`) REFERENCES `danhmucchitieu` (`MaDM`);
+  ADD CONSTRAINT `lichsugiaodich_ibfk_1` FOREIGN KEY (`TKGD`) REFERENCES `taikhoan` (`MaTK`) ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `lichsutichdiem`
@@ -715,8 +663,9 @@ ALTER TABLE `quanlycapbac`
 -- Các ràng buộc cho bảng `savingssotietkiem`
 --
 ALTER TABLE `savingssotietkiem`
-  ADD CONSTRAINT `fk_MaKH` FOREIGN KEY (`MaKH`) REFERENCES `khachhang` (`MaKH`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `savingssotietkiem_ibfk_1` FOREIGN KEY (`MaKH`) REFERENCES `khachhang` (`MaKH`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_MaKH` FOREIGN KEY (`MaTK`) REFERENCES `taikhoan` (`MaTK`),
+  ADD CONSTRAINT `savingssotietkiem_ibfk_1` FOREIGN KEY (`MaTKNguon`) REFERENCES `taikhoan` (`MaTK`),
+  ADD CONSTRAINT `savingssotietkiem_ibfk_2` FOREIGN KEY (`MaKyHan`) REFERENCES `kyhan` (`MaKyHan`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -271,6 +271,28 @@ def tim_kiem_khachhang():
         search_query=search_query
     )
 
+@home_bp.route('/admin/xoa_khachhang', methods=['POST'])
+def xoa_khachhang():
+    # Lấy danh sách mã khách hàng từ form
+    khach_hang_ids = request.form.getlist("xoa_khachhang")
+
+    if not khach_hang_ids:
+        flash("Vui lòng chọn ít nhất một khách hàng để xóa.", "warning")
+        return redirect(url_for('home.admin_khachhang'))
+
+    try:
+        for maKH in khach_hang_ids:
+            khach_hang = KhachHang.query.filter_by(MaKH=maKH).first()
+            if khach_hang:
+                db.session.delete(khach_hang)
+
+        db.session.commit()
+        flash("Xóa khách hàng thành công!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Lỗi khi xóa khách hàng: " + str(e), "danger")
+
+    return redirect(url_for('home.admin_khachhang'))
 
 @home_bp.route('/khachhang/<maKH>')
 def chi_tiet_khachhang(maKH):
@@ -433,7 +455,7 @@ def xem_uu_dai():
             KhuyenMai.CapBacThanhVien == user.MaCapBac),
         func.date(KhuyenMai.ThoiGian) >= today
     ).all()
-    return render_template('user/offers.html', uu_dai_list=uu_dai_list, current_date=today)
+    return render_template('user/offers.html', uu_dai_list=uu_dai_list,tk=tai_khoan, current_date=today)
 
 
 @home_bp.route('/uudai/<maKM>')
@@ -902,7 +924,8 @@ def bieudochitieu():
 
 @home_bp.route('/thongke')
 def thongke():
-    return render_template('user/thongke.html')
+    tk = TaiKhoan.query.filter_by(MaTK=session['MaTK']).first()
+    return render_template('user/thongke.html',tk=tk)
 
 
 @home_bp.route('/sotietkiem')
@@ -914,7 +937,9 @@ def sotietkiem():
 
 @home_bp.route('/lichsugiaodich')
 def lichsugiaodich():
-    return render_template('user/lichsugiaodich.html')
+    matk = session['MaTK']
+    tk = TaiKhoan.query.filter_by(MaTK=matk).first()
+    return render_template('user/lichsugiaodich.html',tk=tk)
 
 
 # ================== API DỮ LIỆU ==================
