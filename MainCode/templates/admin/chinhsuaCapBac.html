@@ -1,104 +1,149 @@
 <!DOCTYPE html>
 <html lang="vi">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Giao diện Nhân Viên</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/chinhSuaUuDai.css') }}">
-</head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/chinhSuaUuDai.css') }}"
+    />
+  </head>
 
-<body>
+  <body>
     <div class="d-flex">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <a href="{{ url_for('auth.login') }}"><i class="fa-solid fa-right-from-bracket fa-lg"></i></a>
-            <div class="text-center mb-3">
-                <div class="rounded-circle bg-primary text-white"
-                    style="width: 80px; height: 80px; line-height: 80px; margin: auto;">A</div>
-                <p class="mt-2">Nhân viên A</p>
-            </div>
-            <a href="{{ url_for('home.admin_khachhang') }}">
-                <div class="menu-item">Khách hàng</div>
-            </a>
-            <a href="{{ url_for('home.admin_uudai') }}">
-                <div class="menu-item">Ưu đãi</div>
-            </a>
-            <a href="{{ url_for('home.danh_sach_cap_bac') }}">
-                <div class="menu-item">Bậc thành viên</div>
-            </a>
-            <a href="{{ url_for('home.admin_taikhoan') }}">
-                <div class="menu-item">Tài khoản</div>
-            </a>
+<<<<<<< HEAD
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <a href="{{ url_for('auth.login') }}"
+          ><i class="fa-solid fa-right-from-bracket fa-lg"></i
+        ></a>
+        <div class="text-center mb-3">
+          <div
+            class="rounded-circle bg-primary text-white"
+            style="width: 80px; height: 80px; line-height: 80px; margin: auto"
+          ></div>
+          <p class="mt-2">{{ten}}</p>
+          </div>
+          <a href="{{ url_for('home.admin_khachhang') }}">
+              <div class="menu-item">Khách hàng</div>
+          </a>
+          <a href="{{ url_for('home.admin_uudai') }}">
+              <div class="menu-item">Ưu đãi</div>
+          </a>
+          <a href="{{ url_for('home.danh_sach_cap_bac') }}">
+              <div class="menu-item">Bậc thành viên</div>
+          </a>
+          <a href="{{ url_for('home.admin_taikhoan') }}">
+              <div class="menu-item">Tài khoản</div>
+          </a>
         </div>
+        
+      </div>
 
         <!-- Main content -->
-        <div class="content">
-            <h4 class="text-muted">Quản lý bậc thành viên</h4>
-        
-            <!-- Thông báo từ Flask -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+      <div class="content">
+        <h4 class="text-muted">Quản lý bậc thành viên</h4>
+      
+        <!-- Thông báo từ Flask -->
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %} {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %}
 
-            <div class="card p-3">
-                <div class="d-flex align-items-center gap-2">
-                    <!-- Form tìm kiếm -->
-                    <form action="{{ url_for('home.tim_kiem_capbac') }}" method="GET" class="d-flex">
-                        <input type="text" class="form-control me-2" name="search" placeholder="Tìm kiếm tên bậc..."
-                            value="{{ request.args.get('search', '') }}">
-                        <button type="submit" class="btn btn-primary btn-lg">Tìm kiếm</button>
-                    </form>
-            
-                    <!-- Nút thêm cấp bậc -->
-                    <a href="{{ url_for('home.them_capbac') }}" class="btn btn-success btn-lg d-flex align-items-center justify-content-center">Thêm</a>
-            
-                    <!-- Form xóa cấp bậc -->
-                    <form method="POST" action="{{ url_for('home.xoa_capbac') }}">
-                        <button type="submit" class="btn btn-danger btn-lg d-flex align-items-center justify-content-center">Xóa</button>
-                    </form>
-                </div>
-                <table class="table table-striped mt-3">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>Mã bậc</th>
-                            <th>Tên bậc</th>
-                            <th>Ngày tạo</th>
-                            <th>Định mức</th>
-                            <th>Hành động</th>
-                            <th>Chọn để xóa</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for capbac in cap_bac_list %}
-                        <tr>
-                            <td>{{ capbac.MaCapBac }}</td>
-                            <td>{{ capbac.TenCapBac }}</td>
-                            <td>{{ capbac.NgayTao }}</td>
-                            <td>{{ capbac.MucDatDuoc }}</td>
-                            <td>
-                                <a href="{{ url_for('home.chi_tiet_cap_bac', maCB=capbac.MaCapBac) }}" class="btn btn-info">
-                                    Xem chi tiết
-                                </a>
-                            </td>
-                            <td>
-                                <input type="checkbox" name="xoa_capbac" value="{{ capbac.MaCapBac }}">
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="card p-3">
+          <div class="d-flex align-items-center gap-2">
+            <!-- Form tìm kiếm -->
+            <form
+              action="{{ url_for('home.tim_kiem_capbac') }}"
+              method="GET"
+              class="d-flex"
+            >
+              <input
+                type="text"
+                class="form-control me-2"
+                name="search"
+                placeholder="Tìm kiếm tên bậc..."
+                value="{{ request.args.get('search', '') }}"
+              />
+              <button type="submit" class="btn btn-primary btn-lg">
+                Tìm kiếm
+              </button>
+            </form>
 
-            </div>
+            <!-- Nút thêm cấp bậc -->
+            <a
+              href="{{ url_for('home.them_capbac') }}"
+              class="btn btn-success btn-lg d-flex align-items-center justify-content-center"
+              >Thêm</a
+            >
+
+            <!-- Form xóa cấp bậc -->
+            <form method="POST" action="{{ url_for('home.xoa_capbac') }}">
+              <button
+                type="submit"
+                class="btn btn-danger btn-lg d-flex align-items-center justify-content-center"
+              >
+                Xóa
+              </button>
+            </form>
+          </div>
+          <table class="table table-striped mt-3">
+            <thead class="table-primary">
+              <tr>
+                <th>Mã bậc</th>
+                <th>Tên bậc</th>
+                <th>Ngày tạo</th>
+                <th>Định mức</th>
+                <th>Hành động</th>
+                <th>Chọn để xóa</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for capbac in cap_bac_list %}
+              <tr>
+                <td>{{ capbac.MaCapBac }}</td>
+                <td>{{ capbac.TenCapBac }}</td>
+                <td>{{ capbac.NgayTao }}</td>
+                <td>{{ capbac.MucDatDuoc }}</td>
+                <td>
+                  <a
+                    href="{{ url_for('home.chi_tiet_cap_bac', maCB=capbac.MaCapBac) }}"
+                    class="btn btn-info"
+                  >
+                    Xem chi tiết
+                  </a>
+                </td>
+                <td>
+                  <input
+                    type="checkbox"
+                    name="xoa_capbac"
+                    value="{{ capbac.MaCapBac }}"
+                  />
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<<<<<<< HEAD
+  </body>
+=======
 </body>
 
+<<<<<<< HEAD
+>>>>>>> 5af7d4f4ae760d877aec69c1c4ef59d2df15c4b8
+=======
+>>>>>>> main
 </html>

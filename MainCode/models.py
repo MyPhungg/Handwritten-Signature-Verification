@@ -194,7 +194,9 @@ class SignatureVector(db.Model):
     __tablename__ = 'signature_vectors'
 
     MaVector = db.Column(db.Integer, primary_key=True)
-    MaKH = db.Column(db.String(10), db.ForeignKey('khachhang.MaKH'), nullable=False)
+
+    MaKH = db.Column(db.String(10), db.ForeignKey(
+        'khachhang.MaKH'), nullable=False)
     vector = db.Column(db.Text, nullable=False)  # lưu JSON string
     NgayTao = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -205,16 +207,22 @@ class SavingsSoTietKiem(db.Model):
     __tablename__ = 'savingssotietkiem'
 
     ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    MaTK = db.Column(db.String(10),db.ForeignKey('taikhoan.MaTK'), nullable=False)
+    MaTK = db.Column(db.String(10), db.ForeignKey(
+        'taikhoan.MaTK'), nullable=False)
     SoTienGui = db.Column(db.Integer, nullable=False)
-    MaKyHan = db.Column(db.String(10),db.ForeignKey('kyhan.MaKyHan'), nullable=False)
+    MaKyHan = db.Column(db.String(10), db.ForeignKey(
+        'kyhan.MaKyHan'), nullable=False)
     NgayMo = db.Column(db.Date, nullable=False)
     NgayKetThuc = db.Column(db.Date, nullable=False)
-    MaTKNguon = db.Column(db.String(10),db.ForeignKey('taikhoan.MaTK'), nullable=False)
+    MaTKNguon = db.Column(db.String(10), db.ForeignKey(
+        'taikhoan.MaTK'), nullable=False)
 
-    taikhoannguon = db.relationship('TaiKhoan', backref='taikhoannguontietkiem',foreign_keys=[MaTKNguon])
-    taikhoan = db.relationship('TaiKhoan', backref='savingssotietkiem',foreign_keys=[MaTKNguon])
+    taikhoannguon = db.relationship(
+        'TaiKhoan', backref='taikhoannguontietkiem', foreign_keys=[MaTKNguon])
+    taikhoan = db.relationship(
+        'TaiKhoan', backref='savingssotietkiem', foreign_keys=[MaTKNguon])
     kyhan = db.relationship('KyHan', backref='savingssotietkiem')
+
 
 class KyHan(db.Model):
     __tablename__ = 'kyhan'
