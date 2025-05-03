@@ -125,9 +125,11 @@
                   <a
                     class="dropdown-item"
                     href="{{ url_for('account.taoTaiKhoan') }}"
-                  ></a>
-                  <a class="dropdown-item">Tạo tài khoản mới</a>
+                    >Tạo tài khoản mới</a
+                  >
                 </li>
+                {% if tk.LoaiTK != 'ML2' %}
+
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
@@ -136,6 +138,7 @@
                     >Nạp tiền vào thẻ</a
                   >
                 </li>
+                {% endif %}
               </ul>
             </li>
 

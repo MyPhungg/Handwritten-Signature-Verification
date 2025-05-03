@@ -72,5 +72,7 @@ def taoTaiKhoan():
         return redirect(url_for('account.chooseAcc'))
     SoTaiKhoan = generate_account_number()
     dsLoaiTK = LoaiTK.query.filter(LoaiTK.MaLoai != 'ML2').all()
-
-    return render_template('user/taoAccMoi.html', SoTaiKhoan=SoTaiKhoan, dsLoaiTK=dsLoaiTK)
+    isLogin = 'MaKH' in session
+    maTK = session['MaTK'] if isLogin else None
+    tk = TaiKhoan.query.get(maTK) if maTK else None
+    return render_template('user/taoAccMoi.html', SoTaiKhoan=SoTaiKhoan, dsLoaiTK=dsLoaiTK, isLogin=isLogin, tk=tk)
