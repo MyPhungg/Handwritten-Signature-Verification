@@ -345,6 +345,18 @@ def generate_ma_kh():
         new_id = "KH1"
 
     return new_id
+def generate_STK():
+    last_tk = TaiKhoan.query.order_by(
+        db.cast(db.func.substr(TaiKhoan.STK, 1), db.Integer).desc()
+    ).first()
+
+    if last_tk and last_tk.STK.isdigit():
+        last_stk_int = int(last_tk.STK)
+        new_stk = str(last_stk_int + 1).zfill(len(last_tk.STK))
+    else:
+        new_stk = "000001"
+
+    return new_stk
 
 
 @home_bp.route("/them_khachhang", methods=["GET", "POST"])
@@ -899,7 +911,7 @@ def sotietkiem():
     isLogin = 'MaKH' in session
     maTK = session['MaTK'] if isLogin else None
     tk = TaiKhoan.query.get(maTK) if maTK else None
-    return render_template('user/sotietkiem.html', tk=tk)
+    return render_template('user/sotietkiem.html', taikhoan=tk)
 
 
 @home_bp.route('/lichsugiaodich')
@@ -1021,15 +1033,23 @@ def mo_so_tiet_kiem():
 
     # Ngày mở và ngày kết thúc
     ngay_mo = date.today()
+    ma_kyhan =''
     if ky_han == '1 tháng':
         ngay_ket_thuc = ngay_mo + relativedelta(months=1)
-        lai_suat = 3
+        ma_kyhan='H1'
+        lai_suat = 1.7
+    if ky_han == '3 tháng':
+        ngay_ket_thuc = ngay_mo + relativedelta(months=3)
+        ma_kyhan='H3'
+        lai_suat = 2
     elif ky_han == '6 tháng':
         ngay_ket_thuc = ngay_mo + relativedelta(months=6)
-        lai_suat = 4
+        ma_kyhan='H3'
+        lai_suat = 3
     elif ky_han == '1 năm':
-        ngay_ket_thuc = ngay_mo + relativedelta(years=1)
-        lai_suat = 5
+        ngay_ket_thuc = ngay_mo + relativedelta(mouths=12)
+        ma_kyhan='H4'
+        lai_suat = 4.7
     else:
         ngay_ket_thuc = ngay_mo
         lai_suat = 0
@@ -1046,19 +1066,32 @@ def mo_so_tiet_kiem():
 
     # Tạo sổ tiết kiệm
     saving = SavingsSoTietKiem(
-        MaKH=taikhoan.MaKH,
+        MaTK=newtktietkiem.MaTK,
         SoTienGui=so_tien_gui,
-        KyHan=ky_han,
-        LaiSuat=lai_suat,
+        MaKyHan=ma_kyhan,
+        MaTKNguon=maTK,
         NgayMo=ngay_mo,
         NgayKetThuc=ngay_ket_thuc
     )
+
+    #tao lsgd
+    newlsgd = LichSuGiaoDich(
+        MaGD=generate_ma_gd(),
+        NgayGD = date.today(),
+            ChieuGD = 0,
+            NoiDungGD = "Tất toán sổ tiết kiệm",
+            GiaTriGD = so_tien_gui,
+            HinhThuc = "mo so tiet kiem",
+            TKGD = newtktietkiem.MaTK
+    )
     db.session.add(saving)
     db.session.add(newtktietkiem)
+    db.session.add(newlsgd)
+    cap_nhat_diem_va_cap_bac(newlsgd.TKGD, int(so_tien_gui))
     db.session.commit()
 
     flash('Mở sổ tiết kiệm thành công!', 'success')
-    return render_template('user/sotietkiem.html', taikhoan=taikhoan)
+    return redirect(url_for('account.chooseAcc'))
 
 
 @home_bp.route('/tat_toan_sotietkiem', methods=['POST'])
