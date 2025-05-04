@@ -15,8 +15,8 @@
         <a href="{{ url_for('auth.login') }}"><i class="fa-solid fa-right-from-bracket fa-lg"></i></a>
         <div class="text-center mb-3">
             <div class="rounded-circle bg-primary text-white"
-                 style="width: 80px; height: 80px; line-height: 80px; margin: auto;">A</div>
-            <p class="mt-2">Nhân viên A</p>
+                style="width: 80px; height: 80px; line-height: 80px; margin: auto;"></div>
+            <p class="mt-2" >{{ten}}</p>
         </div>
         <a href="{{ url_for('home.admin_khachhang') }}"><div class="menu-item">Khách hàng</div></a>
         <a href="{{ url_for('home.admin_uudai') }}"><div class="menu-item">Ưu đãi</div></a>
@@ -29,44 +29,72 @@
         <h4 class="text-muted">Quản lý khách hàng</h4>
 
         <div class="card p-3">
-            <form action="{{ url_for('home.tim_kiem_khachhang') }}" method="GET" class="d-flex">
-                <form action="{{ url_for('home.xoa_khachhang') }}" method="POST">
-                    <div class="d-flex align-items-center gap-2">
-                      <!-- Tìm kiếm -->
-                      <input
-                        type="text"
-                        class="form-control me-2"
-                        name="search"
-                        placeholder="Tìm kiếm tên khách hàng..."
-                        value="{{ request.args.get('search', '') }}"
-                      />
-                      <button
-                        formaction="{{ url_for('home.tim_kiem_khachhang') }}"
-                        formmethod="GET"
-                        class="btn btn-primary btn-lg"
-                      >
-                        Tìm kiếm
-                      </button>
-                
-                      <!-- Thêm khách hàng -->
-                      <a
-                        href="{{ url_for('home.them_khachhang') }}"
-                        class="btn btn-success btn-lg d-flex align-items-center justify-content-center"
-                      >
-                        Thêm
-                      </a>
-                
-                      <!-- Nút xóa khách hàng -->
-                      <button
-                        type="submit"
-                        class="btn btn-danger btn-lg d-flex align-items-center justify-content-center"
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                
-                    <!-- Bảng danh sách khách hàng -->
-            </form>
+            <form method="POST" action="{{ url_for('home.xoa_khachhang') }}">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                  <input
+                    type="text"
+                    class="form-control me-2"
+                    name="search"
+                    placeholder="Tìm kiếm tên khách hàng..."
+                    value="{{ request.args.get('search', '') }}"
+                  />
+                  <button
+                    formaction="{{ url_for('home.tim_kiem_khachhang') }}"
+                    formmethod="GET"
+                    class="btn btn-primary btn-lg"
+                  >
+                    Tìm kiếm
+                  </button>
+              
+                  <a href="{{ url_for('home.them_khachhang') }}"
+                     class="btn btn-success btn-lg">
+                    Thêm
+                  </a>
+              
+                  <button
+                    type="submit"
+                    class="btn btn-danger btn-lg"
+                    onclick="return confirm('Bạn có chắc muốn xóa các khách hàng đã chọn?');"
+                  >
+                    Xóa
+                  </button>
+                </div>
+              
+                <table class="table table-striped">
+                  <thead class="table-primary">
+                    <tr>
+                      <th>Mã KH</th>
+                      <th>Tên khách hàng</th>
+                      <th>Bậc thành viên</th>
+                      <th>Hành động</th>
+                      <th>Chọn để xóa</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for kh in khach_hang_list %}
+                    <tr>
+                      <td>{{ kh.MaKH }}</td>
+                      <td>{{ kh.HoTen }}</td>
+                      <td>{{ kh.capbac.TenCapBac }}</td>
+                      <td>
+                        <button
+                          class="btn btn-info"
+                          data-bs-toggle="modal"
+                          data-bs-target="#viewModal_{{ kh.MaKH }}"
+                        >Xem chi tiết</button>
+                      </td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          name="xoa_khachhang"
+                          value="{{ kh.MaKH }}"
+                        />
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </form>
 
             <table class="table table-striped mt-3">
                 <thead class="table-primary">
