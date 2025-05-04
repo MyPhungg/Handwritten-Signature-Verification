@@ -26,23 +26,23 @@
         color: #333; /* Dark text color */
         font-family: Arial, sans-serif;
       }
-    
+
       .container {
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
       }
-    
+
       nav.navbar {
         margin-bottom: 20px;
       }
-    
+
       h2,
       h3 {
         color: #007bff; /* Blue color for headings */
         text-align: center;
       }
-    
+
       /* Center form and style it */
       form {
         background-color: #ffffff; /* White background for form */
@@ -51,12 +51,12 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         margin-top: 30px;
       }
-    
+
       form label {
         font-weight: bold;
         color: #007bff; /* Blue for labels */
       }
-    
+
       form input[type="number"],
       form select,
       form button {
@@ -67,7 +67,7 @@
         border-radius: 5px;
         font-size: 16px;
       }
-    
+
       form button {
         background-color: #007bff;
         color: white;
@@ -75,36 +75,35 @@
         cursor: pointer;
         font-size: 18px;
       }
-    
+
       form button:hover {
         background-color: #0056b3;
       }
-    
+
       footer {
         background-color: #343a40;
         color: white;
         padding: 30px 0;
       }
-    
+
       footer .container {
         display: flex;
         justify-content: space-between;
       }
-    
+
       footer p {
         font-size: 14px;
       }
-    
+
       footer p a {
         color: #007bff;
         text-decoration: none;
       }
-    
+
       footer p a:hover {
         text-decoration: underline;
       }
     </style>
-    
   </head>
   <body>
     <nav class="navbar navbar-expand-lg bg-dark">
@@ -156,7 +155,7 @@
               >
                 Dịch vụ
               </a>
-              <ul class="dropdown-menu">
+              <ul class="dropdown-menu dropdown-menu-end">
                 <li>
                   <a
                     class="dropdown-item"
@@ -180,10 +179,14 @@
                 <li>
                   {% if taikhoan.LoaiTK == 'ML2' %}
                   <a class="dropdown-item" href="{{url_for('home.tattoan')}}"
-                    >Tất toán sổ tiết kiệm</a>
+                    >Tất toán sổ tiết kiệm</a
+                  >
                   {% else %}
-                  <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
-                    >Mở sổ tiết kiệm</a>
+                  <a
+                    class="dropdown-item"
+                    href="{{url_for('home.mo_so_tiet_kiem')}}"
+                    >Mở sổ tiết kiệm</a
+                  >
                   {% endif %}
                 </li>
                 <li>
@@ -261,10 +264,11 @@
 
       <label for="term">Chọn kỳ hạn:</label>
       <select name="term" id="term" required>
-        <option value="1 tháng">1 tháng (Lãi suất 1.7%)</option>
-        <option value="3 tháng">3 tháng (Lãi suất 2%)</option>
-        <option value="6 tháng">6 tháng (Lãi suất 3%)</option>
-        <option value="1 năm">1 năm (Lãi suất 4.7%)</option>
+        {% for kh in kyhan_list %}
+        <option value="{{ kh.MaKyHan }}">
+          {{ kh.KyHan }} tháng (Lãi suất {{ kh.LaiSuat }}%)
+        </option>
+        {% endfor %}
       </select>
 
       <br /><br />

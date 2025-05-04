@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from sqlalchemy.sql import func
 from sqlalchemy import event
 from sqlalchemy import or_
-from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, LichSuTichDiem, NhanVien, SavingsSoTietKiem
+from models import db, TaiKhoan, KhachHang, CapBacKH, LoaiTK, KhuyenMai, LichSuGiaoDich, LichSuTichDiem, NhanVien, SavingsSoTietKiem, KyHan
 import string
 import random
 import re
@@ -352,6 +352,8 @@ def generate_ma_kh():
         new_id = "KH1"
 
     return new_id
+
+
 def generate_STK():
     last_tk = TaiKhoan.query.order_by(
         db.cast(db.func.substr(TaiKhoan.STK, 1), db.Integer).desc()
@@ -1026,92 +1028,95 @@ def money_area_chart_image():  # biểu đồ tiền vào ra (ở thongke)
     return send_file(img_io, mimetype='image/png')
 
 
-@home_bp.route('/mo-so-tiet-kiem', methods=['POST'])
+@home_bp.route('/mo-so-tiet-kiem', methods=['POST', 'GET'])
 def mo_so_tiet_kiem():
-    maTK = session['MaTK']
-    so_tien_gui = int(request.form['amount'])
-    ky_han = request.form['term']
+    isLogin = 'MaKH' in session
+    maTK = session['MaTK'] if isLogin else None
+    taikhoan = TaiKhoan.query.get(maTK) if maTK else None
+    danh_sach_kyhan = KyHan.query.all()
+    print("Danh sách kỳ hạn:", danh_sach_kyhan)
 
-    taikhoan = TaiKhoan.query.filter_by(MaTK=maTK).first()
-    if taikhoan is None:
-        flash('Tài khoản không tồn tại!', 'error')
-        return render_template('user/sotietkiem.html', taikhoan=taikhoan)
+    if request.method == 'POST':
+        maTK = session['MaTK']
+        so_tien_gui = int(request.form['amount'])
+        ma_kyhan = request.form['term']
 
-    if taikhoan.SoDu < so_tien_gui:
-        flash('Số dư tài khoản không đủ!', 'error')
-        return render_template('user/sotietkiem.html', taikhoan=taikhoan)
+        taikhoan = TaiKhoan.query.filter_by(MaTK=maTK).first()
+        if taikhoan is None:
+            flash('Tài khoản không tồn tại!', 'error')
+            return render_template('user/sotietkiem.html', taikhoan=taikhoan, isLogin=isLogin, kyhan_list=danh_sach_kyhan)
 
-    # Trừ tiền
-    taikhoan.SoDu -= so_tien_gui
+        if taikhoan.SoDu < so_tien_gui:
+            flash('Số dư tài khoản không đủ!', 'error')
+            return render_template('user/sotietkiem.html', taikhoan=taikhoan, isLogin=isLogin, kyhan_list=danh_sach_kyhan)
 
-    # Ngày mở và ngày kết thúc
-    ngay_mo = date.today()
-    ma_kyhan =''
-    if ky_han == '1 tháng':
-        ngay_ket_thuc = ngay_mo + relativedelta(months=1)
-        ma_kyhan='H1'
-        lai_suat = 1.7
-    if ky_han == '3 tháng':
-        ngay_ket_thuc = ngay_mo + relativedelta(months=3)
-        ma_kyhan='H3'
-        lai_suat = 2
-    elif ky_han == '6 tháng':
-        ngay_ket_thuc = ngay_mo + relativedelta(months=6)
-        ma_kyhan='H3'
-        lai_suat = 3
-    elif ky_han == '1 năm':
-        ngay_ket_thuc = ngay_mo + relativedelta(mouths=12)
-        ma_kyhan='H4'
-        lai_suat = 4.7
-    else:
-        ngay_ket_thuc = ngay_mo
-        lai_suat = 0
+        # Trừ tiền
+        taikhoan.SoDu -= so_tien_gui
 
-    newtktietkiem = TaiKhoan(MaTK=generate_ma_tk(),
-                             LoaiTK="ML2",
-                             SoDu=so_tien_gui,
-                             MaKH=taikhoan.MaKH,
-                             STK=generate_STK(),
-                             NgayDangKy=ngay_mo,
-                             TrangThai=1,
-                             ThoiGianDong=''
-                             )
+        # Ngày mở và ngày kết thúc
+        ngay_mo = date.today()
 
-    # Tạo sổ tiết kiệm
-    saving = SavingsSoTietKiem(
-        MaTK=newtktietkiem.MaTK,
-        SoTienGui=so_tien_gui,
-        MaKyHan=ma_kyhan,
-        MaTKNguon=maTK,
-        NgayMo=ngay_mo,
-        NgayKetThuc=ngay_ket_thuc
-    )
+        # Lấy kỳ hạn từ DB
+        kyhan_obj = KyHan.query.filter_by(MaKyHan=ma_kyhan).first()
+        if not kyhan_obj:
+            flash('Kỳ hạn không hợp lệ!', 'error')
+            return render_template('user/sotietkiem.html', taikhoan=taikhoan, isLogin=isLogin, kyhan_list=danh_sach_kyhan)
 
-    #tao lsgd
-    newlsgd = LichSuGiaoDich(
-        MaGD=generate_ma_gd(),
-        NgayGD = date.today(),
-            ChieuGD = 0,
-            NoiDungGD = "Tất toán sổ tiết kiệm",
-            GiaTriGD = so_tien_gui,
-            HinhThuc = "mo so tiet kiem",
-            TKGD = newtktietkiem.MaTK
-    )
-    db.session.add(saving)
-    db.session.add(newtktietkiem)
-    db.session.add(newlsgd)
-    cap_nhat_diem_va_cap_bac(newlsgd.TKGD, int(so_tien_gui))
-    db.session.commit()
+        thang_kyhan = int(kyhan_obj.KyHan)
+        lai_suat = float(kyhan_obj.LaiSuat)
+        ngay_ket_thuc = ngay_mo + relativedelta(months=thang_kyhan)
 
-    flash('Mở sổ tiết kiệm thành công!', 'success')
-    return redirect(url_for('account.chooseAcc'))
+        # Tạo tài khoản tiết kiệm
+        newtktietkiem = TaiKhoan(
+            MaTK=generate_ma_tk(),
+            LoaiTK="ML2",
+            SoDu=so_tien_gui,
+            MaKH=taikhoan.MaKH,
+            STK=generate_STK(),
+            NgayDangKy=ngay_mo,
+            TrangThai=1,
+            ThoiGianDong=None
+        )
+
+        # Tạo sổ tiết kiệm
+        saving = SavingsSoTietKiem(
+            MaTK=newtktietkiem.MaTK,
+            SoTienGui=so_tien_gui,
+            MaKyHan=ma_kyhan,
+            MaTKNguon=maTK,
+            NgayMo=ngay_mo,
+            NgayKetThuc=ngay_ket_thuc
+        )
+
+        # Tạo lịch sử giao dịch
+        newlsgd = LichSuGiaoDich(
+            MaGD=generate_ma_gd(),
+            NgayGD=ngay_mo,
+            ChieuGD=0,
+            NoiDungGD="Gửi tiết kiệm",
+            GiaTriGD=so_tien_gui,
+            HinhThuc="Gửi tiết kiệm",
+            TKGD=maTK
+        )
+
+        db.session.add(newtktietkiem)
+        db.session.add(saving)
+        db.session.add(newlsgd)
+        cap_nhat_diem_va_cap_bac(maTK, so_tien_gui)
+        db.session.commit()
+
+        flash('Mở sổ tiết kiệm thành công!', 'success')
+        return redirect(url_for('account.chooseAcc'))
+
+    return render_template("user/sotietkiem.html", kyhan_list=danh_sach_kyhan, taikhoan=taikhoan, isLogin=isLogin)
 
 
 @home_bp.route('/tat_toan_sotietkiem', methods=['POST'])
 def tat_toan_sotietkiem():
     # Lấy ID người dùng từ session
+    isLogin = 'MaKH' in session
     makh = session['MaKH']
-    matk = session['MaTK']
+    matk = session['MaTK'] if isLogin else None
     if not makh or not matk:
         return redirect(url_for('home.tattoan'))
 
@@ -1130,7 +1135,7 @@ def tat_toan_sotietkiem():
     if sotk.NgayKetThuc > date.today():
         flash("Chưa đến ngày tất toán!", 'warning')
         # hoặc redirect
-        return render_template('user/tattoan.html', sotietkiem=sotk)
+        return render_template('user/tattoan.html', sotietkiem=sotk, tk=taikhoantietkiem, isLogin=isLogin)
     else:
         # lai suat
         laisuat = sotk.SoTienGui * (1 + sotk.kyhan.LaiSuat / 100)
@@ -1177,6 +1182,9 @@ def generate_ma_gd():
 
 @home_bp.route('/tattoan')
 def tattoan():
+    isLogin = 'MaKH' in session
+    maTK = session['MaTK'] if isLogin else None
+    tk = TaiKhoan.query.get(maTK) if maTK else None
     matk = session['MaTK']
     sotietkiem = SavingsSoTietKiem.query.filter_by(MaTK=matk).first()
-    return render_template('user/tattoan.html', sotietkiem=sotietkiem)
+    return render_template('user/tattoan.html', sotietkiem=sotietkiem, tk=tk, isLogin=isLogin)
