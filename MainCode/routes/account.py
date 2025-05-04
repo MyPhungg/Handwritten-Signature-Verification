@@ -1,3 +1,4 @@
+from sqlalchemy import func, cast, Integer
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask import session, flash
 from models import TaiKhoan
@@ -32,6 +33,7 @@ def chooseAcc():
         .filter(TaiKhoan.MaKH == maKH)
         .with_entities(
             TaiKhoan.MaTK,
+            TaiKhoan.STK,
             TaiKhoan.SoDu,
             LoaiTK.TenLoai
         )
@@ -43,16 +45,22 @@ def chooseAcc():
 
 
 def generate_account_number(length=12):
-    account_number = ''.join(random.choices('0123456789', k=length))
-    return account_number
+    stk = ''.join(random.choices('0123456789', k=length))
+    if not TaiKhoan.query.filter_by(STK=stk).first():
+        return stk
 
 
 @account_bp.route('/taoAccMoi', methods=['POST', 'GET'])
 def taoTaiKhoan():
     if request.method == 'POST':
-        # Đếm số lượng nhân viên hiện có
-        so_luong_tai_khoan = TaiKhoan.query.count()
-        maTK = f"TK{so_luong_tai_khoan + 1}"
+
+        last = TaiKhoan.query.order_by(
+            cast(func.substr(TaiKhoan.MaTK, 3), Integer).desc()
+        ).first()
+        if last and last.MaTK[2:].isdigit():
+            maTK = f"TK{int(last.MaTK[2:]) + 1}"
+        else:
+            maTK = "TK1"
 
         maKH = session['MaKH']
         soTaiKhoan = request.form['SoTaiKhoan']
