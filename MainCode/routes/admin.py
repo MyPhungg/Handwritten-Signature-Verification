@@ -71,9 +71,14 @@ def sortListFromDB(model, primarykey):
 @admin_bp.route('/nhanvien/them', methods=['POST'])
 def themNhanVien():
     goToAddStaff()
-    # Đếm số lượng nhân viên hiện có
-    so_luong_nv = NhanVien.query.count()
-    ma_nv_moi = f"NV{so_luong_nv + 1}"
+
+    last = NhanVien.query.order_by(
+        cast(func.substr(NhanVien.MaNV, 3), Integer).desc()
+    ).first()
+    if last and last.MaNV[2:].isdigit():
+        ma_nv_moi = f"NV{int(last.MaTK[2:]) + 1}"
+    else:
+        ma_nv_moi = "NV1"
 
     # Lấy dữ liệu từ form
     ho_ten = request.form['HoTen']

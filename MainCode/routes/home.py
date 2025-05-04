@@ -1,3 +1,4 @@
+from sqlalchemy import func, cast, Integer
 from werkzeug.utils import secure_filename
 import os
 import mysql.connector
@@ -168,8 +169,14 @@ patterns = {
 def napTien():
     if request.method == 'POST':
         # Lấy MaGD
-        so_luong_giao_dich = LichSuGiaoDich.query.count()
-        maGD = f"GD{so_luong_giao_dich+1}"
+        last = LichSuGiaoDich.query.order_by(
+            cast(func.substr(LichSuGiaoDich.MaGD, 3), Integer).desc()
+        ).first()
+        if last and last.MaGD[2:].isdigit():
+            maGD = f"GD{int(last.MaGD[2:]) + 1}"
+        else:
+            maGD = "GD1"
+
         noiDung = request.form['noiDung']
         soTien = request.form['soTien']
         chieuGD = 1
@@ -911,8 +918,14 @@ def lichsugiaodich():
 
 
 def generate_ma_tk():
-    count = TaiKhoan.query.count()
-    return f'TK{count + 1}'
+    last = TaiKhoan.query.order_by(
+        cast(func.substr(TaiKhoan.MaTK, 3), Integer).desc()
+    ).first()
+    if last and last.MaTK[2:].isdigit():
+        maTK = f"TK{int(last.MaTK[2:]) + 1}"
+    else:
+        maTK = "TK1"
+    return maTK
 
 
 def generate_STK():
