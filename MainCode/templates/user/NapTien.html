@@ -62,7 +62,7 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link text-white" onclick="location.href='#aboutUs'"
+              <a class="nav-link text-white" href="{{url_for('home.home')}}"
                 >Về chúng tôi</a
               >
             </li>
@@ -95,7 +95,9 @@
                     >Tất toán sổ tiết kiệm</a
                   >
                   {% else %}
-                  <a class="dropdown-item" href="{{url_for('home.sotietkiem')}}"
+                  <a
+                    class="dropdown-item"
+                    href="{{url_for('home.mo_so_tiet_kiem')}}"
                     >Mở sổ tiết kiệm</a
                   >
                   {% endif %}
