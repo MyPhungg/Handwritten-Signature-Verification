@@ -439,6 +439,29 @@ def verify_signature_to_change_kh():
     flash('Chữ ký không trùng khớp!', 'error')
     return redirect(url_for(back, maKH=kh.MaKH))
 
+@auth_bp.route('/verify-cccd-change', methods=['POST'])
+def verify_cccd_to_change_kh():
+    maKH = request.form.get('maKH')
+    come = request.form.get('come')  # template khi xác thực thành công
+    back = request.form.get('back')  # template khi thất bại
+    cccd_input = request.form.get('cccd')
+
+    kh = KhachHang.query.filter_by(MaKH=maKH).first()
+
+    if not kh:
+        flash('Không tìm thấy khách hàng!', 'error')
+        return redirect(url_for(back, maKH=maKH))
+
+    if not cccd_input:
+        flash('Vui lòng nhập số CCCD!', 'error')
+        return redirect(url_for(back, maKH=maKH))
+
+    if kh.SoCCCD != cccd_input.strip():
+        flash('Sai số CCCD!', 'error')
+        return redirect(url_for(back, maKH=maKH))
+
+    flash('Xác thực CCCD thành công!', 'success')
+    return redirect(url_for(come, maKH=maKH))
 
 @auth_bp.route('/change_status', methods=['POST'])
 def dong_mo_tai_khoan():
